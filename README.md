@@ -1,4 +1,4 @@
 # INT221-SSA3-Integrated
-- [ ] Task 1
-- [x] Task 2
-- [ ] Task 3
+- [/] PBI 1
+- [/] PVI 2
+
