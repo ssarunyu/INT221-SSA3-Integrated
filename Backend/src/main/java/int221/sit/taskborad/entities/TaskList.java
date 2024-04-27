@@ -22,17 +22,17 @@ public class TaskList {
     private String Title;
     @Column(name = "description", nullable = false, length = 100)
     private String Description;
-    @Column(name = "assignee", nullable = false, length = 100)
-    private String Assignee;
+    @Column(name = "assignees", nullable = false, length = 100)
+    private String Assignees;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
 
-    @Column(name = "createOn")
+    @Column(name = "createdOn")
     private ZonedDateTime createdOn;
 
-    @Column(name = "updateOn")
+    @Column(name = "updatedOn")
     private ZonedDateTime updatedOn;
     public enum TaskStatus {
         NO_STATUS,

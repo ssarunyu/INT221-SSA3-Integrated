@@ -11,11 +11,12 @@ import java.time.ZonedDateTime;
 
 @Getter
 @Setter
-@JsonPropertyOrder({"title", "description", "assignee", "status", "createdOn", "updatedOn"})
+@JsonPropertyOrder({"id", "title", "description", "assignees", "status", "createdOn", "updatedOn"})
 public class TaskListByIdDto {
+    private Integer id;
     private String Title;
     private String Description;
-    private String Assignee;
+    private String Assignees;
     private TaskList.TaskStatus status;
     private ZonedDateTime createdOn;
     private ZonedDateTime updatedOn;
