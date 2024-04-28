@@ -1,3 +1,7 @@
+CREATE DATABASE task_base;
+
+USE task_base;
+
 CREATE TABLE `task` (
   `id` int NOT NULL,
   `title` varchar(100) NOT NULL,
@@ -9,12 +13,6 @@ CREATE TABLE `task` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-show variables like '%time_zone%';
-
-set time_zone = '+00:00';
-use task;
--- select * from mysql.time_zone_name;
 
 INSERT INTO task (id, title, description, assignees, status, createdOn, updatedOn) VALUES
 (1, 'TaskTitle1TaskTitle2TaskTitle3TaskTitle4TaskTitle5TaskTitle6TaskTitle7TaskTitle8TaskTitle9TaskTitle0',
@@ -33,5 +31,4 @@ INSERT INTO task (id, title, description, assignees, status, createdOn, updatedO
 INSERT INTO task (id, title, description, assignees, status, createdOn, updatedOn) VALUES
 (4, '_Infrastructure_', '_Setup containers_', 'ไก่งวง กับ เพนกวิน', 'DONE', '2024-04-22 16:15:00+07:00', '2024-04-22 17:00:00+07:00');
 
-
-select * from task;
+select * from task; 
