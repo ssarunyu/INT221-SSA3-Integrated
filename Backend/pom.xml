@@ -9,12 +9,12 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>int221.sit</groupId>
-	<artifactId>taskborad</artifactId>
+	<artifactId>taskboard</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>taskborad</name>
 	<description>integrated project</description>
 	<properties>
-		<java.version>22</java.version>
+		<java.version>18</java.version>
 	</properties>
 	<dependencies>
 		<dependency>

@@ -1,10 +1,10 @@
-package int221.sit.taskborad;
+package int221.sit.taskboard;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class TaskboradApplicationTests {
+class TaskboardApplicationTests {
 
 	@Test
 	void contextLoads() {

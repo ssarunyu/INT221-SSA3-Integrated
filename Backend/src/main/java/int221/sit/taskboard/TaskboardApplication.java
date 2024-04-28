@@ -1,13 +1,13 @@
-package int221.sit.taskborad;
+package int221.sit.taskboard;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class TaskboradApplication {
+public class TaskboardApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(TaskboradApplication.class, args);
+		SpringApplication.run(TaskboardApplication.class, args);
 	}
 
 }

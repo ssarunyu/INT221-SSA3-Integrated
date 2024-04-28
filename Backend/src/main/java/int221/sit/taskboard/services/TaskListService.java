@@ -1,14 +1,13 @@
-package int221.sit.taskborad.services;
+package int221.sit.taskboard.services;
 
-import int221.sit.taskborad.DTO.TaskListByIdDto;
-import int221.sit.taskborad.DTO.TaskListDto;
-import int221.sit.taskborad.entities.TaskList;
-import int221.sit.taskborad.repositories.TaskListRepository;
+import int221.sit.taskboard.DTO.TaskListByIdDto;
+import int221.sit.taskboard.DTO.TaskListDto;
+import int221.sit.taskboard.entities.TaskList;
+import int221.sit.taskboard.repositories.TaskListRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;

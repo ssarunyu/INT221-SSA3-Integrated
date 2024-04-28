@@ -1,9 +1,9 @@
-package int221.sit.taskborad.controller;
+package int221.sit.taskboard.controller;
 
-import int221.sit.taskborad.DTO.TaskListByIdDto;
-import int221.sit.taskborad.DTO.TaskListDto;
-import int221.sit.taskborad.entities.TaskList;
-import int221.sit.taskborad.services.TaskListService;
+import int221.sit.taskboard.DTO.TaskListByIdDto;
+import int221.sit.taskboard.DTO.TaskListDto;
+import int221.sit.taskboard.entities.TaskList;
+import int221.sit.taskboard.services.TaskListService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

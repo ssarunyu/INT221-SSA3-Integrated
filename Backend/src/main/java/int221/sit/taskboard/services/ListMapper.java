@@ -1,4 +1,4 @@
-package int221.sit.taskborad.services;
+package int221.sit.taskboard.services;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
