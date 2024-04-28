@@ -13,7 +13,7 @@ CREATE TABLE `task` (
 show variables like '%time_zone%';
 
 set time_zone = '+00:00';
-
+use task;
 -- select * from mysql.time_zone_name;
 
 INSERT INTO task (id, title, description, assignees, status, createdOn, updatedOn) VALUES
