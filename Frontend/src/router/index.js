@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import TaskDetail from '@/components/TaskDetail.vue'
+import EditPopup from '@/components/EditPopup.vue'
+import Notfound from '@/views/Notfound.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -12,12 +14,25 @@ const router = createRouter({
     {
       path: '/task',
       name: 'task',
-      component: HomeView
+      component: HomeView,
+      children: [
+        {
+          path: '/:id/edit',
+          name: 'EditPopup',
+          component: EditPopup,
+          props: true
+        },
+      ]
     },
     {
-      path: '/task/:taskId',
+      path: '/:taskId',
       name: 'TaskDetail',
       component: TaskDetail
+    },
+    {
+      path: "/error",
+      name: "Notfound",
+      component: Notfound,
     },
   ]
 })

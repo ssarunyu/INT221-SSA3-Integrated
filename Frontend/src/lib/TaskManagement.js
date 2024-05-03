@@ -10,6 +10,10 @@ class TaskManagement {
             this.allTasks.push(i)
         })
     }
+    deleteTask(id) {
+        const find = this.getAllTask.find(item => item.id === id)
+        this.allTasks.splice(find, 1)
+    }
     getAllTask() {
         return this.allTasks
     }
