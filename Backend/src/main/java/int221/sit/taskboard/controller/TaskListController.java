@@ -1,5 +1,6 @@
 package int221.sit.taskboard.controller;
 
+import int221.sit.taskboard.DTO.NewTaskListDto;
 import int221.sit.taskboard.DTO.TaskListByIdDto;
 import int221.sit.taskboard.DTO.TaskListDto;
 import int221.sit.taskboard.entities.TaskList;
@@ -47,4 +48,22 @@ public class TaskListController {
     public List<TaskListDto> getAllTaskListDto(@RequestParam(required = false) String[] param) {
         return service.getAllTaskListDto(param);
     }
+
+    @PostMapping("")
+    public NewTaskListDto addNewTaskList(@RequestBody NewTaskListDto newTaskList) {
+        return service.createNewTaskList(newTaskList);
+    }
+
+    @PutMapping("/{id}")
+    public TaskList updateTaskList(@RequestBody TaskList taskList,@PathVariable Integer id) {
+        return service.updateTaskList(id, taskList);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteTaskList(@PathVariable Integer id) {
+        String message =service.removeTaskList(id);
+        return ResponseEntity.ok().body(message);
+    }
+
+
 }
