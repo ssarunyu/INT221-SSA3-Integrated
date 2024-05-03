@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class NewTaskListDto {
+    private Integer id;
     private String Title;
     private String Description;
     private String Assignees;

@@ -7,6 +7,7 @@ import int221.sit.taskboard.entities.TaskList;
 import int221.sit.taskboard.services.TaskListService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,8 +51,9 @@ public class TaskListController {
     }
 
     @PostMapping("")
-    public NewTaskListDto addNewTaskList(@RequestBody NewTaskListDto newTaskList) {
-        return service.createNewTaskList(newTaskList);
+    public ResponseEntity<NewTaskListDto> addNewTaskList(@RequestBody NewTaskListDto newTaskList) {
+        NewTaskListDto createdTaskList = service.createNewTaskList(newTaskList);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdTaskList);
     }
 
     @PutMapping("/{id}")
@@ -64,6 +66,5 @@ public class TaskListController {
         String message =service.removeTaskList(id);
         return ResponseEntity.ok().body(message);
     }
-
 
 }
