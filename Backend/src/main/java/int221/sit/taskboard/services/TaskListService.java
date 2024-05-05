@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class TaskListService {
     public TaskList findById(Integer id) {
         return repository.findById(id).orElseThrow(
               ()-> new ItemNotFoundException(
-                "TaskList Number ' "+ id + " ' does not exist!"));
+                "Task id " + id + " does not exist!"));
     }
 
     public TaskList getTaskListById(Integer id) {
@@ -52,7 +53,7 @@ public class TaskListService {
 
     public List<TaskListByIdDto> getTaskListByIdDto(Integer id) {
         TaskList taskList = repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task " + id + " does not exist !!"));
+                .orElseThrow(() -> new ItemNotFoundException("Task id"+ id + "does not exist!"));
         List<TaskList> taskListSingleton = Collections.singletonList(taskList);
         return listMapper.mapList(taskListSingleton, TaskListByIdDto.class, modelMapper);
     }
@@ -60,21 +61,35 @@ public class TaskListService {
     @Transactional
     public NewTaskListDto createNewTaskList(NewTaskListDto newTaskListDto) {
         TaskList taskList = modelMapper.map(newTaskListDto, TaskList.class);
+        if (taskList.getStatus() == null) {
+            taskList.setStatus(TaskList.TaskStatus.NO_STATUS);
+        }
+//        taskList.setCreatedOn(ZonedDateTime.now());
         return modelMapper.map(repository.saveAndFlush(taskList), newTaskListDto.getClass());
     }
 
     @Transactional
-    public String removeTaskList(Integer id) {
-        TaskList taskList = repository.findById(id).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Task Id " + id + " DOES NOT EXIST !!!"));
-        repository.delete(taskList);
-        return "Task ID " + id + " has been successfully deleted.";
+    public TaskListDto removeTaskListById(Integer id) {
+        TaskList taskList = repository.findById(id).orElse(null);
+        if (taskList != null) {
+            TaskListDto deletedTaskListDto = modelMapper.map(taskList, TaskListDto.class);
+            repository.delete(taskList);
+            return deletedTaskListDto;
+        } else {
+            throw new ItemNotFoundException("Task id " + id + " does not exist!");
+        }
     }
 
     @Transactional
-    public TaskList updateTaskList(Integer id, TaskList taskList) {
-        TaskList taskListUpdated= repository.findById(id)
-                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Task Id" + id + "DOES NOT EXIST !!!"));
+    public TaskList updateTaskListById(Integer id, TaskList taskList) {
+        TaskList taskListUpdated= repository.findById(id).orElse(null);
         taskList.setId(id);
+        if (taskList.getStatus() == null){
+            taskList.setStatus(TaskList.TaskStatus.NO_STATUS);
+        }
+//        taskList.setUpdatedOn(ZonedDateTime.now());
         return repository.save(taskList);
     }
+
+    //status , assignees is ""
 }

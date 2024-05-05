@@ -58,13 +58,13 @@ public class TaskListController {
 
     @PutMapping("/{id}")
     public TaskList updateTaskList(@RequestBody TaskList taskList,@PathVariable Integer id) {
-        return service.updateTaskList(id, taskList);
+        return service.updateTaskListById(id, taskList);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteTaskList(@PathVariable Integer id) {
-        String message =service.removeTaskList(id);
-        return ResponseEntity.ok().body(message);
+    public ResponseEntity<TaskListDto> deletedTaskListById(@PathVariable Integer id) {
+        TaskListDto deletedTaskListDto = service.removeTaskListById(id);
+        return ResponseEntity.ok().body(deletedTaskListDto);
     }
 
 }
