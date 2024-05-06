@@ -21,13 +21,14 @@ const router = createRouter({
           name: 'EditPopup',
           component: EditPopup,
           props: true
+        },
+        {
+          path: '/:id',
+          name: 'TaskDetail',
+          component: TaskDetail,
+          props: true
         }
       ]
-    },
-    {
-      path: '/:taskId',
-      name: 'TaskDetail',
-      component: TaskDetail
     },
     {
       path: "/error",

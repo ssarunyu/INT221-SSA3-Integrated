@@ -1,40 +1,14 @@
 <script setup>
-import { getData, getDataById } from '@/lib/fetchMethod.js';
-import { TaskManagement } from '@/lib/TaskManagement.js'
-import router from '@/router';
-import { ref, onMounted } from 'vue';
-
-import { useRoute } from 'vue-router';
-const { params } = useRoute()
-
-const taskManagement = ref(new TaskManagement())
-const options = {
-  timeZoneName: "short",
-  hour12: false,
-};
-
-onMounted(async () => {
-    const result = await getDataById(import.meta.env.VITE_URL, params.taskId)
-    // Not found page handle
-    if(result.status === 404) {
-      alert('The requested task does not exist')
-      router.push('/error')
-      setTimeout(() => {
-        router.push('/')
-      }, 2000);
-    } else {
-      const formatCreatedOn = new Date(result.createdOn).toLocaleString('en-AU', options)
-      const formatUpdatedOn = new Date(result.updatedOn).toLocaleString('en-AU', options)
-      result.createdOn = formatCreatedOn
-      result.updatedOn = formatUpdatedOn
-      // Front-end
-      taskManagement.value.addTask(result)
-    }
+const props = defineProps({
+  item: {
+    type: Object
+  }
 })
+
 </script>
 
 <template>
-  <div class="bg-white shadow-xl p-10 m-10 flex flex-col rounded-lg" v-for="item in taskManagement.getAllTask()">
+  <div>
     <h1 class="itbkk-title text-2xl font-bold break-all">
       {{ item.title }}
     </h1>
@@ -57,7 +31,7 @@ onMounted(async () => {
       <!-- Status -->
       <div>
         <p class="text-lg font-bold" for="">Status</p>
-        <p class="itbkk-status">{{ item.status }}</p>
+        <p>{{ item.status }}</p>
       </div>
     </div>
     <hr class="h-px my-5 bg-gray-200 border-0">

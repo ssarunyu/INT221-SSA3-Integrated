@@ -6,6 +6,7 @@ import Toast from '@/components/Toast.vue'
 import AddPopup from '@/components/AddPopup.vue';
 import EditPopup from '@/components/EditPopup.vue'
 import DeletePopup from '@/components/DeletePopup.vue'
+import TaskDetail from '@/components/TaskDetail.vue';
 import router from '@/router';
 
 const taskManagement = ref(new TaskManagement())
@@ -134,12 +135,26 @@ const deleteConfirm = async () => {
         deletePopupStatus.value = false
     }
 }
+
+//Task Detail
+const taskPopupDetail = ref(false);
+const taskDetailTarget = ref()
+const openTaskDetail = async (id) => {
+    taskPopupDetail.value = true
+    const result =  await getDataById(import.meta.env.VITE_URL, id)
+    result.createdOn = new Date(result.createdOn).toLocaleString('en-AU', options)
+    result.updatedOn = new Date(result.updatedOn).toLocaleString('en-AU', options)
+    taskDetailTarget.value = result
+    console.log(id)
+    router.push({ name: 'TaskDetail', params: { id: id }})
+}
 </script>
 
 <template>
     <DeletePopup v-show="deletePopupStatus" v-if="deleteTarget" :deleteItem="deleteTarget" @close="deletePopupStatus = false" @confirm="deleteConfirm()"/>
     <AddPopup v-show="addPopupStatus" @close="addPopupStatus = false" @confirm="confirmAdd"/>
     <EditPopup v-show="editPopupStatus" v-if="targetItem" :itemData="targetItem" @update="updateEdit" @close="closeEditPopup()"/>
+    <TaskDetail v-show="taskPopupDetail" v-if="taskDetailTarget" :item="taskDetailTarget"/>
     <div class="w-full min-h-screen p-5">
         <h1 class="flex text-2xl font-bold justify-center mb-5">ITBKK SSA3 Taskboard</h1>
         <div class="flex flex-col space-y-3">
@@ -168,9 +183,9 @@ const deleteConfirm = async () => {
                         {{ item.id }}
                     </p>
                     <div class="w-full">
-                        <router-link class="itbkk-title break-all font-bold text-xl duration-200 hover:text-blue-500" :to="{ name: 'TaskDetail', params: { taskId: item.id } }">
+                        <p class="itbkk-title break-all font-bold text-xl duration-200 hover:text-blue-500" @click="openTaskDetail(item.id)">
                             {{ item.title }}
-                        </router-link>
+                        </p>
                         <p class="itbkk-assignees" :class="item.assignees === null ? 'italic text-gray-500' : ''">
                             Assignees : {{ item.assignees === null ? 'Unassigned' : item.assignees }}
                         </p>
