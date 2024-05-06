@@ -49,6 +49,7 @@ const updateHandle = () => {
               </div>
               <!-- FIXED: Date -->
               <div class="flex flex-col">
+                <p><strong>Timezone</strong> {{ Intl.DateTimeFormat().resolvedOptions().timeZone }}</p>
                 <p><strong>Created On</strong> {{ itemData.createdOn }}</p>
                 <p><strong>Updated On</strong> {{ itemData.updatedOn }}</p>
               </div>

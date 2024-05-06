@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import TaskDetail from '@/components/TaskDetail.vue'
 import EditPopup from '@/components/EditPopup.vue'
 import Notfound from '@/views/Notfound.vue'
+import { getDataById } from '@/lib/fetchMethod.js'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,24 +18,44 @@ const router = createRouter({
       component: HomeView,
       children: [
         {
-          path: '/:id/edit',
+          path: ':id/edit',
           name: 'EditPopup',
           component: EditPopup,
-          props: true
+          props: true,
+          async beforeEnter(to) {
+            const result = await getDataById(import.meta.env.VITE_URL, to.params.id)
+            if(result.status === 404) {
+              alert('The requested task does not exist')
+              router.push('/404')
+              setTimeout(() => {
+                router.push('/task')
+              }, 3000)
+            }
+          }
         },
         {
-          path: '/:id',
+          path: ':id',
           name: 'TaskDetail',
           component: TaskDetail,
-          props: true
-        }
+          props: true,
+          async beforeEnter(to) {
+            const result = await getDataById(import.meta.env.VITE_URL, to.params.id)
+            if(result.status === 404) {
+              alert('The requested task does not exist')
+              router.push('/404')
+              setTimeout(() => {
+                router.push('/task')
+              }, 3000)
+            }
+          }
+        },
       ]
     },
     {
-      path: "/error",
-      name: "Notfound",
-      component: Notfound,
-    },
+      path: '/404',
+      name: 'Notfound',
+      component: Notfound
+    }
   ]
 })
 

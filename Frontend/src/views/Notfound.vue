@@ -11,7 +11,7 @@
                 This page does not exist
             </div>
             <div class="text-gray-300 font-medium text-sm md:text-xl lg:text-xl">
-                The page you are looking for could not be found.
+                The page you are looking for could not be found. Page will redirect in 3 seconds
             </div>
         </div>
       </div>

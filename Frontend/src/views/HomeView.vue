@@ -144,16 +144,20 @@ const deleteConfirm = async () => {
 }
 
 //Task Detail
-const taskPopupDetail = ref(false);
+const taskPopupStatus = ref(false);
 const taskDetailTarget = ref()
 const openTaskDetail = async (id) => {
-    taskPopupDetail.value = true
+    taskDetailTarget.value = ''
+    taskPopupStatus.value = true
     const result =  await getDataById(import.meta.env.VITE_URL, id)
     result.createdOn = new Date(result.createdOn).toLocaleString('en-AU', options)
     result.updatedOn = new Date(result.updatedOn).toLocaleString('en-AU', options)
     taskDetailTarget.value = result
-    console.log(id)
-    router.push({ name: 'TaskDetail', params: { id: id }})
+    router.push({ name: 'TaskDetail', params: { id: id } })
+}
+const closeTaskDetail = () => {
+    taskPopupStatus.value = false
+    router.push('/task')
 }
 </script>
 
@@ -161,7 +165,7 @@ const openTaskDetail = async (id) => {
     <DeletePopup v-show="deletePopupStatus" v-if="deleteTarget" :deleteItem="deleteTarget" @close="deletePopupStatus = false" @confirm="deleteConfirm()"/>
     <AddPopup v-show="addPopupStatus" @close="closeAddPopup()" @confirm="confirmAdd"/>
     <EditPopup v-show="editPopupStatus" v-if="targetItem" :itemData="targetItem" @update="updateEdit" @close="closeEditPopup()"/>
-    <TaskDetail v-show="taskPopupDetail" v-if="taskDetailTarget" :item="taskDetailTarget"/>
+    <TaskDetail v-show="taskPopupStatus" v-if="taskDetailTarget" :item="taskDetailTarget" @close="closeTaskDetail"/>
     <div class="w-full min-h-screen p-5">
         <h1 class="flex text-2xl font-bold justify-center mb-5">ITBKK SSA3 Taskboard</h1>
         <div class="flex flex-col space-y-3">
@@ -171,7 +175,7 @@ const openTaskDetail = async (id) => {
                 <p>Status</p>
             </div>
             <Toast :toastObject="toastHandle" @close="toastHandle.status = false"/>
-            <div @click="openAddPopup()" class="itbkk-button-add text-center p-2 bg-green-300 rounded cursor-pointer duration-300 hover:bg-green-400 hover:scale-105">
+            <div @click="openAddPopup()" class="itbkk-button-add w-40 text-center p-2 bg-green-300 rounded cursor-pointer duration-300 hover:bg-green-400 hover:scale-105">
                 + Add New Task
             </div>
             <div v-for="item in taskManagement.getAllTask()" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded">
@@ -190,7 +194,7 @@ const openTaskDetail = async (id) => {
                         {{ item.id }}
                     </p>
                     <div class="w-full">
-                        <p class="itbkk-title break-all font-bold text-xl duration-200 hover:text-blue-500" @click="openTaskDetail(item.id)">
+                        <p class="itbkk-title break-all font-bold text-xl duration-200 cursor-pointer hover:text-gray-700" @click="openTaskDetail(item.id)">
                             {{ item.title }}
                         </p>
                         <p class="itbkk-assignees" :class="item.assignees === null ? 'italic text-gray-500' : ''">
