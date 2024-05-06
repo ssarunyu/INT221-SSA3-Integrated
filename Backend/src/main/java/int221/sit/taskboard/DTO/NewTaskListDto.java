@@ -3,16 +3,13 @@ package int221.sit.taskboard.DTO;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import int221.sit.taskboard.entities.TaskList;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
-@JsonPropertyOrder({"id", "title", "assignees", "status"})
 @Data
-public class TaskListDto {
+@JsonPropertyOrder({"id", "title", "description", "assignees", "status"})
+public class NewTaskListDto {
     private Integer id;
     private String Title;
+    private String Description;
     private String Assignees;
-    private TaskList.TaskStatus status;
+    private TaskList.TaskStatus status = TaskList.TaskStatus.NO_STATUS;
 }

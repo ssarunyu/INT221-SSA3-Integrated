@@ -1,11 +1,13 @@
 package int221.sit.taskboard.controller;
 
+import int221.sit.taskboard.DTO.NewTaskListDto;
 import int221.sit.taskboard.DTO.TaskListByIdDto;
 import int221.sit.taskboard.DTO.TaskListDto;
 import int221.sit.taskboard.entities.TaskList;
 import int221.sit.taskboard.services.TaskListService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,4 +49,22 @@ public class TaskListController {
     public List<TaskListDto> getAllTaskListDto(@RequestParam(required = false) String[] param) {
         return service.getAllTaskListDto(param);
     }
+
+    @PostMapping("")
+    public ResponseEntity<NewTaskListDto> addNewTaskList(@RequestBody NewTaskListDto newTaskList) {
+        NewTaskListDto createdTaskList = service.createNewTaskList(newTaskList);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdTaskList);
+    }
+
+    @PutMapping("/{id}")
+    public TaskList updateTaskList(@RequestBody TaskList taskList,@PathVariable Integer id) {
+        return service.updateTaskListById(id, taskList);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<TaskListDto> deletedTaskListById(@PathVariable Integer id) {
+        TaskListDto deletedTaskListDto = service.removeTaskListById(id);
+        return ResponseEntity.ok().body(deletedTaskListDto);
+    }
+
 }

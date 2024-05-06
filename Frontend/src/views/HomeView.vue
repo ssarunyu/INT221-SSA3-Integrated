@@ -101,6 +101,13 @@ const updateEdit = async (newEdit) => {
 
 // Add
 const addPopupStatus = ref(false)
+const openAddPopup = () => {
+  addPopupStatus.value = true
+}
+const closeAddPopup = () => {
+  addPopupStatus.value = false
+  router.push('/task')
+}
 const confirmAdd = async (newTask) => {
     // Back-end
     const response = await postData(import.meta.env.VITE_URL, newTask)
@@ -152,7 +159,7 @@ const openTaskDetail = async (id) => {
 
 <template>
     <DeletePopup v-show="deletePopupStatus" v-if="deleteTarget" :deleteItem="deleteTarget" @close="deletePopupStatus = false" @confirm="deleteConfirm()"/>
-    <AddPopup v-show="addPopupStatus" @close="addPopupStatus = false" @confirm="confirmAdd"/>
+    <AddPopup v-show="addPopupStatus" @close="closeAddPopup()" @confirm="confirmAdd"/>
     <EditPopup v-show="editPopupStatus" v-if="targetItem" :itemData="targetItem" @update="updateEdit" @close="closeEditPopup()"/>
     <TaskDetail v-show="taskPopupDetail" v-if="taskDetailTarget" :item="taskDetailTarget"/>
     <div class="w-full min-h-screen p-5">
@@ -164,7 +171,7 @@ const openTaskDetail = async (id) => {
                 <p>Status</p>
             </div>
             <Toast :toastObject="toastHandle" @close="toastHandle.status = false"/>
-            <div @click="addPopupStatus = true" class="itbkk-button-add text-center p-2 bg-green-300 rounded cursor-pointer duration-300 hover:bg-green-400 hover:scale-105">
+            <div @click="openAddPopup()" class="itbkk-button-add text-center p-2 bg-green-300 rounded cursor-pointer duration-300 hover:bg-green-400 hover:scale-105">
                 + Add New Task
             </div>
             <div v-for="item in taskManagement.getAllTask()" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded">
