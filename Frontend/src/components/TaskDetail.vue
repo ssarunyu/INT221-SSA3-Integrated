@@ -57,12 +57,7 @@ onMounted(async () => {
       <!-- Status -->
       <div>
         <p class="text-lg font-bold" for="">Status</p>
-        <select class="itbkk-status border border-black px-3 py-1 rounded" v-model="item.status" name="" id="">
-          <option value="NO_STATUS">No Status</option>
-          <option value="TO_DO">To Do</option>
-          <option value="DOING">Doing</option>
-          <option value="DONE">Done</option>
-        </select>
+        <p class="itbkk-status">{{ item.status }}</p>
       </div>
     </div>
     <hr class="h-px my-5 bg-gray-200 border-0">

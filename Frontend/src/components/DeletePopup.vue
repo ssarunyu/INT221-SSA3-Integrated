@@ -1,7 +1,4 @@
 <script setup>
-import { ref } from 'vue'
-import { TaskManagement } from '@/lib/TaskManagement.js'
-import { deleteData } from '@/lib/fetchMethod.js'
 const props = defineProps({
     deleteItem: Object
 })
@@ -16,7 +13,7 @@ const confirmHandle = () => {
 </script>
 
 <template>
-<div class="fixed inset-0 flex items-center justify-center z-50 backdrop-blur confirm-dialog ">
+<div class="fixed inset-0 flex items-center justify-center z-50 bg-gray-500 bg-opacity-75 backdrop-blur confirm-dialog ">
     <div class="relative px-4 min-h-screen md:flex md:items-center md:justify-center">
         <div class=" opacity-25 w-full h-full absolute z-10 inset-0"></div>
         <div class="bg-white rounded-lg md:max-w-md md:mx-auto p-4 fixed inset-x-0 bottom-0 z-50 mb-4 mx-4 md:relative shadow-lg">
@@ -38,7 +35,7 @@ const confirmHandle = () => {
                     Delete
                 </button>
                 <button @click="closeHandle()" id="confirm-cancel-btn" class="block w-full md:inline-block md:w-auto px-4 py-3 md:py-2 bg-gray-200 rounded-lg font-semibold text-sm mt-4 md:mt-0 md:order-1">
-                Cancel
+                    Cancel
                 </button>
             </div>
         </div>
