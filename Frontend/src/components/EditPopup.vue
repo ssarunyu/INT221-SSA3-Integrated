@@ -10,7 +10,7 @@ const closeHandle = () => {
     emit('close')
 }
 const updateHandle = () => {
-  emit('update')
+  emit('update', props.itemData)
 }
 </script>
 
@@ -18,7 +18,7 @@ const updateHandle = () => {
   <div class="fixed z-10 inset-0 overflow-y-auto">
     <div class="flex items-center justify-center h-screen">
       <!-- Overlay -->
-      <div class="fixed inset-0 bg-gray-500 bg-opacity-75"></div>
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 backdrop-blur"></div>
       <!-- Popup -->
       <div class="relative bg-white rounded-lg shadow-xl w-[70%]">
         <!-- Popup content -->
@@ -53,7 +53,7 @@ const updateHandle = () => {
                 <p><strong>Updated On</strong> {{ itemData.updatedOn }}</p>
               </div>
             </form>
-            <div class="space-x-5">
+            <div class="mt-5 space-x-5">
                 <button class="bg-green-500 duration-200 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded"
                 @click="updateHandle()">
                   Save

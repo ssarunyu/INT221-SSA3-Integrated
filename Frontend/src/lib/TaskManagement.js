@@ -10,9 +10,13 @@ class TaskManagement {
             this.allTasks.push(i)
         })
     }
+    updateTask(task, id) {
+        const index = this.allTasks.findIndex(item => item.id === id)
+        this.allTasks[index] = task
+    }
     deleteTask(id) {
-        const find = this.getAllTask.find(item => item.id === id)
-        this.allTasks.splice(find, 1)
+        const index = this.allTasks.findIndex(item => item.id === id)
+        this.allTasks.splice(index, 1)
     }
     getAllTask() {
         return this.allTasks

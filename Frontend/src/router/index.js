@@ -21,7 +21,7 @@ const router = createRouter({
           name: 'EditPopup',
           component: EditPopup,
           props: true
-        },
+        }
       ]
     },
     {

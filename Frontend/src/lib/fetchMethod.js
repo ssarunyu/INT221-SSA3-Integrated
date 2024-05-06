@@ -1,10 +1,10 @@
 async function getData(url) {
     try {
-        const res = await fetch(url, {
+        const response = await fetch(url, {
             method: "GET",
             redirect: "follow"
         })
-        const result = res.json()
+        const result = response.json()
         return result
     } catch (error) {
         console.log(error)
@@ -14,24 +14,45 @@ async function getData(url) {
 async function getDataById(url, id) {
     const finalURL = `${url}/${id}`
     try {
-        const res = await fetch(finalURL, {
+        const response = await fetch(finalURL, {
             method: "GET",
             redirect: "follow"
         })
-        const result = res.json()
+        const result = response.json()
         return result
     } catch (error) {
         console.log(error)
     }  
 }
 
-async function postData(url) {
+async function postData(url, task) {
     try {
-        const res = await fetch(url, {
+        const response = await fetch(url, {
             method: "POST",
-            redirect: "follow"
+            headers: {
+                "Content-Type": "application/json"
+            },
+            redirect: "follow",
+            body: JSON.stringify(task)
         })
-        console.log(res)
+        return response
+    } catch (error) {
+        console.log(error)
+    }  
+}
+
+async function updateData(url, task, id) {
+    const finalURL = `${url}/${id}`
+    try {
+        const response = await fetch(finalURL, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            redirect: "follow",
+            body: JSON.stringify(task)
+        })
+        return response
     } catch (error) {
         console.log(error)
     }  
@@ -40,14 +61,14 @@ async function postData(url) {
 async function deleteData(url, id) {
     const finalURL = `${url}/${id}`
     try {
-        const res = await fetch(finalURL, {
+        const response = await fetch(finalURL, {
             method: "DELETE",
             redirect: "follow"
         })
-        console.log(res)
+        return response
     } catch (error) {
         console.log(error)
     }  
 }
 
-export { getData, getDataById, postData, deleteData }
+export { getData, getDataById, postData, updateData, deleteData }
