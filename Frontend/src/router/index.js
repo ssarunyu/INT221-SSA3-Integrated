@@ -18,12 +18,12 @@ const router = createRouter({
       component: HomeView,
       children: [
         {
-          path: ':id/edit',
+          path: ':editId/edit',
           name: 'EditPopup',
           component: EditPopup,
           props: true,
           async beforeEnter(to) {
-            const result = await getDataById(import.meta.env.VITE_URL, to.params.id)
+            const result = await getDataById(import.meta.env.VITE_URL, to.params.editId)
             if(result.status === 404) {
               alert('The requested task does not exist')
               router.go(-1)
@@ -31,12 +31,12 @@ const router = createRouter({
           }
         },
         {
-          path: ':id',
+          path: ':detailId',
           name: 'TaskDetail',
           component: TaskDetail,
           props: true,
           async beforeEnter(to) {
-            const result = await getDataById(import.meta.env.VITE_URL, to.params.id)
+            const result = await getDataById(import.meta.env.VITE_URL, to.params.detailId)
             if(result.status === 404) {
               alert('The requested task does not exist')
               router.push('/404')

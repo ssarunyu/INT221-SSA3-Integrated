@@ -2,12 +2,16 @@
 import { ref, watch, onMounted } from 'vue';
 import { getData, getDataById, deleteData, postData, updateData } from '@/lib/fetchMethod.js';
 import { TaskManagement } from '@/lib/TaskManagement.js'
+import { useRoute } from 'vue-router';
+import router from '@/router';
 import Toast from '@/components/Toast.vue'
 import AddPopup from '@/components/AddPopup.vue';
 import EditPopup from '@/components/EditPopup.vue'
 import DeletePopup from '@/components/DeletePopup.vue'
 import TaskDetail from '@/components/TaskDetail.vue';
-import router from '@/router';
+import { styleStatus } from '@/lib/styleStatus';
+
+const route = useRoute()
 
 const taskManagement = ref(new TaskManagement())
 
@@ -42,25 +46,34 @@ watch(items, (newItems) => {
 
 onMounted(async () => {
     await fetch()
+    const detailId = route.params.detailId
+    const editId = route.params.editId
+    if(detailId) {
+        await openTaskDetail(detailId)
+    } else if (editId) {
+        await openEditPopup(editId)
+    }
 })
-
-const styleStatus = (name) => {
-    if(name === 'No Status') {
-        return 'bg-gray-300'
-    }
-    if(name === 'To Do') {
-        return 'bg-red-300'
-    }
-    if(name === 'Doing') {
-        return 'bg-amber-300'
-    }
-    if(name === 'Done') {
-        return 'bg-green-300'
-    }
-}
 
 // Toast
 const toastHandle = ref()
+
+//Task Detail
+const taskPopupStatus = ref(false);
+const taskDetailTarget = ref()
+const openTaskDetail = async (componentId) => {
+    router.push({ name: 'TaskDetail', params: { detailId: componentId } })
+    taskDetailTarget.value = ''
+    taskPopupStatus.value = true
+    const result =  await getDataById(import.meta.env.VITE_URL, componentId)
+    result.createdOn = new Date(result.createdOn).toLocaleString('en-AU', options)
+    result.updatedOn = new Date(result.updatedOn).toLocaleString('en-AU', options)
+    taskDetailTarget.value = result
+}
+const closeTaskDetail = () => {
+    taskPopupStatus.value = false
+    router.push('/task')
+}
 
 // Edit
 const options = {
@@ -69,14 +82,13 @@ const options = {
 }
 const targetItem = ref()
 const editPopupStatus = ref(false)
-const openEditPopup = async (id) => {
+const openEditPopup = async (componentId) => {
+    router.push({ name: 'EditPopup', params: { editId: componentId }})
     editPopupStatus.value = true
-    const result = await getDataById(import.meta.env.VITE_URL, id)
+    const result = await getDataById(import.meta.env.VITE_URL, componentId)
     result.createdOn = new Date(result.createdOn).toLocaleString('en-AU', options)
     result.updatedOn = new Date(result.updatedOn).toLocaleString('en-AU', options)
     targetItem.value = result
-    // Change path
-    router.push({ name: 'EditPopup', params: { id: id }})
 }
 const closeEditPopup = () => {
     targetItem.value = ''
@@ -145,23 +157,6 @@ const deleteConfirm = async () => {
         deletePopupStatus.value = false
     }
 }
-
-//Task Detail
-const taskPopupStatus = ref(false);
-const taskDetailTarget = ref()
-const openTaskDetail = async (id) => {
-    taskDetailTarget.value = ''
-    taskPopupStatus.value = true
-    const result =  await getDataById(import.meta.env.VITE_URL, id)
-    result.createdOn = new Date(result.createdOn).toLocaleString('en-AU', options)
-    result.updatedOn = new Date(result.updatedOn).toLocaleString('en-AU', options)
-    taskDetailTarget.value = result
-    router.push({ name: 'TaskDetail', params: { id: id } })
-}
-const closeTaskDetail = () => {
-    taskPopupStatus.value = false
-    router.push('/task')
-}
 </script>
 
 <template>
@@ -199,7 +194,7 @@ const closeTaskDetail = () => {
                         {{ item.id }}
                     </p>
                     <div class="w-full">
-                        <p class="itbkk-title break-all font-bold text-xl duration-200 cursor-pointer hover:text-gray-700" @click="openTaskDetail(item.id)">
+                        <p @click="openTaskDetail(item.id)" class="itbkk-title break-all font-bold text-xl duration-200 cursor-pointer hover:text-gray-700">
                             {{ item.title }}
                         </p>
                         <p class="itbkk-assignees" :class="item.assignees === null ? 'italic text-gray-500' : ''">

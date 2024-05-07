@@ -19,6 +19,11 @@ const confirmHandle = () => {
     status: addStatus.value ? addStatus.value.trim() : null
   }
   emit('confirm', newTask)
+  // Clear form when open again
+  addTitle.value = ''
+  addDescription.value = ''
+  addAssignees.value = ''
+  addStatus.value = ''
 }
 </script>
 

@@ -51,7 +51,7 @@ const updateHandle = () => {
               </div>
               <div class="flex items-center space-x-3 ">
                   <p for="">Status</p>
-                  <select @input="disabled = false" class="itbkk-status rounded px-3 py-1 border border-gray-300" v-model="itemData.status" name="" id="">
+                  <select @change="disabled = false" class="itbkk-status rounded px-3 py-1 border border-gray-300" v-model="itemData.status" name="" id="">
                     <option value="NO_STATUS">No Status</option>
                     <option value="TO_DO">To Do</option>
                     <option value="DOING">Doing</option>

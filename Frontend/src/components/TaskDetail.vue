@@ -1,4 +1,6 @@
 <script setup>
+import { styleStatus } from '@/lib/styleStatus';
+
 const props = defineProps({
   item: {
     type: Object
@@ -50,15 +52,15 @@ const closeHandle = () => {
           </div>
           <!-- Ass -->
           <div>
-            <p class="text-lg font-bold" for="">Assignees</p>
+            <p class="text-lg font-bold">Assignees</p>
             <p class="itbkk-assignees" :class="item.assignees === null ? 'text-gray-500 italic' : ''">
               {{ item.assignees === null ? 'Unassigned' : item.assignees }}
             </p>
           </div>
           <!-- Status -->
           <div>
-            <p class="text-lg font-bold" for="">Status</p>
-            <p>{{ item.status }}</p>
+            <p class="text-lg font-bold">Status</p>
+            <p :class="styleStatus(item.status)" class="px-5 py-1 w-[7rem] rounded text-center">{{ item.status }}</p>
           </div>
         </div>
         <hr class="h-px my-5 bg-gray-200 border-0">
