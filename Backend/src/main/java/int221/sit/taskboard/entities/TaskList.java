@@ -36,4 +36,16 @@ public class TaskList {
         DOING,
         DONE
     }
+
+    public void trimValues() {
+        if (this.Title != null) {
+            this.Title = this.Title.trim();
+        }
+        if (this.Description != null) {
+            this.Description = this.Description.trim();
+        }
+        if (this.Assignees != null) {
+            this.Assignees = this.Assignees.trim();
+        }
+    }
 }

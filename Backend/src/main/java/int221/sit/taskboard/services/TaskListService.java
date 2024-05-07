@@ -11,7 +11,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.ZonedDateTime;
@@ -61,6 +60,7 @@ public class TaskListService {
     @Transactional
     public NewTaskListDto createNewTaskList(NewTaskListDto newTaskListDto) {
         TaskList taskList = modelMapper.map(newTaskListDto, TaskList.class);
+        taskList.trimValues();
         if (taskList.getStatus() == null) {
             taskList.setStatus(TaskList.TaskStatus.NO_STATUS);
         }
@@ -84,6 +84,7 @@ public class TaskListService {
     public TaskList updateTaskListById(Integer id, TaskList taskList) {
         TaskList taskListUpdated= repository.findById(id).orElse(null);
         taskList.setId(id);
+        taskList.trimValues();
         if (taskList.getStatus() == null){
             taskList.setStatus(TaskList.TaskStatus.NO_STATUS);
         }

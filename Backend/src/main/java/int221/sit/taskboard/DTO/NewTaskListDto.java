@@ -12,4 +12,5 @@ public class NewTaskListDto {
     private String Description;
     private String Assignees;
     private TaskList.TaskStatus status = TaskList.TaskStatus.NO_STATUS;
+
 }
