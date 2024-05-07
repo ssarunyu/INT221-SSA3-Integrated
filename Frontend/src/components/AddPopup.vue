@@ -13,10 +13,10 @@ const addStatus = ref(null)
 const confirmHandle = () => {
   const newTask = 
   {
-    title: addTitle.value,
-    description: addDescription.value,
-    assignees: addAssignees.value,
-    status: addStatus.value
+    title: addTitle.value ? addTitle.value.trim() : null,
+    description: addDescription.value ? addDescription.value.trim() : null,
+    assignees: addAssignees.value ? addAssignees.value.trim() : null,
+    status: addStatus.value ? addStatus.value.trim() : null
   }
   emit('confirm', newTask)
 }
@@ -35,22 +35,22 @@ const confirmHandle = () => {
             <h2 class="text-2xl font-bold mb-4">Add Task</h2>
             <hr>
             <div class="flex flex-col">
-                <label class="font-semibold" for="title">Title</label>
+                <p class="font-semibold">Title</p>
                 <input v-model="addTitle" class="itbkk-title border border-black rounded p-2 peer invalid:border-red-500 focus:outline-none" type="text" required>
                 <p class="hidden peer-invalid:block text-red-600 text-sm">
                     This field required
                 </p>
             </div>
             <div class="flex flex-col">
-                <label class="font-semibold" for="assignees">Description</label>
+                <p class="font-semibold">Description</p>
                 <input v-model="addDescription" class="itbkk-description border border-black rounded p-2 focus:outline-none" type="text">
             </div>
             <div class="flex flex-col">
-                <label class="font-semibold" for="assignees">Assignees</label>
+                <p class="font-semibold">Assignees</p>
                 <input v-model="addAssignees" class="itbkk-assignees border border-black rounded p-2 focus:outline-none" type="text">
             </div>
             <div class="flex items-center space-x-3 ">
-                <label for="">Status</label>
+                <p class="font-semibold">Status</p>
                 <select v-model="addStatus" class="itbkk-status rounded px-3 py-1 border border-gray-300">
                   <option value="NO_STATUS">No Status</option>
                   <option value="TO_DO">To Do</option>
@@ -60,7 +60,7 @@ const confirmHandle = () => {
               </div>
             </form>
             <div class="mt-5 space-x-5">
-              <button @click="confirmHandle()" :disabled="!addTitle" class="itbkk-button-confirm bg-green-500 duration-200 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded disabled:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50">
+              <button @click="confirmHandle()" :disabled="!addTitle" class="itbkk-button-confirm disabled bg-green-500 duration-200 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded disabled:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50">
                 Save
               </button>
               <button @click="closeHandle()" class="itbkk-button-cancel disabled bg-red-500 duration-200 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded">

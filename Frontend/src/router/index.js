@@ -26,10 +26,7 @@ const router = createRouter({
             const result = await getDataById(import.meta.env.VITE_URL, to.params.id)
             if(result.status === 404) {
               alert('The requested task does not exist')
-              router.push('/404')
-              setTimeout(() => {
-                router.push('/task')
-              }, 3000)
+              router.go(-1)
             }
           }
         },

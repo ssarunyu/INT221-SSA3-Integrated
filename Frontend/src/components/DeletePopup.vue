@@ -25,16 +25,16 @@ const confirmHandle = () => {
                 </div>
                 <div class="mt-4 md:mt-0 md:ml-6 text-center md:text-left">
                 <p class="font-bold">Warning!</p>
-                <p class="text-sm text-gray-700 mt-1">
-                    You will lose <strong class="break-all">{{ deleteItem.title }}</strong> task by this action. This action cannot be undone.
+                <p class="itbkk-message text-sm text-gray-700 mt-1">
+                    Do you want to delete the task number <strong>id: {{ deleteItem.id }} - Title: {{ deleteItem.title }}</strong>
                 </p>
                 </div>
             </div>
-            <div class="text-center md:text-right mt-4 md:flex md:justify-end">
-                <button @click="confirmHandle()" id="confirm-delete-btn" class="block w-full md:inline-block md:w-auto px-4 py-3 md:py-2 bg-red-200 text-red-700 rounded-lg font-semibold text-sm md:ml-2 md:order-2">
-                    Delete
+            <div class="itbkk-button-action text-center md:text-right mt-4 md:flex md:justify-end">
+                <button @click="confirmHandle()" id="confirm-delete-btn" class="itbkk-button-confirm block w-full md:inline-block md:w-auto px-4 py-3 md:py-2 bg-red-200 text-red-700 rounded-lg font-semibold text-sm md:ml-2 md:order-2">
+                    Confirm
                 </button>
-                <button @click="closeHandle()" id="confirm-cancel-btn" class="block w-full md:inline-block md:w-auto px-4 py-3 md:py-2 bg-gray-200 rounded-lg font-semibold text-sm mt-4 md:mt-0 md:order-1">
+                <button @click="closeHandle()" id="confirm-cancel-btn" class="itbkk-button-cancel block w-full md:inline-block md:w-auto px-4 py-3 md:py-2 bg-gray-200 rounded-lg font-semibold text-sm mt-4 md:mt-0 md:order-1">
                     Cancel
                 </button>
             </div>

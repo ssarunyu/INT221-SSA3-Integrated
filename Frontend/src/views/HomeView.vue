@@ -86,9 +86,11 @@ const closeEditPopup = () => {
 const updateEdit = async (newEdit) => {
     const response = await updateData(import.meta.env.VITE_URL,
     {
-        title: newEdit.title, description: newEdit.description, assignees: newEdit.assignees, status: newEdit.status
-    },
-    newEdit.id)
+        title: newEdit.title,
+        description: newEdit.description,
+        assignees: newEdit.assignees,
+        status: newEdit.status
+    }, newEdit.id)
     if(response.ok) {
         // Toast
         toastHandle.value = {type: 'success', status: true, message: `Task successfully edited to ${newEdit.title} !`}
@@ -133,12 +135,13 @@ const deleteConfirm = async () => {
     const response = await deleteData(import.meta.env.VITE_URL, deleteTarget.value.id)
     // Check Status
     if(response.ok) {
-        toastHandle.value = {type: 'success', status: true, message: `${deleteTarget.value.title} task deleted!`}
+        toastHandle.value = {type: 'success', status: true, message: `The task has been deleted`}
         // Front-end
         taskManagement.value.deleteTask(deleteTarget.value.id)
         deletePopupStatus.value = false
     } else {
         toastHandle.value = {type: 'error', status: true, message: `Task doesn't exist`}
+        taskManagement.value.deleteTask(deleteTarget.value.id)
         deletePopupStatus.value = false
     }
 }
@@ -182,8 +185,10 @@ const closeTaskDetail = () => {
                 <div class="absolute left-0 w-1 h-10" :class="styleStatus(item.status)"></div>
                 <div class="flex items-center space-x-3">
                     <div>
-                        <div class="dropdown">
-                            <div tabindex="0" role="button" class="itbkk-button-action btn m-1 border-none font-bold text-2xl">:</div>
+                        <div class="dropdown itbkk-button-action">
+                            <p tabindex="0" role="button" class=" btn m-1 border-none font-bold text-2xl">
+                                :
+                            </p>
                             <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-white rounded-box w-40">
                                 <li><a class="itbkk-button-edit" @click="openEditPopup(item.id)">Edit</a></li>
                                 <li><a class="itbkk-button-delete" @click="openDeletePopup(item.id)">Delete</a></li>
