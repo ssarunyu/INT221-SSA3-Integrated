@@ -87,6 +87,8 @@ public class TaskListService {
         taskList.trimValues();
         if (taskList.getStatus() == null){
             taskList.setStatus(TaskList.TaskStatus.NO_STATUS);
+        } else {
+            throw new ItemNotFoundException("Task id " + id + " does not exist!");
         }
 //        taskList.setUpdatedOn(ZonedDateTime.now());
         return repository.save(taskList);
