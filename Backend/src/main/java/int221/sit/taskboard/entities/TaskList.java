@@ -24,13 +24,14 @@ public class TaskList {
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private TaskStatus status = TaskList.TaskStatus.NO_STATUS;
+    private TaskStatus status;
 
     @Column(name = "createdOn", insertable = false, updatable = false)
     private ZonedDateTime createdOn;
 
     @Column(name = "updatedOn", insertable = false, updatable = false)
     private ZonedDateTime updatedOn;
+
     public enum TaskStatus {
         NO_STATUS,
         TO_DO,
