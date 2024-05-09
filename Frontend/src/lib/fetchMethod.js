@@ -71,4 +71,4 @@ async function deleteData(url, id) {
     }  
 }
 
-export { getData, getDataById, postData, updateData, deleteData }
+export { getData, getDataById, postData, updateData, deleteData}

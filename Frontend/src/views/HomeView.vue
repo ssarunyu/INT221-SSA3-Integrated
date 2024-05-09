@@ -173,8 +173,13 @@ const deleteConfirm = async () => {
                 <p>Status</p>
             </div>
             <Toast :toastObject="toastHandle" @close="toastHandle.status = false"/>
-            <div @click="openAddPopup()" class="itbkk-button-add w-40 text-center p-2 bg-green-300 rounded cursor-pointer duration-300 hover:bg-green-400 hover:scale-105">
+            <div class="flex w-full justify-between font-xl ">
+                <div @click="openAddPopup()" class="itbkk-button-add w-40 text-center p-2 bg-green-300 rounded cursor-pointer duration-300 hover:bg-green-400 hover:scale-105">
                 + Add New Task
+                </div>
+                <div class="itbkk-manage-status w-40 text-center p-2 bg-gray-300 rounded cursor-pointer duration-300 hover:bg-gray-400 hover:scale-105">
+                    <RouterLink to="/task/statuses">Manage Status</RouterLink>
+                </div>
             </div>
             <div v-for="item in taskManagement.getAllTask()" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded">
                 <div class="absolute left-0 w-1 h-10" :class="styleStatus(item.status)"></div>

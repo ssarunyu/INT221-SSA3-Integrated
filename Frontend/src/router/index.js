@@ -4,6 +4,7 @@ import TaskDetail from '@/components/TaskDetail.vue'
 import EditPopup from '@/components/EditPopup.vue'
 import Notfound from '@/views/Notfound.vue'
 import { getDataById } from '@/lib/fetchMethod.js'
+import StatusView from '@/views/StatusView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -15,8 +16,17 @@ const router = createRouter({
     {
       path: '/task',
       name: 'task',
-      component: HomeView,
       children: [
+        {
+          path: '',
+          name: 'Home',
+          component: HomeView 
+        },
+        {
+          path: 'statuses',
+          name: 'StatusView',
+          component: StatusView
+        },
         {
           path: ':editId/edit',
           name: 'EditPopup',
@@ -45,7 +55,7 @@ const router = createRouter({
               }, 3000)
             }
           }
-        },
+        }
       ]
     },
     {

@@ -1,6 +1,7 @@
 class TaskManagement {
     constructor() {
         this.allTasks = []
+        this.allStatus = []
     }
     addTask(item) {
         this.allTasks.push(item)
@@ -20,6 +21,9 @@ class TaskManagement {
     }
     getAllTask() {
         return this.allTasks
+    }
+    getAllStatus(){
+        return this.allStatus
     }
 }
 
