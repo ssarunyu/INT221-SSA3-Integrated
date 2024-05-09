@@ -88,8 +88,12 @@ public class TaskListService {
         if (taskList.getStatus() == null){
             taskList.setStatus(TaskList.TaskStatus.NO_STATUS);
         }
-//        taskList.setUpdatedOn(ZonedDateTime.now());
-        return repository.save(taskList);
+        if(taskListUpdated != null) {
+            repository.save(taskList);
+        } else {
+            throw new ItemNotFoundException("Task id " + id + " does not exist!");
+        }
+        return taskListUpdated;
     }
 
     //status , assignees is ""
