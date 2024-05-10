@@ -178,7 +178,7 @@ const deleteConfirm = async () => {
                 + Add New Task
                 </div>
                 <div class="itbkk-manage-status w-40 text-center p-2 bg-gray-300 rounded cursor-pointer duration-300 hover:bg-gray-400 hover:scale-105">
-                    <RouterLink to="/task/statuses">Manage Status</RouterLink>
+                    <RouterLink :to="{name: 'StatusView'}">Manage Status</RouterLink>
                 </div>
             </div>
             <div v-for="item in taskManagement.getAllTask()" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded">
