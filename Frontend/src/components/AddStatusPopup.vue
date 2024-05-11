@@ -44,7 +44,7 @@ const confirmHandle = () => {
                             </div>
                     </form>
                         <div class="mt-5 space-x-5">
-                            <button @click="confirmHandle()" :disabled="!addTitle" class="itbkk-button-confirm disabled bg-green-500 duration-200 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded disabled:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50">
+                            <button @click="confirmHandle()" :disabled="!addName" class="itbkk-button-confirm disabled bg-green-500 duration-200 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded disabled:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50">
                                 Save
                             </button>
                             <button @click="closeHandle()" class="itbkk-button-cancel disabled bg-red-500 duration-200 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded">

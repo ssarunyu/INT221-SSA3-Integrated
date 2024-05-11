@@ -45,6 +45,10 @@ const updateHandle = () => {
                   <p class="font-semibold">Description</p>
                   <input @input="disabled = false" class="itbkk-description border border-black rounded p-2 focus:outline-none" type="text" v-model="itemData.description" :placeholder="itemData.description === null ? 'No Description Provided' : ''">
               </div>
+              <div class="flex flex-col">
+                  <p class="font-semibold">Assignees</p>
+                  <input @input="disabled = false" class="itbkk-assignees border border-black rounded p-2 focus:outline-none" type="text" v-model="itemData.assignees" :placeholder="itemData.assignees === null ? 'Unassigned' : ''">
+              </div>
               <div class="flex items-center space-x-3 ">
                   <p for="">Status</p>
                   <select @change="disabled = false" class="itbkk-status rounded px-3 py-1 border border-gray-300" v-model="itemData.status" name="" id="">
