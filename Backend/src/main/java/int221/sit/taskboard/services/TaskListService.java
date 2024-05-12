@@ -3,6 +3,7 @@ package int221.sit.taskboard.services;
 import int221.sit.taskboard.DTO.TaskListByIdDto;
 import int221.sit.taskboard.DTO.TaskListDto;
 import int221.sit.taskboard.DTO.NewTaskListDto;
+import int221.sit.taskboard.entities.StatusList;
 import int221.sit.taskboard.entities.TaskList;
 import int221.sit.taskboard.exceptions.ItemNotFoundException;
 import int221.sit.taskboard.repositories.TaskListRepository;
@@ -61,9 +62,6 @@ public class TaskListService {
     public NewTaskListDto createNewTaskList(NewTaskListDto newTaskListDto) {
         TaskList taskList = modelMapper.map(newTaskListDto, TaskList.class);
         taskList.trimValues();
-        if (taskList.getStatus() == null) {
-            taskList.setStatus(TaskList.TaskStatus.NO_STATUS);
-        }
 //        taskList.setCreatedOn(ZonedDateTime.now());
         return modelMapper.map(repository.saveAndFlush(taskList), newTaskListDto.getClass());
     }
@@ -85,9 +83,6 @@ public class TaskListService {
         TaskList taskListUpdated= repository.findById(id).orElse(null);
         taskList.setId(id);
         taskList.trimValues();
-        if (taskList.getStatus() == null){
-            taskList.setStatus(TaskList.TaskStatus.NO_STATUS);
-        }
         if(taskListUpdated != null) {
             repository.save(taskList);
         } else {

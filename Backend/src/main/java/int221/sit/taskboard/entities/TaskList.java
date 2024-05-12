@@ -1,19 +1,20 @@
 package int221.sit.taskboard.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.ZonedDateTime;
-import java.sql.Date;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "task")
+@Table(name = "tasks")
 public class TaskList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "taskId")
     private Integer id;
     @Column(name = "title", nullable = true, length = 100)
     private String Title;
@@ -22,22 +23,16 @@ public class TaskList {
     @Column(name = "assignees", nullable = false, length = 100)
     private String Assignees;
 
-    @Column(name = "status", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private TaskStatus status;
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name ="statusId")
+    private StatusList status;
 
     @Column(name = "createdOn", insertable = false, updatable = false)
     private ZonedDateTime createdOn;
 
     @Column(name = "updatedOn", insertable = false, updatable = false)
     private ZonedDateTime updatedOn;
-
-    public enum TaskStatus {
-        NO_STATUS,
-        TO_DO,
-        DOING,
-        DONE
-    }
 
     public void trimValues() {
         if (this.Title != null) {

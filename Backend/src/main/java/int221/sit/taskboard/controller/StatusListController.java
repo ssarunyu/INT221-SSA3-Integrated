@@ -1,6 +1,7 @@
 package int221.sit.taskboard.controller;
 
 import int221.sit.taskboard.entities.StatusList;
+import int221.sit.taskboard.entities.TaskList;
 import int221.sit.taskboard.exceptions.ItemNotFoundException;
 import int221.sit.taskboard.services.StatusListService;
 import org.modelmapper.ModelMapper;
@@ -33,5 +34,10 @@ public class StatusListController {
     public ResponseEntity<StatusList> addNewStatus(@RequestBody StatusList newStatus) {
         StatusList createNewStatus = service.addStatus(newStatus);
         return ResponseEntity.status(HttpStatus.CREATED).body(createNewStatus);
+    }
+    
+    @PutMapping("/{id}")
+    public StatusList updateStatus(@RequestBody StatusList statusList, @PathVariable Integer id){
+        return service.updateStatus(id, statusList);
     }
 }

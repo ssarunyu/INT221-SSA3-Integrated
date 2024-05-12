@@ -1,6 +1,7 @@
 package int221.sit.taskboard.DTO;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import int221.sit.taskboard.entities.StatusList;
 import int221.sit.taskboard.entities.TaskList;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +16,7 @@ public class TaskListByIdDto {
     private String Title;
     private String Description;
     private String Assignees;
-    private TaskList.TaskStatus status;
+    private StatusList status;
     private ZonedDateTime createdOn;
     private ZonedDateTime updatedOn;
 }
