@@ -4,6 +4,7 @@ services:
     environment:
       MYSQL_USER: dev1
       MYSQL_PASSWORD: dev1
+      MYSQL_ROOT_PASSWORD: sb;,k,jk
     ports:
       - "3307:3306"
     volumes:
@@ -14,3 +15,11 @@ services:
       - "8080:8080"
     depends_on:
       - database
+  frontend:
+    build: ./Frontend/
+  proxy:
+    image: nginx:alpine
+    volumes:
+    - ./Proxy/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+    - "80:80"
