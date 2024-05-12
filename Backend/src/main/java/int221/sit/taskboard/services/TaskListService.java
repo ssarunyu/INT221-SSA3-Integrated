@@ -62,7 +62,13 @@ public class TaskListService {
     public NewTaskListDto createNewTaskList(NewTaskListDto newTaskListDto) {
         TaskList taskList = modelMapper.map(newTaskListDto, TaskList.class);
         taskList.trimValues();
-//        taskList.setCreatedOn(ZonedDateTime.now());
+
+        if(newTaskListDto.getStatus() == null) {
+            StatusList defaultStatus = new StatusList();
+            defaultStatus.setName("No Status");
+            taskList.setStatus(defaultStatus);
+        }
+
         return modelMapper.map(repository.saveAndFlush(taskList), newTaskListDto.getClass());
     }
 
@@ -83,6 +89,13 @@ public class TaskListService {
         TaskList taskListUpdated= repository.findById(id).orElse(null);
         taskList.setId(id);
         taskList.trimValues();
+
+        if(taskList.getStatus() == null) {
+            StatusList defaultStatus = new StatusList();
+            defaultStatus.setName("No Status");
+            taskList.setStatus(defaultStatus);
+        }
+
         if(taskListUpdated != null) {
             repository.save(taskList);
         } else {
@@ -90,6 +103,4 @@ public class TaskListService {
         }
         return taskListUpdated;
     }
-
-    //status , assignees is ""
 }

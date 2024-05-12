@@ -15,7 +15,7 @@ public class StatusList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "statusId")
     private Integer id;
-    @Column(name = "statusName")
+    @Column(name = "statusName", nullable = false)
     private String name;
     @Column(name = "statusDescription")
     private String description;

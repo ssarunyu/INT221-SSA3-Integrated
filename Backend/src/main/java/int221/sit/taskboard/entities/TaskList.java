@@ -34,6 +34,13 @@ public class TaskList {
     @Column(name = "updatedOn", insertable = false, updatable = false)
     private ZonedDateTime updatedOn;
 
+//    public TaskList() {
+//        if (this.status == null) {
+//            this.status = new StatusList();
+//            this.status.setName("No Status");
+//        }
+//    }
+
     public void trimValues() {
         if (this.Title != null) {
             this.Title = this.Title.trim();

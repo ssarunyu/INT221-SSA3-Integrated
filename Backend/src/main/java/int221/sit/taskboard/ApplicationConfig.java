@@ -15,11 +15,6 @@ public class ApplicationConfig {
         return new ModelMapper();
     }
 
-//    @Bean
-//    public DateTimeFormatter dateTimeFormatter() {
-//        return DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-//    }
-
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {

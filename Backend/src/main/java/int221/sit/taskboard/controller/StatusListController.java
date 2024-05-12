@@ -40,4 +40,9 @@ public class StatusListController {
     public StatusList updateStatus(@RequestBody StatusList statusList, @PathVariable Integer id){
         return service.updateStatus(id, statusList);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<StatusList> deleteStatus(@PathVariable Integer id) {
+        return service.deleteStatus(id);
+    }
 }

@@ -35,10 +35,11 @@ public class StatusListService {
 
     @Transactional
     public StatusList addStatus(StatusList newStatus) {
-        if(newStatus.getName() == null) {
-            throw new ItemNotFoundException("NOT FOUND");
-        } else {
+        if(newStatus.getName() != null) {
+            newStatus.trimValues();
             return repository.saveAndFlush(newStatus);
+        } else {
+            throw new RuntimeException("Status name is required");
         }
     }
 
@@ -55,4 +56,14 @@ public class StatusListService {
         return statusListUpdated;
     }
 
+    @Transactional
+    public ResponseEntity<StatusList> deleteStatus(Integer id) {
+        StatusList statusList = repository.findById(id).orElse(null);
+        if(statusList != null){
+            repository.delete(statusList);
+        } else {
+            throw new ItemNotFoundException("Status id " + id + " does not exist!");
+        }
+        return ResponseEntity.ok(statusList);
+    }
 }
