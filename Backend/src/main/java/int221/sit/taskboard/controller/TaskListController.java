@@ -5,17 +5,18 @@ import int221.sit.taskboard.DTO.TaskListByIdDto;
 import int221.sit.taskboard.DTO.TaskListDto;
 import int221.sit.taskboard.entities.TaskList;
 import int221.sit.taskboard.services.TaskListService;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/tasks")
+@RequestMapping("/v2/tasks")
 @CrossOrigin(origins = {"http://localhost:5173","http://ip23ssa3.sit.kmutt.ac.th"})
 public class TaskListController {
     @Autowired
@@ -53,13 +54,21 @@ public class TaskListController {
 
     @PostMapping("")
     public ResponseEntity<NewTaskListDto> addNewTaskList(@RequestBody NewTaskListDto newTaskList) {
-        NewTaskListDto createdTaskList = service.createNewTaskList(newTaskList);
+        Integer status = newTaskList.getStatus().getId();
+        NewTaskListDto createdTaskList = service.createNewTaskList(newTaskList,status);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTaskList);
     }
 
     @PutMapping("/{id}")
-    public TaskList updateTaskList(@RequestBody TaskList taskList,@PathVariable Integer id) {
-        return service.updateTaskListById(id, taskList);
+    public ResponseEntity<NewTaskListDto> updateTaskList(@RequestBody NewTaskListDto taskLists, @PathVariable Integer id) {
+        try{
+            Integer status = taskLists.getStatus().getId();
+            TaskList taskListToUpdate = modelMapper.map(taskLists, TaskList.class);
+            NewTaskListDto updatedTask = service.updateTaskListById(id, taskListToUpdate, status);
+            return ResponseEntity.ok(updatedTask);
+        } catch (HttpClientErrorException e){
+            return ResponseEntity.status(e.getStatusCode()).body(null);
+        }
     }
 
     @DeleteMapping("/{id}")

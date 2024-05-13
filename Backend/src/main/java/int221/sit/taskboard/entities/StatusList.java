@@ -2,12 +2,16 @@ package int221.sit.taskboard.entities;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @JsonPropertyOrder({"id", "name", "description"})
 @Table(name = "statuses")
 public class StatusList {

@@ -6,6 +6,7 @@ import int221.sit.taskboard.DTO.NewTaskListDto;
 import int221.sit.taskboard.entities.StatusList;
 import int221.sit.taskboard.entities.TaskList;
 import int221.sit.taskboard.exceptions.ItemNotFoundException;
+import int221.sit.taskboard.repositories.StatusListRepository;
 import int221.sit.taskboard.repositories.TaskListRepository;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
@@ -14,14 +15,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TaskListService {
     @Autowired
     private TaskListRepository repository;
+
+    @Autowired
+    public StatusListRepository statusListRepository;
 
     @Autowired
     public ModelMapper modelMapper;
@@ -59,17 +63,24 @@ public class TaskListService {
     }
 
     @Transactional
-    public NewTaskListDto createNewTaskList(NewTaskListDto newTaskListDto) {
-        TaskList taskList = modelMapper.map(newTaskListDto, TaskList.class);
-        taskList.trimValues();
-
-        if(newTaskListDto.getStatus() == null) {
-            StatusList defaultStatus = new StatusList();
-            defaultStatus.setName("No Status");
-            taskList.setStatus(defaultStatus);
+    public NewTaskListDto createNewTaskList(NewTaskListDto newTaskListDto,Integer statusId) {
+        TaskList newTaskList = modelMapper.map(newTaskListDto, TaskList.class);
+        newTaskList.trimValues();
+        if(statusId != null) {
+            StatusList statusList = statusListRepository.findById(statusId).orElse(null);
+            if (statusList != null) {
+                newTaskList.setStatus(statusList);
+            }
         }
 
-        return modelMapper.map(repository.saveAndFlush(taskList), newTaskListDto.getClass());
+        if(newTaskList.getStatus().getId() == null) {
+            StatusList defaultStatus = statusListRepository.findById(1).orElseThrow(() -> new ItemNotFoundException("Default status not found"));
+            newTaskList.setStatus(defaultStatus);
+        }
+
+        TaskList createdTaskList = repository.saveAndFlush(newTaskList);
+
+        return modelMapper.map(createdTaskList, NewTaskListDto.class);
     }
 
     @Transactional
@@ -78,29 +89,29 @@ public class TaskListService {
         if (taskList != null) {
             TaskListDto deletedTaskListDto = modelMapper.map(taskList, TaskListDto.class);
             repository.delete(taskList);
-            return deletedTaskListDto;
+            return modelMapper.map(deletedTaskListDto, TaskListDto.class);
         } else {
             throw new ItemNotFoundException("Task id " + id + " does not exist!");
         }
     }
 
     @Transactional
-    public TaskList updateTaskListById(Integer id, TaskList taskList) {
-        TaskList taskListUpdated= repository.findById(id).orElse(null);
+    public NewTaskListDto updateTaskListById(Integer id, TaskList taskList, Integer statusId) {
+        TaskList taskListUpdated = repository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException("Task id " + id + " does not exist!"));
+
         taskList.setId(id);
         taskList.trimValues();
 
-        if(taskList.getStatus() == null) {
-            StatusList defaultStatus = new StatusList();
-            defaultStatus.setName("No Status");
-            taskList.setStatus(defaultStatus);
+        if (statusId != null) {
+            StatusList statusList = statusListRepository.findById(statusId).orElse(null);
+            if (statusList != null) {
+                taskListUpdated.setStatus(statusList);
+            }
         }
 
-        if(taskListUpdated != null) {
-            repository.save(taskList);
-        } else {
-            throw new ItemNotFoundException("Task id " + id + " does not exist!");
-        }
-        return taskListUpdated;
+        TaskList updateTaskList = repository.save(taskListUpdated);
+
+        return modelMapper.map(updateTaskList, NewTaskListDto.class);
     }
 }

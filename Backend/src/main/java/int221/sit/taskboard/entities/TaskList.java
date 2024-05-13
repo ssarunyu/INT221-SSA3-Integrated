@@ -25,7 +25,7 @@ public class TaskList {
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name ="statusId")
+    @JoinColumn(name ="statusId", referencedColumnName = "statusId")
     private StatusList status;
 
     @Column(name = "createdOn", insertable = false, updatable = false)
