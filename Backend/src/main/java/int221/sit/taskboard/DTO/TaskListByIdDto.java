@@ -16,7 +16,7 @@ public class TaskListByIdDto {
     private String Title;
     private String Description;
     private String Assignees;
-    private StatusList status;
+    private Integer status;
     private ZonedDateTime createdOn;
     private ZonedDateTime updatedOn;
 }

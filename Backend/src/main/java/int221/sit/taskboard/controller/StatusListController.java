@@ -37,8 +37,9 @@ public class StatusListController {
     }
     
     @PutMapping("/{id}")
-    public StatusList updateStatus(@RequestBody StatusList statusList, @PathVariable Integer id){
-        return service.updateStatus(id, statusList);
+    public ResponseEntity<StatusList> updateStatus(@RequestBody StatusList statusList, @PathVariable Integer id){
+        StatusList updateStatus = service.updateStatus(id, statusList);
+        return ResponseEntity.status(HttpStatus.OK).body(updateStatus);
     }
 
     @DeleteMapping("/{id}")

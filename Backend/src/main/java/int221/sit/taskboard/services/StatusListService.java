@@ -19,9 +19,6 @@ public class StatusListService {
     @Autowired
     private ModelMapper modelMapper;
 
-    @Autowired
-    private ListMapper listMapper;
-
     public List<StatusList> getALl() {
         return repository.findAll();
     }

@@ -1,5 +1,6 @@
 package int221.sit.taskboard.services;
 
+import int221.sit.taskboard.DTO.NewTaskListDtoV2;
 import int221.sit.taskboard.DTO.TaskListByIdDto;
 import int221.sit.taskboard.DTO.TaskListDto;
 import int221.sit.taskboard.DTO.NewTaskListDto;
@@ -17,7 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskListService {
@@ -29,9 +30,6 @@ public class TaskListService {
 
     @Autowired
     public ModelMapper modelMapper;
-
-    @Autowired
-    public ListMapper listMapper;
 
     public List<TaskList> getAllTaskList(String[] param) {
         if (param == null) {
@@ -50,37 +48,41 @@ public class TaskListService {
         return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task " + id + " does not exist !!"));
     }
 
-    public List<TaskListDto> getAllTaskListDto(String[] param) {
-        List<TaskList> taskList = repository.findAll();
-        return listMapper.mapList(taskList, TaskListDto.class, modelMapper);
+    public List<TaskListDto> getAllTaskListDto() {
+        List<TaskList> taskLists = repository.findAll();
+        return taskLists.stream()
+                .map(taskList -> modelMapper.map(taskList, TaskListDto.class))
+                .collect(Collectors.toList());
     }
 
-    public List<TaskListByIdDto> getTaskListByIdDto(Integer id) {
+    public TaskListByIdDto getTaskListByIdDto(Integer id) {
         TaskList taskList = repository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Task id"+ id + "does not exist!"));
         List<TaskList> taskListSingleton = Collections.singletonList(taskList);
-        return listMapper.mapList(taskListSingleton, TaskListByIdDto.class, modelMapper);
+        return modelMapper.map(taskListSingleton, TaskListByIdDto.class);
     }
 
     @Transactional
-    public NewTaskListDto createNewTaskList(NewTaskListDto newTaskListDto,Integer statusId) {
-        TaskList newTaskList = modelMapper.map(newTaskListDto, TaskList.class);
-        newTaskList.trimValues();
-        if(statusId != null) {
-            StatusList statusList = statusListRepository.findById(statusId).orElse(null);
-            if (statusList != null) {
-                newTaskList.setStatus(statusList);
-            }
+    public NewTaskListDto createNewTaskList(NewTaskListDtoV2 newTaskListDto, Integer statusId) {
+        final Integer finalStatusId;
+        newTaskListDto.trimValues();
+
+        if (statusId == null) {
+            finalStatusId = 1;
+        } else {
+            finalStatusId = statusId;
         }
 
-        if(newTaskList.getStatus().getId() == null) {
-            StatusList defaultStatus = statusListRepository.findById(1).orElseThrow(() -> new ItemNotFoundException("Default status not found"));
-            newTaskList.setStatus(defaultStatus);
-        }
+        StatusList statusList = statusListRepository.findById(finalStatusId)
+                .orElseThrow(() -> new ItemNotFoundException("Status id " + finalStatusId + " does not exist!"));
 
-        TaskList createdTaskList = repository.saveAndFlush(newTaskList);
+        TaskList taskList = modelMapper.map(newTaskListDto, TaskList.class);
+        taskList.setStatus(statusList);
 
-        return modelMapper.map(createdTaskList, NewTaskListDto.class);
+        NewTaskListDto taskListDto = modelMapper.map(repository.saveAndFlush(taskList), NewTaskListDto.class);
+        taskListDto.setStatus(new StatusList());
+
+        return modelMapper.map(repository.saveAndFlush(taskList), taskListDto.getClass());
     }
 
     @Transactional

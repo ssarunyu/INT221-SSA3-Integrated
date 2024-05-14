@@ -15,13 +15,4 @@ public class ApplicationConfig {
         return new ModelMapper();
     }
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/{id}").allowedOrigins("http://localhost:5173","http://ip23ssa3.sit.kmutt.ac.th");
-            }
-        };
-    }
 }

@@ -10,8 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
 @JsonPropertyOrder({"id", "name", "description"})
 @Table(name = "statuses")
 public class StatusList {

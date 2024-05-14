@@ -17,11 +17,11 @@ public class TaskList {
     @Column(name = "taskId")
     private Integer id;
     @Column(name = "title", nullable = true, length = 100)
-    private String Title;
+    private String title;
     @Column(name = "description", nullable = false, length = 100)
-    private String Description;
+    private String description;
     @Column(name = "assignees", nullable = false, length = 100)
-    private String Assignees;
+    private String assignees;
 
     @JsonIgnore
     @ManyToOne
@@ -42,14 +42,14 @@ public class TaskList {
 //    }
 
     public void trimValues() {
-        if (this.Title != null) {
-            this.Title = this.Title.trim();
+        if (this.title != null) {
+            this.title = this.title.trim();
         }
-        if (this.Description != null) {
-            this.Description = this.Description.trim();
+        if (this.description != null) {
+            this.description = this.description.trim();
         }
-        if (this.Assignees != null) {
-            this.Assignees = this.Assignees.trim();
+        if (this.assignees != null) {
+            this.assignees = this.assignees.trim();
         }
     }
 }

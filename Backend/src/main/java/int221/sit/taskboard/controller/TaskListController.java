@@ -1,11 +1,12 @@
 package int221.sit.taskboard.controller;
 
 import int221.sit.taskboard.DTO.NewTaskListDto;
+import int221.sit.taskboard.DTO.NewTaskListDtoV2;
 import int221.sit.taskboard.DTO.TaskListByIdDto;
 import int221.sit.taskboard.DTO.TaskListDto;
 import int221.sit.taskboard.entities.TaskList;
+import int221.sit.taskboard.services.StatusListService;
 import int221.sit.taskboard.services.TaskListService;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,9 @@ import java.util.List;
 public class TaskListController {
     @Autowired
     private TaskListService service;
+
+    @Autowired
+    private StatusListService statusService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -49,20 +53,20 @@ public class TaskListController {
 
     @GetMapping("")
     public List<TaskListDto> getAllTaskListDto(@RequestParam(required = false) String[] param) {
-        return service.getAllTaskListDto(param);
+        return service.getAllTaskListDto();
     }
 
     @PostMapping("")
-    public ResponseEntity<NewTaskListDto> addNewTaskList(@RequestBody NewTaskListDto newTaskList) {
-        Integer status = newTaskList.getStatus().getId();
-        NewTaskListDto createdTaskList = service.createNewTaskList(newTaskList,status);
+    public ResponseEntity<NewTaskListDto> addNewTaskList(@RequestBody NewTaskListDtoV2 newTaskList) {
+        Integer status = newTaskList.getStatus();
+        NewTaskListDto createdTaskList = service.createNewTaskList(newTaskList, status);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTaskList);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<NewTaskListDto> updateTaskList(@RequestBody NewTaskListDto taskLists, @PathVariable Integer id) {
-        try{
-            Integer status = taskLists.getStatus().getId();
+    public ResponseEntity<NewTaskListDto> updateTaskList(@RequestBody NewTaskListDtoV2 taskLists, @PathVariable Integer id) {
+        try {
+            Integer status = taskLists.getStatus();
             TaskList taskListToUpdate = modelMapper.map(taskLists, TaskList.class);
             NewTaskListDto updatedTask = service.updateTaskListById(id, taskListToUpdate, status);
             return ResponseEntity.ok(updatedTask);
