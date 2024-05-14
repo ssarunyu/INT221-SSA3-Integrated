@@ -13,9 +13,9 @@ import java.time.ZonedDateTime;
 @JsonPropertyOrder({"id", "title", "description", "assignees", "status", "createdOn", "updatedOn"})
 public class TaskListByIdDto {
     private Integer id;
-    private String title;
-    private String description;
-    private String assignees;
+    private String Title;
+    private String Description;
+    private String Assignees;
     private StatusList status;
     private ZonedDateTime createdOn;
     private ZonedDateTime updatedOn;

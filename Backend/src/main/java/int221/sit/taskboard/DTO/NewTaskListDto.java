@@ -14,8 +14,8 @@ import lombok.Setter;
 @JsonPropertyOrder({"id", "title", "description", "assignees", "status"})
 public class NewTaskListDto {
     private Integer id;
-    private String title;
-    private String description;
-    private String assignees;
+    private String Title;
+    private String Description;
+    private String Assignees;
     private StatusList status;
 }

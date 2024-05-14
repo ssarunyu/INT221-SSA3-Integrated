@@ -109,13 +109,9 @@ public class TaskListService {
         taskListUpdated.setAssignees(newTaskListDto.getAssignees());
 
         if (statusId != null) {
-            StatusList statusList = statusListRepository.findById(statusId).orElse(null);
-            if (statusList != null) {
-                taskListUpdated.setTitle(taskList.getTitle());
-                taskListUpdated.setStatus(statusList);
-                taskListUpdated.setAssignees(taskList.getAssignees());
-                taskListUpdated.setDescription(taskList.getDescription());
-            }
+            StatusList statusList = statusListRepository.findById(statusId)
+                    .orElseThrow(() -> new ItemNotFoundException("Status id " + statusId + " does not exist!"));
+            taskListUpdated.setStatus(statusList);
         }
 
         TaskList updatedTaskList = repository.saveAndFlush(taskListUpdated);
