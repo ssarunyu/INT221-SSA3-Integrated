@@ -1,10 +1,22 @@
 <script setup>
+import { onMounted } from 'vue';
+import { getData } from '@/lib/fetchMethod';
 import { ref } from 'vue'
 
 const emit = defineEmits(['confirm', 'close'])
 const closeHandle = () => {
   emit('close')
 }
+
+const allStatus = ref()
+const fetchStatus = async () => {
+  const response = await getData(import.meta.env.VITE_STATUS_URL)
+  allStatus.value = await response
+}
+
+onMounted(async() => {
+  await fetchStatus()
+})
 
 const addTitle = ref('')
 const addDescription = ref(null)
@@ -16,7 +28,7 @@ const confirmHandle = () => {
     title: addTitle.value ? addTitle.value.trim() : null,
     description: addDescription.value ? addDescription.value.trim() : null,
     assignees: addAssignees.value ? addAssignees.value.trim() : null,
-    status: addStatus.value ? addStatus.value.trim() : null
+    status: addStatus.value
   }
   emit('confirm', newTask)
   // Clear form when open again
@@ -33,7 +45,7 @@ const confirmHandle = () => {
     <!-- Overlay -->
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 backdrop-blur"></div>
     <!-- Popup -->
-    <div class="relative bg-white rounded-lg shadow-xl w-[70%]">
+    <div class="itbkk-modal-task relative bg-white rounded-lg shadow-xl w-[70%]">
       <!-- Popup content -->
       <div class="flex flex-col p-5">
         <form class="space-y-5" novalidate>
@@ -57,10 +69,7 @@ const confirmHandle = () => {
             <div class="flex items-center space-x-3 ">
                 <p class="font-semibold">Status</p>
                 <select v-model="addStatus" class="itbkk-status rounded px-3 py-1 border border-gray-300">
-                  <option value="NO_STATUS">No Status</option>
-                  <option value="TO_DO">To Do</option>
-                  <option value="DOING">Doing</option>
-                  <option value="DONE">Done</option>
+                  <option v-for="status in allStatus" :value="status.id">{{ status.name }}</option>
                 </select>
               </div>
             </form>

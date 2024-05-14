@@ -10,6 +10,8 @@ function styleStatus(name) {
     }
     if(name === 'Done') {
         return 'bg-green-300'
+    } else {
+        return 'text-white bg-gradient-to-r from-sky-300 to-pink-300'
     }
 }
 

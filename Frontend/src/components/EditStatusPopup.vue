@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from "vue"
+
 const props = defineProps({
     itemData: {
         type: Object
@@ -22,7 +23,7 @@ const updateHandle = () => {
 </script>
 
 <template>
-  <div class="fixed z-10 inset-0 overflow-y-auto">
+  <div v-if="props.itemData" class="fixed z-10 inset-0 overflow-y-auto">
     <div class="flex items-center justify-center h-screen">
       <!-- Overlay -->
       <div class="fixed inset-0 bg-gray-500 bg-opacity-75 backdrop-blur"></div>
@@ -31,11 +32,11 @@ const updateHandle = () => {
         <!-- Popup content -->
         <div class="flex flex-col p-5">
           <form class="space-y-5">
-              <h2 class="text-2xl font-bold mb-4">Edit Status</h2>
+              <h2 class="text-2xl font-bold mb-4">Edit Task</h2>
               <hr>
               <div class="flex flex-col">
-                  <p class="font-semibold">Name</p>
-                  <input @input="disabled = false" class="itbkk-title border border-black rounded p-2 peer invalid:border-red-500 focus:outline-none" type="text" v-model="itemData.name" required>
+                  <p class="font-semibold">name</p>
+                  <input @input="disabled = false" class="itbkk-status-name border border-black rounded p-2 peer invalid:border-red-500 focus:outline-none" type="text" v-model="itemData.name" required>
                   <p class="hidden peer-invalid:block text-red-600 text-sm">
                     This field required
                   </p>

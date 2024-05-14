@@ -26,7 +26,7 @@ const confirmHandle = () => {
     <div class="fixed z-10 inset-0 overflow-y-auto">
         <div class="flex items-center justify-center h-screen">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 backdrop-blur"></div>
-            <div class="relative bg-white rounded-lg shadow-xl w-[70%]">
+            <div class="itbkk-modal-status relative bg-white rounded-lg shadow-xl w-[70%]">
                 <div class="flex flex-col p-5">
                     <form class="space-y-5" novalidate>
                         <h2 class="text-2xl font-bold mb-4">Add Status</h2>

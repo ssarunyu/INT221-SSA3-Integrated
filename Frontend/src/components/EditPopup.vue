@@ -1,8 +1,12 @@
 <script setup>
 import { ref } from "vue"
+
 const props = defineProps({
     itemData: {
         type: Object
+    },
+    statusData: {
+      type: Object
     }
 })
 
@@ -17,13 +21,14 @@ const updateHandle = () => {
   props.itemData.title = props.itemData.title ? props.itemData.title.trim() : null
   props.itemData.description = props.itemData.description ? props.itemData.description.trim() : null
   props.itemData.assignees = props.itemData.assignees ? props.itemData.assignees.trim() : null
+  props.itemData.status = props.itemData.status
   emit('update', props.itemData)
   disabled.value = true
 }
 </script>
 
 <template>
-  <div class="fixed z-10 inset-0 overflow-y-auto">
+  <div v-if="props.itemData && props.statusData" class="fixed z-10 inset-0 overflow-y-auto">
     <div class="flex items-center justify-center h-screen">
       <!-- Overlay -->
       <div class="fixed inset-0 bg-gray-500 bg-opacity-75 backdrop-blur"></div>
@@ -50,15 +55,11 @@ const updateHandle = () => {
                   <input @input="disabled = false" class="itbkk-assignees border border-black rounded p-2 focus:outline-none" type="text" v-model="itemData.assignees" :placeholder="itemData.assignees === null ? 'Unassigned' : ''">
               </div>
               <div class="flex items-center space-x-3 ">
-                  <p for="">Status</p>
+                  <p>Status</p>
                   <select @change="disabled = false" class="itbkk-status rounded px-3 py-1 border border-gray-300" v-model="itemData.status" name="" id="">
-                    <option value="NO_STATUS">No Status</option>
-                    <option value="TO_DO">To Do</option>
-                    <option value="DOING">Doing</option>
-                    <option value="DONE">Done</option>
+                    <option v-for="status in statusData" :value="status">{{ status.name }}</option>
                   </select>
               </div>
-              <!-- FIXED: Date -->
               <div class="flex flex-col">
                 <p><strong>Timezone</strong> {{ Intl.DateTimeFormat().resolvedOptions().timeZone }}</p>
                 <p><strong>Created On</strong> {{ itemData.createdOn }}</p>

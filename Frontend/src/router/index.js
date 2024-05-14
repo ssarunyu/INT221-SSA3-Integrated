@@ -2,86 +2,29 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import TaskDetail from '@/components/TaskDetail.vue'
 import EditPopup from '@/components/EditPopup.vue'
-import Notfound from '@/views/Notfound.vue'
-import { getDataById } from '@/lib/fetchMethod.js'
-import StatusView from '@/views/StatusView.vue'
-import { comment } from 'postcss'
 import EditStatusPopup from '@/components/EditStatusPopup.vue'
+
+import Notfound from '@/views/Notfound.vue'
+import StatusView from '@/views/StatusView.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      redirect: '/task',
+      name: 'RootPath',
+      redirect: { name: 'Home' }
     },
-    {
-      path: '/task',
-      name: 'task',
+    { path: '/task', name: 'Home', component: HomeView,
       children: [
-        {
-          path: '',
-          name: 'Home',
-          component: HomeView,
-        },
-        {
-          path: 'statuses',
-          name: 'StatusView',
-          component: StatusView,
-          children: [
-            {
-              path: ':editStatus/edit',
-              name: 'EditStatusPopup',
-              component: EditStatusPopup,
-              props: true,
-              async beforeEnter(to) {
-                const result = await getDataById(
-                  import.meta.env.VITE_URL,
-                  to.params.EditStatus
-                )
-                if (result.status === 404) {
-                  alert('The requested task does not exist')
-                  router.go(-1)
-                }
-              },
-            },
-          ],
-        },
-        {
-          path: ':editId/edit',
-          name: 'EditPopup',
-          component: EditPopup,
-          props: true,
-          async beforeEnter(to) {
-            const result = await getDataById(
-              import.meta.env.VITE_URL,
-              to.params.editId
-            )
-            if (result.status === 404) {
-              alert('The requested task does not exist')
-              router.go(-1)
-            }
-          },
-        },
-        {
-          path: ':detailId',
-          name: 'TaskDetail',
-          component: TaskDetail,
-          props: true,
-          async beforeEnter(to) {
-            const result = await getDataById(
-              import.meta.env.VITE_URL,
-              to.params.detailId
-            )
-            if (result.status === 404) {
-              alert('The requested task does not exist')
-              router.push('/404')
-              setTimeout(() => {
-                router.push('/task')
-              }, 3000)
-            }
-          },
-        },
+        { path: ':detailId', name: 'TaskDetail', component: TaskDetail, },
+        { path: ':editId/edit', name: 'EditPopup', component: EditPopup, },
+      ]
+    },
+    { path: '/status', name: 'StatusView', component: StatusView,
+      children: [
+        { path: ':editStatusId/edit', name: 'EditStatusPopup', component: EditStatusPopup },
       ],
     },
     {

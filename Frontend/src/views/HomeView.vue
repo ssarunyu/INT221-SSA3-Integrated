@@ -2,24 +2,23 @@
 import { ref, watch, onMounted } from 'vue';
 import { getData, getDataById, deleteData, postData, updateData } from '@/lib/fetchMethod.js';
 import { TaskManagement } from '@/lib/TaskManagement.js'
-import { useRoute } from 'vue-router';
 import router from '@/router';
 import Toast from '@/components/Toast.vue'
 import AddPopup from '@/components/AddPopup.vue';
 import EditPopup from '@/components/EditPopup.vue'
 import DeletePopup from '@/components/DeletePopup.vue'
-import TaskDetail from '@/components/TaskDetail.vue';
 import { styleStatus } from '@/lib/styleStatus';
-
-const route = useRoute()
 
 const taskManagement = ref(new TaskManagement())
 
 const fetch = async() => {
-    // Fetch data
-    const result = await getData(import.meta.env.VITE_URL)
-    // Front-end
-    taskManagement.value.addAllTask(result)
+    // Fetch task
+    const allTask = await getData(import.meta.env.VITE_TASK_URL)
+    taskManagement.value.addAllTask(allTask)
+
+    // Fetch status
+    const allStatus = await getData(import.meta.env.VITE_STATUS_URL)
+    taskManagement.value.addAllStatus(allStatus)
 }
 
 const items = taskManagement.value.getAllTask()
@@ -46,62 +45,41 @@ watch(items, (newItems) => {
 
 onMounted(async () => {
     await fetch()
-    const detailId = route.params.detailId
-    const editId = route.params.editId
-    if(detailId) {
-        await openTaskDetail(detailId)
-    } else if (editId) {
-        await openEditPopup(editId)
-    }
 })
 
 // Toast
 const toastHandle = ref()
 
-//Task Detail
-const taskPopupStatus = ref(false);
-const taskDetailTarget = ref()
-const openTaskDetail = async (componentId) => {
-    router.push({ name: 'TaskDetail', params: { detailId: componentId } })
-    taskDetailTarget.value = ''
-    taskPopupStatus.value = true
-    const result =  await getDataById(import.meta.env.VITE_URL, componentId)
-    result.createdOn = new Date(result.createdOn).toLocaleString('en-AU', options)
-    result.updatedOn = new Date(result.updatedOn).toLocaleString('en-AU', options)
-    taskDetailTarget.value = result
-}
-const closeTaskDetail = () => {
-    taskPopupStatus.value = false
-    router.push('/task')
-}
-
 // Edit
 const options = {
-  timeZoneName: "short",
-  hour12: false,
+    timeZoneName: "short",
+    hour12: false,
 }
-const targetItem = ref()
+const editTaskTarget = ref()
 const editPopupStatus = ref(false)
 const openEditPopup = async (componentId) => {
-    router.push({ name: 'EditPopup', params: { editId: componentId }})
-    editPopupStatus.value = true
-    const result = await getDataById(import.meta.env.VITE_URL, componentId)
-    result.createdOn = new Date(result.createdOn).toLocaleString('en-AU', options)
-    result.updatedOn = new Date(result.updatedOn).toLocaleString('en-AU', options)
-    targetItem.value = result
+    const result = await getDataById(import.meta.env.VITE_TASK_URL, componentId)
+    if(result) {
+        editPopupStatus.value = true
+        router.push({ name: 'EditPopup', params: { editId: componentId }})
+        result.createdOn = new Date(result.createdOn).toLocaleString('en-AU', options)
+        result.updatedOn = new Date(result.updatedOn).toLocaleString('en-AU', options)
+        editTaskTarget.value = result
+    }
 }
 const closeEditPopup = () => {
-    targetItem.value = ''
+    editTaskTarget.value = ''
     editPopupStatus.value = false
-    router.push('/task')
+    router.push({ name: 'Home' })
 }
 const updateEdit = async (newEdit) => {
-    const response = await updateData(import.meta.env.VITE_URL,
+    console.log(newEdit)
+    const response = await updateData(import.meta.env.VITE_TASK_URL,
     {
         title: newEdit.title,
         description: newEdit.description,
         assignees: newEdit.assignees,
-        status: newEdit.status
+        status: newEdit.status.id
     }, newEdit.id)
     if(response.ok) {
         // Toast
@@ -109,22 +87,21 @@ const updateEdit = async (newEdit) => {
         // Front-end
         taskManagement.value.updateTask(newEdit, newEdit.id)
         editPopupStatus.value = false
-        router.push('/task')
+        router.push({ name: 'Home' })
     }
 }
 
 // Add
 const addPopupStatus = ref(false)
 const openAddPopup = () => {
-  addPopupStatus.value = true
+    addPopupStatus.value = true
 }
 const closeAddPopup = () => {
-  addPopupStatus.value = false
-  router.push('/task')
+    addPopupStatus.value = false
 }
 const confirmAdd = async (newTask) => {
     // Back-end
-    const response = await postData(import.meta.env.VITE_URL, newTask)
+    const response = await postData(import.meta.env.VITE_TASK_URL, newTask)
     if(response.ok) {
         // Add Toast
         toastHandle.value = {type: 'success', status: true, message: `${newTask.title} task added successfully!`}
@@ -139,12 +116,12 @@ const deletePopupStatus = ref(false)
 const deleteTarget = ref()
 const openDeletePopup = async (id) => {
     deletePopupStatus.value = true
-    const result = await getDataById(import.meta.env.VITE_URL, id)
+    const result = await getDataById(import.meta.env.VITE_TASK_URL, id)
     deleteTarget.value = result
 }
 const deleteConfirm = async () => {
     // Back-end
-    const response = await deleteData(import.meta.env.VITE_URL, deleteTarget.value.id)
+    const response = await deleteData(import.meta.env.VITE_TASK_URL, deleteTarget.value.id)
     // Check Status
     if(response.ok) {
         toastHandle.value = {type: 'success', status: true, message: `The task has been deleted`}
@@ -160,10 +137,12 @@ const deleteConfirm = async () => {
 </script>
 
 <template>
+    <!-- For details -->
+    <router-view></router-view>
+    <!-- Components -->
     <DeletePopup v-show="deletePopupStatus" v-if="deleteTarget" :deleteItem="deleteTarget" @close="deletePopupStatus = false" @confirm="deleteConfirm()"/>
     <AddPopup v-show="addPopupStatus" @close="closeAddPopup()" @confirm="confirmAdd"/>
-    <EditPopup v-show="editPopupStatus" v-if="targetItem" :itemData="targetItem" @update="updateEdit" @close="closeEditPopup()"/>
-    <TaskDetail v-show="taskPopupStatus" v-if="taskDetailTarget" :item="taskDetailTarget" @close="closeTaskDetail"/>
+    <EditPopup v-show="editPopupStatus" v-if="editTaskTarget" :itemData="editTaskTarget" :statusData="taskManagement.getAllStatus()" @update="updateEdit" @close="closeEditPopup()"/>
     <div class="w-full min-h-screen p-5">
         <h1 class="flex text-2xl font-bold justify-center mb-5">ITBKK SSA3 Taskboard</h1>
         <div class="flex flex-col space-y-3">
@@ -177,12 +156,10 @@ const deleteConfirm = async () => {
                 <div @click="openAddPopup()" class="itbkk-button-add w-40 text-center p-2 bg-green-300 rounded cursor-pointer duration-300 hover:bg-green-400 hover:scale-105">
                 + Add New Task
                 </div>
-                <div class="itbkk-manage-status w-40 text-center p-2 bg-gray-300 rounded cursor-pointer duration-300 hover:bg-gray-400 hover:scale-105">
-                    <RouterLink :to="{name: 'StatusView'}">Manage Status</RouterLink>
-                </div>
+                <router-link class="itbkk-manage-status p-2 bg-gray-300 rounded w-[150px] text-center duration-300 hover:bg-gray-400" :to="{ name: 'StatusView' }">Manage Status</router-link>
             </div>
-            <div v-for="item in taskManagement.getAllTask()" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded">
-                <div class="absolute left-0 w-1 h-10" :class="styleStatus(item.status)"></div>
+            <div v-for="item in taskManagement.getAllTask()" :key="item.id" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded">
+                <div class="absolute left-0 w-1 h-10" :class="styleStatus(item.status.name)"></div>
                 <div class="flex items-center space-x-3">
                     <div>
                         <div class="dropdown itbkk-button-action">
@@ -199,7 +176,7 @@ const deleteConfirm = async () => {
                         {{ item.id }}
                     </p>
                     <div class="w-full">
-                        <p @click="openTaskDetail(item.id)" class="itbkk-title break-all font-bold text-xl duration-200 cursor-pointer hover:text-gray-700">
+                        <p @click="router.push({ name: 'TaskDetail', params: { detailId: item.id}})" class="itbkk-title break-all font-bold text-xl duration-200 cursor-pointer hover:text-gray-700">
                             {{ item.title }}
                         </p>
                         <p class="itbkk-assignees" :class="item.assignees === null ? 'italic text-gray-500' : ''">
@@ -208,7 +185,7 @@ const deleteConfirm = async () => {
                     </div>
                 </div>
                 <div>
-                    <p class="itbkk-status px-4 py-2 rounded" :class="styleStatus(item.status)">{{ item.status }}</p>
+                    <p class="itbkk-status px-4 py-2 rounded" :class="styleStatus(item.status.name)">{{ item.status.name }}</p>
                 </div>
             </div>
         </div>

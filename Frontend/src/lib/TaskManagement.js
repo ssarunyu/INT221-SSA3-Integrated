@@ -22,17 +22,21 @@ class TaskManagement {
   getAllTask() {
     return this.allTasks
   }
-  getAllStatus() {
-    return this.allStatus
+  // Status
+  addStatus(item) {
+    this.allStatus.push(item)
   }
   addAllStatus(items) {
     items.forEach((i) => {
       this.allStatus.push(i)
     })
   }
-  updateStatus(status , id) {
+  updateStatus(status, id) {
     const index = this.allStatus.findIndex((item) => item.id === id)
     this.allStatus[index] = status
+  }
+  getAllStatus() {
+    return this.allStatus
   }
 }
 
