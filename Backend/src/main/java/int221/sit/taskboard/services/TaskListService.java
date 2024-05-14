@@ -64,14 +64,9 @@ public class TaskListService {
 
     @Transactional
     public NewTaskListDto createNewTaskList(NewTaskListDtoV2 newTaskListDto, Integer statusId) {
-        final Integer finalStatusId;
         newTaskListDto.trimValues();
 
-        if (statusId == null) {
-            finalStatusId = 1;
-        } else {
-            finalStatusId = statusId;
-        }
+        Integer finalStatusId = (statusId == null) ? 1 : statusId;
 
         StatusList statusList = statusListRepository.findById(finalStatusId)
                 .orElseThrow(() -> new ItemNotFoundException("Status id " + finalStatusId + " does not exist!"));
@@ -79,10 +74,10 @@ public class TaskListService {
         TaskList taskList = modelMapper.map(newTaskListDto, TaskList.class);
         taskList.setStatus(statusList);
 
-        NewTaskListDto taskListDto = modelMapper.map(repository.saveAndFlush(taskList), NewTaskListDto.class);
-        taskListDto.setStatus(new StatusList());
+        TaskList savedTaskList = repository.saveAndFlush(taskList);
+        NewTaskListDto taskListDto = modelMapper.map(savedTaskList, NewTaskListDto.class);
 
-        return modelMapper.map(repository.saveAndFlush(taskList), taskListDto.getClass());
+        return taskListDto;
     }
 
     @Transactional
