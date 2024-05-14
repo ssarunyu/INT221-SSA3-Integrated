@@ -38,10 +38,11 @@ public class TaskListService {
             return repository.findAllById(List.of());
         }
     }
+
     public TaskList findById(Integer id) {
         return repository.findById(id).orElseThrow(
-              ()-> new ItemNotFoundException(
-                "Task id " + id + " does not exist!"));
+                () -> new ItemNotFoundException(
+                        "Task id " + id + " does not exist!"));
     }
 
     public TaskList getTaskListById(Integer id) {
@@ -57,7 +58,7 @@ public class TaskListService {
 
     public TaskListByIdDto getTaskListByIdDto(Integer id) {
         TaskList taskList = repository.findById(id)
-                .orElseThrow(() -> new ItemNotFoundException("Task id"+ id + "does not exist!"));
+                .orElseThrow(() -> new ItemNotFoundException("Task id" + id + "does not exist!"));
         List<TaskList> taskListSingleton = Collections.singletonList(taskList);
         return modelMapper.map(taskListSingleton, TaskListByIdDto.class);
     }
@@ -66,10 +67,15 @@ public class TaskListService {
     public NewTaskListDto createNewTaskList(NewTaskListDtoV2 newTaskListDto, Integer statusId) {
         newTaskListDto.trimValues();
 
-        Integer finalStatusId = (statusId == null) ? 1 : statusId;
+        StatusList statusList;
+        if (statusId != null) {
+            statusList = statusListRepository.findById(statusId)
+                    .orElseThrow(() -> new ItemNotFoundException("Status id " + statusId + " does not exist!"));
+        } else {
+            statusList = statusListRepository.findById(1)
+                    .orElseThrow(() -> new ItemNotFoundException("Status id 1 does not exist!"));
+        }
 
-        StatusList statusList = statusListRepository.findById(finalStatusId)
-                .orElseThrow(() -> new ItemNotFoundException("Status id " + finalStatusId + " does not exist!"));
 
         TaskList taskList = modelMapper.map(newTaskListDto, TaskList.class);
         taskList.setStatus(statusList);
@@ -93,22 +99,25 @@ public class TaskListService {
     }
 
     @Transactional
-    public NewTaskListDto updateTaskListById(Integer id, TaskList taskList, Integer statusId) {
+    public NewTaskListDto updateTaskListById(Integer id, NewTaskListDtoV2 newTaskListDto, Integer statusId) {
+
         TaskList taskListUpdated = repository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Task id " + id + " does not exist!"));
 
-        taskList.setId(id);
-        taskList.trimValues();
+        newTaskListDto.trimValues();
+
+        taskListUpdated.setTitle(newTaskListDto.getTitle());
+        taskListUpdated.setDescription(newTaskListDto.getDescription());
+        taskListUpdated.setAssignees(newTaskListDto.getAssignees());
 
         if (statusId != null) {
-            StatusList statusList = statusListRepository.findById(statusId).orElse(null);
-            if (statusList != null) {
-                taskListUpdated.setStatus(statusList);
-            }
+            StatusList statusList = statusListRepository.findById(statusId)
+                    .orElseThrow(() -> new ItemNotFoundException("Status id " + statusId + " does not exist!"));
+            taskListUpdated.setStatus(statusList);
         }
 
-        TaskList updateTaskList = repository.save(taskListUpdated);
+        TaskList updatedTaskList = repository.saveAndFlush(taskListUpdated);
 
-        return modelMapper.map(updateTaskList, NewTaskListDto.class);
+        return modelMapper.map(updatedTaskList, NewTaskListDto.class);
     }
 }

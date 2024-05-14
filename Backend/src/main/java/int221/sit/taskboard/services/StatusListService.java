@@ -42,15 +42,25 @@ public class StatusListService {
 
     @Transactional
     public StatusList updateStatus(Integer id, StatusList statuslist){
-        StatusList statusListUpdated = repository.findById(id).orElse(null);
-        statuslist.setId(id);
+        StatusList existingStatus = repository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException("Status id " + id + " does not exist!"));
+
         statuslist.trimValues();
-        if(statusListUpdated != null){
-            repository.save(statuslist);
-        } else {
-            throw new ItemNotFoundException("Status id " + id + " does not exist!");
+
+        if (statuslist.getName() == null || statuslist.getName().isEmpty()) {
+            throw new IllegalArgumentException("Status name is required");
         }
-        return statusListUpdated;
+
+        if (existingStatus.getId() == 1) {
+            throw new IllegalArgumentException("Cannot update Status Id 1");
+        }
+
+        existingStatus.setName(statuslist.getName());
+        existingStatus.setDescription(statuslist.getDescription());
+
+        StatusList updatedStatus = repository.save(existingStatus);
+
+        return updatedStatus;
     }
 
     @Transactional

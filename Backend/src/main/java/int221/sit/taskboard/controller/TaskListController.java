@@ -5,6 +5,7 @@ import int221.sit.taskboard.DTO.NewTaskListDtoV2;
 import int221.sit.taskboard.DTO.TaskListByIdDto;
 import int221.sit.taskboard.DTO.TaskListDto;
 import int221.sit.taskboard.entities.TaskList;
+import int221.sit.taskboard.exceptions.ItemNotFoundException;
 import int221.sit.taskboard.services.StatusListService;
 import int221.sit.taskboard.services.TaskListService;
 import org.modelmapper.ModelMapper;
@@ -65,14 +66,9 @@ public class TaskListController {
 
     @PutMapping("/{id}")
     public ResponseEntity<NewTaskListDto> updateTaskList(@RequestBody NewTaskListDtoV2 taskLists, @PathVariable Integer id) {
-        try {
             Integer status = taskLists.getStatus();
-            TaskList taskListToUpdate = modelMapper.map(taskLists, TaskList.class);
-            NewTaskListDto updatedTask = service.updateTaskListById(id, taskListToUpdate, status);
+            NewTaskListDto updatedTask = service.updateTaskListById(id, taskLists, status);
             return ResponseEntity.ok(updatedTask);
-        } catch (HttpClientErrorException e){
-            return ResponseEntity.status(e.getStatusCode()).body(null);
-        }
     }
 
     @DeleteMapping("/{id}")
