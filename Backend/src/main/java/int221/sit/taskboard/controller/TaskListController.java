@@ -59,6 +59,29 @@ public class TaskListController {
 
     @PostMapping("")
     public ResponseEntity<NewTaskListDto> addNewTaskList(@RequestBody NewTaskListDtoV2 newTaskList) {
+
+        if (newTaskList.getTitle() != null) {
+            newTaskList.setTitle(newTaskList.getTitle().trim());
+        }
+
+        if (newTaskList.getDescription() != null) {
+            if (newTaskList.getDescription().isEmpty()) {
+                newTaskList.setDescription(null);
+            } else {
+                newTaskList.setDescription(newTaskList.getDescription().trim());
+            }
+
+        }
+
+        if (newTaskList.getAssignees() != null) {
+
+            if (newTaskList.getAssignees().isEmpty()) {
+                newTaskList.setAssignees(null);
+            } else {
+                newTaskList.setAssignees(newTaskList.getAssignees().trim());
+            }
+        }
+
         Integer status = newTaskList.getStatus();
         NewTaskListDto createdTaskList = service.createNewTaskList(newTaskList, status);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTaskList);
@@ -66,9 +89,13 @@ public class TaskListController {
 
     @PutMapping("/{id}")
     public ResponseEntity<NewTaskListDto> updateTaskList(@RequestBody NewTaskListDtoV2 taskLists, @PathVariable Integer id) {
+        try {
             Integer status = taskLists.getStatus();
             NewTaskListDto updatedTask = service.updateTaskListById(id, taskLists, status);
             return ResponseEntity.ok(updatedTask);
+        } catch (ItemNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @DeleteMapping("/{id}")

@@ -73,7 +73,7 @@ public class TaskListService {
                     .orElseThrow(() -> new ItemNotFoundException("Status id " + statusId + " does not exist!"));
         } else {
             statusList = statusListRepository.findById(1)
-                    .orElseThrow(() -> new ItemNotFoundException("Status id 1 does not exist!"));
+                    .orElseThrow(() -> new ItemNotFoundException("Default status does not exist!"));
         }
 
 
@@ -103,8 +103,6 @@ public class TaskListService {
 
         TaskList taskListUpdated = repository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Task id " + id + " does not exist!"));
-
-        newTaskListDto.trimValues();
 
         taskListUpdated.setTitle(newTaskListDto.getTitle());
         taskListUpdated.setDescription(newTaskListDto.getDescription());
