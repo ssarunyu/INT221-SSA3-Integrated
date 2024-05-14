@@ -1,6 +1,6 @@
 GRANT ALL PRIVILEGES ON *.* TO 'dev1'@'%';
 CREATE SCHEMA `task_base` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
-use task_base ; 
+use  task_base ; 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -12,11 +12,11 @@ use task_base ;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
+ 
 --
 -- Table structure for table `Task`
 --
-
+ 
 DROP TABLE IF EXISTS `tasks`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -31,13 +31,13 @@ CREATE TABLE `tasks` (
   UNIQUE KEY `id_UNIQUE` (`taskId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
-
+ 
+ 
 USE task_base;
 
 CREATE TABLE statuses (
   statusId INT NOT NULL AUTO_INCREMENT,
-  statusName VARCHAR(50) NOT NULL,
+  statusName VARCHAR(50) NOT NULL UNIQUE,
   statusDescription VARCHAR(200),
   PRIMARY KEY (statusId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -47,7 +47,7 @@ ADD COLUMN statusId INT not null ,
 ADD CONSTRAINT fk_tasks_statuses
 FOREIGN KEY (statusId) REFERENCES statuses(statusId);
 
-
+ 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
@@ -55,10 +55,10 @@ FOREIGN KEY (statusId) REFERENCES statuses(statusId);
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
+ 
 INSERT INTO statuses (statusName, statusDescription)
 VALUES
-	('No Status', 'Task No status'),
+('No Status', 'The default status'),
     ('To Do', 'Task needs to be started'),
     ('Doing', 'Task is in progress'),
     ('Done', 'Task is completed');
