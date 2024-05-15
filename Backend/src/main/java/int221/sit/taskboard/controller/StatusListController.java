@@ -1,10 +1,10 @@
 package int221.sit.taskboard.controller;
 
+import int221.sit.taskboard.DTO.NewTaskListDtoV2;
 import int221.sit.taskboard.entities.StatusList;
-import int221.sit.taskboard.entities.TaskList;
 import int221.sit.taskboard.exceptions.ItemNotFoundException;
 import int221.sit.taskboard.services.StatusListService;
-import org.modelmapper.ModelMapper;
+import int221.sit.taskboard.services.TaskListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +19,9 @@ public class StatusListController {
 
     @Autowired
     private StatusListService service;
+
+    @Autowired
+    private TaskListService tasklistService;
 
     @GetMapping("")
     public List<StatusList> getAllStatusList() {
@@ -45,5 +48,16 @@ public class StatusListController {
     @DeleteMapping("/{id}")
     public ResponseEntity<StatusList> deleteStatus(@PathVariable Integer id) {
         return service.deleteStatus(id);
+    }
+
+    @DeleteMapping("/{id}/{newId}")
+    public ResponseEntity<NewTaskListDtoV2> deleteStatusAndTransfer(@PathVariable Integer id, @PathVariable Integer newId) {
+        try {
+            NewTaskListDtoV2 transferTask = tasklistService.transferTasking(id, newId);
+            service.deleteStatus(id);
+            return ResponseEntity.status(HttpStatus.OK).body(transferTask);
+        } catch (ItemNotFoundException e) {
+           throw e;
+        }
     }
 }

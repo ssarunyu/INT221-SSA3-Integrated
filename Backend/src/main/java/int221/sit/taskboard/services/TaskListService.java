@@ -118,4 +118,17 @@ public class TaskListService {
 
         return modelMapper.map(updatedTaskList, NewTaskListDto.class);
     }
+
+    @Transactional
+    public NewTaskListDtoV2 transferTasking(Integer oldStatusId, Integer newStatusId){
+        StatusList newStatus = statusListRepository.findById(newStatusId)
+                .orElseThrow(() -> new ItemNotFoundException("New status ID not found"));
+
+        List<TaskList> taskLists = repository.findByStatusId(oldStatusId);
+        for (TaskList taskList : taskLists) {
+            taskList.setStatus(newStatus);
+            repository.saveAndFlush(taskList);
+        }
+        return null;
+    }
 }

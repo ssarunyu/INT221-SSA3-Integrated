@@ -94,7 +94,7 @@ public class TaskListController {
             NewTaskListDto updatedTask = service.updateTaskListById(id, taskLists, status);
             return ResponseEntity.ok(updatedTask);
         } catch (ItemNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw e;
         }
     }
 
