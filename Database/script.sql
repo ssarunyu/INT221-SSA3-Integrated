@@ -1,6 +1,8 @@
 GRANT ALL PRIVILEGES ON *.* TO 'dev1'@'%';
+
+DROP DATABASE IF EXISTS `task_base`;
 CREATE SCHEMA `task_base` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
-use  task_base ; 
+use task_base; 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -59,15 +61,15 @@ FOREIGN KEY (statusId) REFERENCES statuses(statusId);
 INSERT INTO statuses (statusName, statusDescription)
 VALUES
 ('No Status', 'The default status'),
-    ('To Do', 'Task needs to be started'),
-    ('Doing', 'Task is in progress'),
-    ('Done', 'Task is completed');
+    ('To Do', null),
+    ('Doing', 'Being worked on'),
+    ('Done', 'Finished');
 
-INSERT INTO `tasks` VALUES
-(1,'TaskTitle1TaskTitle2TaskTitle3TaskTitle4TaskTitle5TaskTitle6TaskTitle7TaskTitle8TaskTitle9TaskTitle0','Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti1Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti2Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti3Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti4Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti5','Assignees1Assignees2Assignees3','2024-04-22 09:00:00','2024-04-22 09:00:00', 1),
-(2,'Repository',null,null,'2024-04-22 09:05:00','2024-04-22 14:00:00', 2),
-(3,'ดาต้าเบส','ສ້າງຖານຂໍ້ມູນ','あなた、彼、彼女 (私ではありません)','2024-04-22 09:10:00','2024-04-25 00:00:00',3 ),
-(4,'_Infrastructure_','_Setup containers_','ไก่งวง กับ เพนกวิน','2024-04-22 09:15:00','2024-04-22 10:00:00', 4);
+-- INSERT INTO `tasks` VALUES
+-- (1,'TaskTitle1TaskTitle2TaskTitle3TaskTitle4TaskTitle5TaskTitle6TaskTitle7TaskTitle8TaskTitle9TaskTitle0','Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti1Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti2Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti3Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti4Descripti1Descripti2Descripti3Descripti4Descripti5Descripti6Descripti7Descripti8Descripti9Descripti5','Assignees1Assignees2Assignees3','2024-04-22 09:00:00','2024-04-22 09:00:00', 1),
+-- (2,'Repository',null,null,'2024-04-22 09:05:00','2024-04-22 14:00:00', 2),
+-- (3,'ดาต้าเบส','ສ້າງຖານຂໍ້ມູນ','あなた、彼、彼女 (私ではありません)','2024-04-22 09:10:00','2024-04-25 00:00:00',3 ),
+-- (4,'_Infrastructure_','_Setup containers_','ไก่งวง กับ เพนกวิน','2024-04-22 09:15:00','2024-04-22 10:00:00', 4);
 
 select * from tasks;
 select * from statuses ; 

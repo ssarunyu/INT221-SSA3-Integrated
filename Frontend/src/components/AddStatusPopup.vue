@@ -1,23 +1,43 @@
 <script setup>
 import { ref } from 'vue'
+import { postData } from '@/lib/fetchMethod'
 
-const emit = defineEmits(['confirm', 'close'])
+const emit = defineEmits(['confirmAddStatus', 'close', 'toastItem'])
 const closeHandle = () => {
-  emit('close')
+    emit('close')
 }
 
+const toastHandle = ref()
 const addName = ref('')
 const addDescription = ref(null)
-const confirmHandle = () => {
-  const newStatus = 
-  {
-    name: addName.value ? addName.value.trim() : null,
-    description: addDescription.value ? addDescription.value.trim() : null,
-  }
-  emit('confirm', newStatus)
-  // Clear form when open again
-  addName.value = ''
-  addDescription.value = ''
+const newStatus = ref({})
+const confirmHandle = async () => {
+    const statusToCreate = {
+        name: addName.value ? addName.value.trim() : null,
+        description: addDescription.value ? addDescription.value.trim() : null,
+    }
+
+    const response = await postData(import.meta.env.VITE_STATUS_URL, statusToCreate)
+    if (response.ok) {
+    const createdStatus = await response.json() // Assuming the response contains the created status
+    newStatus.value = {
+        id: createdStatus.id, // Extract ID from the response
+        name: createdStatus.name,
+        description: createdStatus.description,
+    }
+    emit('confirmAddStatus', newStatus.value)
+    toastHandle.value = { type: 'success', status: true, message: `Success` }
+    emit('toastItem', toastHandle.value)
+    emit('close') // Close modal after adding status
+    } else {
+        toastHandle.value = { type: 'error', status: true, message: `Failed to add status` }
+        emit('toastItem', toastHandle.value)
+        emit('close') // Close modal after adding status
+    }
+
+    // Clear form when open again
+    addName.value = ''
+    addDescription.value = ''
 }
 
 </script>
@@ -44,10 +64,10 @@ const confirmHandle = () => {
                             </div>
                     </form>
                         <div class="mt-5 space-x-5">
-                            <button @click="confirmHandle()" :disabled="!addName" class="itbkk-button-confirm disabled bg-green-500 duration-200 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded disabled:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50">
+                            <button @click="confirmHandle" :disabled="!addName" class="itbkk-button-confirm disabled bg-green-500 duration-200 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded disabled:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50">
                                 Save
                             </button>
-                            <button @click="closeHandle()" class="itbkk-button-cancel disabled bg-red-500 duration-200 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded">
+                            <button @click="closeHandle" class="itbkk-button-cancel disabled bg-red-500 duration-200 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded">
                                 Cancel
                             </button>
                         </div>

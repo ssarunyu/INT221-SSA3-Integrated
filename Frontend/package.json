@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build --base=/ssa3/",
+    "build": "vite build",
     "preview": "vite preview",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run"

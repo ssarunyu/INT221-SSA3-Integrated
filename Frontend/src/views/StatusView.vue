@@ -1,17 +1,13 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import router from '@/router';
-import { useRoute } from 'vue-router'
 import { styleStatus } from '@/lib/styleStatus'
 import { TaskManagement } from '@/lib/TaskManagement.js'
-import { getData, getDataById, updateData } from '@/lib/fetchMethod.js'
+import { getData } from '@/lib/fetchMethod.js'
 import AddStatusPopup from '@/components/AddStatusPopup.vue'
-import EditStatusPopup from '@/components/EditStatusPopup.vue';
 import Toast from '@/components/Toast.vue'
-import { postData } from '@/lib/fetchMethod.js'
 
 const taskManagement = ref(new TaskManagement())
-const route = useRoute()
 
 const fetch = async() => {
     // Fetch data
@@ -20,73 +16,29 @@ const fetch = async() => {
     taskManagement.value.addAllStatus(response)
 }
 
-
 onMounted(async () => {
     await fetch()
-    if(route.params.editStatusId) {
-        const response = await getDataById(import.meta.env.VITE_STATUS_URL, route.params.editStatusId)
-        if(response.status !== 404) {
-            await editPopupStatus(route.params.editStatusId)
-        } else {
-            toastHandle.value = {type: 'error', status: true, message: `An error has occurred, the status does not exist`}
-            closeEditPopupStatus()
-        }
-    }
 })
 
 // Toast
 const toastHandle = ref()
 
-//Add Status
-const addPopupStatus = ref(false)
-const confirmAddStatus = async (newStatus) => {
-    // Back-end
-    const response = await postData(import.meta.env.VITE_STATUS_URL, newStatus)
-    if(response.ok) {
-        addPopupStatus.value = false
-        router.push({ name: 'StatusView' })
-        // Add Toast
-        toastHandle.value = {type: 'success', status: true, message: `${newStatus.name} Status added successfully!`}
-        // Front-end
-        taskManagement.value.addStatus(await response.json())
-    }
+const addStatusShow = ref(false)
+const controlAddStatus = (newStatus) => {
+    taskManagement.value.addStatus(newStatus)
 }
-
-const targetItem = ref()
-const editStatusPopup = ref(false)
-const editPopupStatus = async (statusId) => {
-    router.push({name: 'EditStatusPopup', params: { editStatusId : statusId}})
-    const result = await getDataById(import.meta.env.VITE_STATUS_URL, statusId)
-    targetItem.value = result
-    editStatusPopup.value = true
+const controlUpdateStatus = (updateNewStatus) => {
+    taskManagement.value.updateStatus(updateNewStatus, updateNewStatus.id)
 }
-const closeEditPopupStatus = () => {
-    targetItem.value = ''
-    editStatusPopup.value = false
-    router.push({ name: 'StatusView' })
-}
-const updateEdit = async (newStatus) => {
-    const response = await updateData(import.meta.env.VITE_STATUS_URL,
-    {
-        name: newStatus.name,
-        description: newStatus.description
-    },newStatus.id)
-    if(response.ok) {
-        // Toast
-        toastHandle.value = {type: 'success', status: true, message: `Status successfully edited to ${newStatus.id} !`}
-        // Front-end
-        taskManagement.value.updateStatus(newStatus, newStatus.id)
-        editPopupStatus.value = false
-        router.push({ name: 'StatusView' })
-    }
+const controlToast = (newToast) => {
+    toastHandle.value = newToast
 }
 </script>
 
 
 <template>
-    <router-view></router-view>
-    <AddStatusPopup v-show="addPopupStatus" @confirm="confirmAddStatus" @close="addPopupStatus = false" />
-    <EditStatusPopup v-show="editStatusPopup" v-if="targetItem" :itemData="targetItem" @close="closeEditPopupStatus()" @update="updateEdit()"/>
+    <AddStatusPopup v-if="addStatusShow" @confirmAddStatus="controlAddStatus" @close="addStatusShow = false" @toastItem="controlToast"/>
+    <router-view @updateStatus="controlUpdateStatus" @toastItem="controlToast"></router-view>
     <div class="w-full min-h-screen p-5">
         <h1 class="flex text-2xl font-bold justify-center mb-5">ITBKK SSA3 Taskboard</h1>
         <div class="flex w-full justify-between">
@@ -95,7 +47,7 @@ const updateEdit = async (newStatus) => {
                 <p class="font-bold text-gray-400 ml-1">></p>
                 <router-link :to="{ name: 'StatusView' }" class="font-bold ml-1 hover:scale-105">Task Status</router-link>
             </div>
-            <div @click="addPopupStatus = true" class="itbkk-button-add p-2 w-35 m-1 rounded cursor-pointer duration-300 bg-gray-300 hover:bg-gray-400 hover:scale-105">
+            <div @click="addStatusShow = true" class="itbkk-button-add p-2 w-35 m-1 rounded cursor-pointer duration-300 bg-gray-300 hover:bg-gray-400 hover:scale-105">
                 + Add Status
             </div>
         </div>
@@ -121,7 +73,7 @@ const updateEdit = async (newStatus) => {
                         {{ item.description === null ? 'No description is provided' : item.description }}
                     </div>
                     <div class="itbkk-status-action flex" v-if="item.name !== 'No Status'">
-                        <div @click="editPopupStatus(item.id)" class="itbkk-button-edit p-2 px-5 w-35 text-center m-1 rounded cursor-pointer duration-300 bg-gray-300 hover:bg-gray-400 hover:scale-105">
+                        <div @click="router.push({name: 'EditStatusPopup', params: { editStatusId: item.id }})" class="itbkk-button-edit p-2 px-5 w-35 text-center m-1 rounded cursor-pointer duration-300 bg-gray-300 hover:bg-gray-400 hover:scale-105">
                             Edit
                         </div>
                         <div @click="" class="itbkk-button-delete p-2 px-3 w-35 m-1 rounded cursor-pointer text-center duration-300 bg-gray-300 hover:bg-gray-400 hover:scale-105">
