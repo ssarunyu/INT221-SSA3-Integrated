@@ -1,9 +1,6 @@
 package int221.sit.taskboard.services;
 
-import int221.sit.taskboard.DTO.NewTaskListDtoV2;
-import int221.sit.taskboard.DTO.TaskListByIdDto;
-import int221.sit.taskboard.DTO.TaskListDto;
-import int221.sit.taskboard.DTO.NewTaskListDto;
+import int221.sit.taskboard.DTO.*;
 import int221.sit.taskboard.entities.StatusList;
 import int221.sit.taskboard.entities.TaskList;
 import int221.sit.taskboard.exceptions.ItemNotFoundException;
@@ -17,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -130,5 +128,45 @@ public class TaskListService {
             repository.saveAndFlush(taskList);
         }
         return null;
+    }
+
+    public List<TaskListSortingDto> getTasksSortedByStatusName(String sortBy, List<String> filterStatuses) {
+        List<TaskList> tasks;
+
+        if (filterStatuses == null || filterStatuses.isEmpty()) {
+            tasks = repository.findAll();
+        } else {
+            tasks = repository.findByStatusNameIn(filterStatuses);
+        }
+
+        tasks = sortTasks(tasks, sortBy);
+
+        return tasks.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    private List<TaskList> sortTasks(List<TaskList> tasks, String sortBy) {
+        switch (sortBy) {
+            case "status.name":
+                tasks.sort(Comparator.comparing(task -> task.getStatus().getName()));
+                break;
+            case "status.name.desc":
+                tasks.sort((task1, task2) -> task2.getStatus().getName().compareTo(task1.getStatus().getName()));
+                break;
+            case "createdDate":
+            default:
+                tasks.sort(Comparator.comparing(TaskList::getCreatedOn));
+                break;
+        }
+        return tasks;
+    }
+
+    private TaskListSortingDto convertToDto(TaskList task) {
+        TaskListSortingDto dto = modelMapper.map(task, TaskListSortingDto.class);
+        dto.setTitle(task.getTitle() != null ? task.getTitle() : "");
+        dto.setAssignees(task.getAssignees() != null ? task.getAssignees() : "");
+        dto.setStatus(task.getStatus() != null ? task.getStatus().getName() : "");
+        return dto;
     }
 }

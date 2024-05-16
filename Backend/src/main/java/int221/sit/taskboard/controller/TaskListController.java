@@ -1,9 +1,6 @@
 package int221.sit.taskboard.controller;
 
-import int221.sit.taskboard.DTO.NewTaskListDto;
-import int221.sit.taskboard.DTO.NewTaskListDtoV2;
-import int221.sit.taskboard.DTO.TaskListByIdDto;
-import int221.sit.taskboard.DTO.TaskListDto;
+import int221.sit.taskboard.DTO.*;
 import int221.sit.taskboard.entities.TaskList;
 import int221.sit.taskboard.exceptions.ItemNotFoundException;
 import int221.sit.taskboard.services.StatusListService;
@@ -13,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
 
@@ -29,6 +25,8 @@ public class TaskListController {
 
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private TaskListService taskListService;
 
 //    @GetMapping("")
 //    public List<TaskList> getAllTaskList(@RequestParam(required = false) String[] param) {
@@ -52,10 +50,10 @@ public class TaskListController {
         return ResponseEntity.ok(taskListByIdDto);
     }
 
-    @GetMapping("")
-    public List<TaskListDto> getAllTaskListDto(@RequestParam(required = false) String[] param) {
-        return service.getAllTaskListDto();
-    }
+//    @GetMapping("")
+//    public List<TaskListDto> getAllTaskListDto(@RequestParam(required = false) String[] param) {
+//        return service.getAllTaskListDto();
+//    }
 
     @PostMapping("")
     public ResponseEntity<NewTaskListDto> addNewTaskList(@RequestBody NewTaskListDtoV2 newTaskList) {
@@ -103,4 +101,13 @@ public class TaskListController {
         TaskListDto deletedTaskListDto = service.removeTaskListById(id);
         return ResponseEntity.ok().body(deletedTaskListDto);
     }
+
+    @GetMapping("")
+    public List<TaskListSortingDto> getTasksSortedByStatusName(
+    @RequestParam(name = "sortBy", defaultValue = "createdDate") String sortBy,
+    @RequestParam(name = "filterStatuses", required = false) List<String> filterStatuses
+    ) {
+        return service.getTasksSortedByStatusName(sortBy, filterStatuses);
+    }
+
 }
