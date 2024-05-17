@@ -71,4 +71,17 @@ async function deleteData(url, id) {
     }  
 }
 
-export { getData, getDataById, postData, updateData, deleteData}
+async function transferData(url, oldId, newId) {
+    const finalURL = `${url}/${oldId}/${newId}`
+    try {
+        const response = await fetch(finalURL, {
+            method: "DELETE",
+            redirect: "follow"
+        })
+        return response
+    } catch (error) {
+        console.log(error)
+    }  
+}
+
+export { getData, getDataById, postData, updateData, deleteData, transferData}

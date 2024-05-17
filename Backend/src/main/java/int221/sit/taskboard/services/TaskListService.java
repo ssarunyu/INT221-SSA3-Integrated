@@ -130,43 +130,43 @@ public class TaskListService {
         return null;
     }
 
-    public List<TaskListSortingDto> getTasksSortedByStatusName(String sortBy, List<String> filterStatuses) {
-        List<TaskList> tasks;
-
-        if (filterStatuses == null || filterStatuses.isEmpty()) {
-            tasks = repository.findAll();
-        } else {
-            tasks = repository.findByStatusNameIn(filterStatuses);
-        }
-
-        tasks = sortTasks(tasks, sortBy);
-
-        return tasks.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-    }
-
-    private List<TaskList> sortTasks(List<TaskList> tasks, String sortBy) {
-        switch (sortBy) {
-            case "status.name":
-                tasks.sort(Comparator.comparing(task -> task.getStatus().getName()));
-                break;
-            case "status.name.desc":
-                tasks.sort((task1, task2) -> task2.getStatus().getName().compareTo(task1.getStatus().getName()));
-                break;
-            case "createdDate":
-            default:
-                tasks.sort(Comparator.comparing(TaskList::getCreatedOn));
-                break;
-        }
-        return tasks;
-    }
-
-    private TaskListSortingDto convertToDto(TaskList task) {
-        TaskListSortingDto dto = modelMapper.map(task, TaskListSortingDto.class);
-        dto.setTitle(task.getTitle() != null ? task.getTitle() : "");
-        dto.setAssignees(task.getAssignees() != null ? task.getAssignees() : "");
-        dto.setStatus(task.getStatus() != null ? task.getStatus().getName() : "");
-        return dto;
-    }
+//    public List<TaskListSortingDto> getTasksSortedByStatusName(String sortBy, List<String> filterStatuses) {
+//        List<TaskList> tasks;
+//
+//        if (filterStatuses == null || filterStatuses.isEmpty()) {
+//            tasks = repository.findAll();
+//        } else {
+//            tasks = repository.findByStatusNameIn(filterStatuses);
+//        }
+//
+//        tasks = sortTasks(tasks, sortBy);
+//
+//        return tasks.stream()
+//                .map(this::convertToDto)
+//                .collect(Collectors.toList());
+//    }
+//
+//    private List<TaskList> sortTasks(List<TaskList> tasks, String sortBy) {
+//        switch (sortBy) {
+//            case "status.name":
+//                tasks.sort(Comparator.comparing(task -> task.getStatus().getName()));
+//                break;
+//            case "status.name.desc":
+//                tasks.sort((task1, task2) -> task2.getStatus().getName().compareTo(task1.getStatus().getName()));
+//                break;
+//            case "createdDate":
+//            default:
+//                tasks.sort(Comparator.comparing(TaskList::getCreatedOn));
+//                break;
+//        }
+//        return tasks;
+//    }
+//
+//    private TaskListSortingDto convertToDto(TaskList task) {
+//        TaskListSortingDto dto = modelMapper.map(task, TaskListSortingDto.class);
+//        dto.setTitle(task.getTitle() != null ? task.getTitle() : "");
+//        dto.setAssignees(task.getAssignees() != null ? task.getAssignees() : "");
+//        dto.setStatus(task.getStatus() != null ? task.getStatus().getName() : "");
+//        return dto;
+//    }
 }
