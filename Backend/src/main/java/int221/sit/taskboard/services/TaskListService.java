@@ -164,9 +164,7 @@ public class TaskListService {
 
     private TaskListSortingDto convertToDto(TaskList task) {
         TaskListSortingDto dto = modelMapper.map(task, TaskListSortingDto.class);
-        dto.setTitle(task.getTitle() != null ? task.getTitle() : "");
-        dto.setAssignees(task.getAssignees() != null ? task.getAssignees() : "");
-        dto.setStatus(task.getStatus() != null ? task.getStatus().getName() : "");
+        dto.setStatus(task.getStatus() != null ? task.getStatus().getName() : null);
         return dto;
     }
 }
