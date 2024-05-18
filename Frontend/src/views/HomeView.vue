@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import { getData, getDataById, deleteData, postData, updateData } from '@/lib/fetchMethod.js';
 import { TaskManagement } from '@/lib/TaskManagement.js'
 import router from '@/router';
@@ -134,6 +134,30 @@ const deleteConfirm = async () => {
         deletePopupStatus.value = false
     }
 }
+
+// const sortStage = ref(0)
+// const changeSortStage = () => {
+//     // Stage run 0, 1, 2
+//     sortStage.value = (sortStage.value + 1) % 3
+// }
+// const sortTask = computed(() => {
+//     const copyTask = [...taskManagement.value.getAllTask()]
+//     if(sortStage.value === 0) {
+//         return copyTask
+//     } else if(sortStage.value === 1) {
+//         return copyTask.sort((a, b) => a.status.name.localeCompare(b.status.name))
+//     } else if(sortStage.value === 2) {
+//         return copyTask.sort((a, b) => b.status.name.localeCompare(a.status.name))
+//     }
+// })
+// const sortIcon = computed(() => {
+//     if(sortStage.value === 1) {
+//         return 'fa-solid fa-sort-down'
+//     } else if(sortStage.value === 2) {
+//         return 'fa-solid fa-sort-up'
+//     }
+//     return 'fa-solid fa-sort'
+// })
 </script>
 
 <template>
@@ -146,19 +170,28 @@ const deleteConfirm = async () => {
     <div class="w-full min-h-screen p-5">
         <h1 class="flex text-2xl font-bold justify-center mb-5">ITBKK SSA3 Taskboard</h1>
         <div class="flex flex-col space-y-3">
-            <div class="flex w-full justify-between font-xl font-bold text-white border-b border-gray-300 p-3 bg-blue-400 rounded">
-                <p>Title</p>
-                <p>Assignees</p>
-                <p>Status</p>
-            </div>
             <Toast :toastObject="toastHandle" @close="toastHandle.status = false"/>
             <div class="flex w-full justify-between font-xl ">
                 <div @click="openAddPopup()" class="itbkk-button-add w-40 text-center p-2 bg-green-300 rounded cursor-pointer duration-300 hover:bg-green-400 hover:scale-105">
-                + Add New Task
+                    + Add New Task
                 </div>
                 <router-link class="itbkk-manage-status p-2 bg-gray-300 rounded w-[150px] text-center duration-300 hover:bg-gray-400" :to="{ name: 'StatusView' }">Manage Status</router-link>
             </div>
-            <div v-for="item in taskManagement.getAllTask()" :key="item.id" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded">
+            <div class="flex w-full items-center justify-between font-xl font-bold text-white border-b border-gray-300 p-3 bg-blue-400 rounded">
+                <p>Title</p>
+                <p>Assignees</p>
+                <div class="flex items-center space-x-3">
+                    <p>Status</p>
+                    <!-- <div class="flex justify-end items-center space-x-3">
+                        <div @click="changeSortStage()" class="p-2 border rounded cursor-pointer transition duration-300">
+                            <div class="flex items-center">
+                                <font-awesome-icon v-if="sortIcon" :icon="sortIcon" />
+                            </div>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+            <div v-for="item in taskManagement.getAllTask()" :key="item.id" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded border">
                 <div class="absolute left-0 w-1 h-10" :class="styleStatus(item.status.name)"></div>
                 <div class="flex items-center space-x-3">
                     <div>

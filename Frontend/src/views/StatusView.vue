@@ -3,9 +3,11 @@ import { onMounted, ref } from 'vue'
 import router from '@/router';
 import { styleStatus } from '@/lib/styleStatus'
 import { TaskManagement } from '@/lib/TaskManagement.js'
-import { getData } from '@/lib/fetchMethod.js'
+import { getData, deleteData } from '@/lib/fetchMethod.js'
 import AddStatusPopup from '@/components/AddStatusPopup.vue'
 import Toast from '@/components/Toast.vue'
+import DeleteStatusPopup from '@/components/DeleteStatusPopup.vue';
+import TransferDeleteStatusPopup from '@/components/TransferDeleteStatusPopup.vue';
 
 const taskManagement = ref(new TaskManagement())
 
@@ -24,6 +26,10 @@ onMounted(async () => {
 const toastHandle = ref()
 
 const addStatusShow = ref(false)
+const normalDeleteStatusShow = ref(false)
+const transferDeleteStatusShow = ref(false)
+const deleteTarget = ref()
+
 const controlAddStatus = (newStatus) => {
     taskManagement.value.addStatus(newStatus)
 }
@@ -33,11 +39,30 @@ const controlUpdateStatus = (updateNewStatus) => {
 const controlToast = (newToast) => {
     toastHandle.value = newToast
 }
+const sendDeleteStatus = async (obj) => {
+    // Get all task already use that status
+    const getAllTask = await getData(import.meta.env.VITE_TASK_URL)
+    const filterRepeatTask = getAllTask.filter((a) => a.status.id === obj.id)
+    if(filterRepeatTask.length > 0) {
+        transferDeleteStatusShow.value = true
+        // NOTE: Transfer
+        deleteTarget.value = obj
+    } else {
+        // NOTE: Normal delete
+        normalDeleteStatusShow.value = true
+        deleteTarget.value = obj
+    }
+}
+const controlDelete = async (statusId) => {
+    taskManagement.value.deleteStatus(statusId.id)
+}
 </script>
 
 
 <template>
     <AddStatusPopup v-if="addStatusShow" @confirmAddStatus="controlAddStatus" @close="addStatusShow = false" @toastItem="controlToast"/>
+    <DeleteStatusPopup v-if="normalDeleteStatusShow" :deleteItem="deleteTarget" @confirmDeleteStatus="controlDelete" @close="normalDeleteStatusShow = false"/>
+    <TransferDeleteStatusPopup v-if="transferDeleteStatusShow" :deleteItem="deleteTarget" @confirmDeleteStatus="controlDelete" @close="transferDeleteStatusShow = false"/>
     <router-view @updateStatus="controlUpdateStatus" @toastItem="controlToast"></router-view>
     <div class="w-full min-h-screen p-5">
         <h1 class="flex text-2xl font-bold justify-center mb-5">ITBKK SSA3 Taskboard</h1>
@@ -76,7 +101,7 @@ const controlToast = (newToast) => {
                         <div @click="router.push({name: 'EditStatusPopup', params: { editStatusId: item.id }})" class="itbkk-button-edit p-2 px-5 w-35 text-center m-1 rounded cursor-pointer duration-300 bg-gray-300 hover:bg-gray-400 hover:scale-105">
                             Edit
                         </div>
-                        <div @click="" class="itbkk-button-delete p-2 px-3 w-35 m-1 rounded cursor-pointer text-center duration-300 bg-gray-300 hover:bg-gray-400 hover:scale-105">
+                        <div @click="sendDeleteStatus(item)" class="itbkk-button-delete p-2 px-3 w-35 m-1 rounded cursor-pointer text-center duration-300 bg-gray-300 hover:bg-gray-400 hover:scale-105">
                             Delete
                         </div>
                     </div>
