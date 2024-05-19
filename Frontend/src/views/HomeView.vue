@@ -135,29 +135,32 @@ const deleteConfirm = async () => {
     }
 }
 
-// const sortStage = ref(0)
-// const changeSortStage = () => {
-//     // Stage run 0, 1, 2
-//     sortStage.value = (sortStage.value + 1) % 3
-// }
-// const sortTask = computed(() => {
-//     const copyTask = [...taskManagement.value.getAllTask()]
-//     if(sortStage.value === 0) {
-//         return copyTask
-//     } else if(sortStage.value === 1) {
-//         return copyTask.sort((a, b) => a.status.name.localeCompare(b.status.name))
-//     } else if(sortStage.value === 2) {
-//         return copyTask.sort((a, b) => b.status.name.localeCompare(a.status.name))
-//     }
-// })
-// const sortIcon = computed(() => {
-//     if(sortStage.value === 1) {
-//         return 'fa-solid fa-sort-down'
-//     } else if(sortStage.value === 2) {
-//         return 'fa-solid fa-sort-up'
-//     }
-//     return 'fa-solid fa-sort'
-// })
+const sortStage = ref(0);
+const changeSortStage = () => {
+  sortStage.value = (sortStage.value + 1) % 3;
+};
+
+const sortTask = computed(() => {
+  const copyTask = [...taskManagement.value.getAllTask()];
+
+  const sortFunctions = {
+    0: tasks => tasks,
+    1: tasks => tasks.sort((a, b) => b.status.name.localeCompare(a.status.name)),
+    2: tasks => tasks.sort((a, b) => a.status.name.localeCompare(b.status.name))
+  };
+
+  return sortFunctions[sortStage.value](copyTask);
+});
+
+const sortIcon = computed(() => {
+  const icons = {
+    0: 'fa-solid fa-sort',
+    1: 'fa-solid fa-sort-up',
+    2: 'fa-solid fa-sort-down'
+  };
+
+  return icons[sortStage.value];
+});
 </script>
 
 <template>
@@ -180,15 +183,11 @@ const deleteConfirm = async () => {
             <div class="flex w-full items-center justify-between font-xl font-bold text-white border-b border-gray-300 p-3 bg-blue-400 rounded">
                 <p>Title</p>
                 <p>Assignees</p>
-                <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-1">
                     <p>Status</p>
-                    <!-- <div class="flex justify-end items-center space-x-3">
-                        <div @click="changeSortStage()" class="p-2 border rounded cursor-pointer transition duration-300">
-                            <div class="flex items-center">
-                                <font-awesome-icon v-if="sortIcon" :icon="sortIcon" />
-                            </div>
-                        </div>
-                    </div> -->
+                    <div @click="changeSortStage()"class="p-2 cursor-pointer transition duration-300">
+                        <font-awesome-icon v-if="sortIcon" :icon="sortIcon" />
+                    </div>
                 </div>
             </div>
             <div v-for="item in taskManagement.getAllTask()" :key="item.id" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded border">
