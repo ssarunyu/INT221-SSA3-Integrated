@@ -17,6 +17,12 @@ const confirmHandle = async () => {
     const response = await deleteData(import.meta.env.VITE_STATUS_URL, props.deleteItem.id)
     if(response.ok) {
         emit('confirmDeleteStatus', await response.json())
+        toastHandle.value = { type: 'success', status: true, message: `The status has been deleted` }
+        emit('toastItem', toastHandle.value)
+        emit('close')
+    } else {
+        toastHandle.value = { type: 'error', status: true, message: `An error has occurred, the status does not exist` }
+        emit('toastItem', toastHandle.value)
         emit('close')
     }
 }
@@ -38,7 +44,7 @@ const confirmHandle = async () => {
                 <div class="mt-4 md:mt-0 md:ml-6 text-center md:text-left">
                 <p class="font-bold">Warning!</p>
                 <p class="itbkk-message text-sm text-gray-700 mt-1">
-                    Do you want to delete this status <strong>id: {{ deleteItem.id }} - {{ deleteItem.name }}</strong>
+                    Do you want to delete <strong>{{ deleteItem.name }}</strong> status?
                 </p>
                 </div>
             </div>

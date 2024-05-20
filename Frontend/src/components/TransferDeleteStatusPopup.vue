@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getData, getDataById, deleteData, transferData } from '@/lib/fetchMethod'
-import router from '@/router'
 
 const toastHandle = ref()
 const props = defineProps({
@@ -23,7 +22,7 @@ onMounted(async () => {
     allStatusExist.value = filterStatus
 
     // Get all task already use that status
-    // NOTE: should be go to transfer
+    // NOTE: should go to transfer
     const getAllTask = await getData(import.meta.env.VITE_TASK_URL)
     const filterRepeatTask = getAllTask.filter((a) => a.status.id === props.deleteItem.id)
     repeatItem.value = filterRepeatTask
@@ -33,6 +32,12 @@ const confirmHandle = async () => {
     const response = await transferData(import.meta.env.VITE_STATUS_URL, props.deleteItem.id, userTransferSelect.value)
     if(response.ok) {
         emit('confirmDeleteStatus', props.deleteItem.id)
+        toastHandle.value = { type: 'success', status: true, message: `${repeatItem.value.length} task have been transferred and the status has been deleted` }
+        emit('toastItem', toastHandle.value)
+        emit('close')
+    } else {
+        toastHandle.value = { type: 'error', status: true, message: `An error has occurred, the status does not exist` }
+        emit('toastItem', toastHandle.value)
         emit('close')
     }
 }
@@ -40,7 +45,7 @@ const confirmHandle = async () => {
 
 <template>
     <!-- NOTE: Transfer delete -->
-    <div v-if="deleteItem" class="fixed inset-0 flex items-center justify-center z-50 bg-gray-500 bg-opacity-75 backdrop-blur confirm-dialog ">
+    <div v-if="deleteItem && repeatItem" class="fixed inset-0 flex items-center justify-center z-50 bg-gray-500 bg-opacity-75 backdrop-blur confirm-dialog ">
     <div class="relative px-4 min-h-screen md:flex md:items-center md:justify-center">
         <div class=" opacity-25 w-full h-full absolute z-10 inset-0"></div>
         <div class="bg-white rounded-lg md:max-w-md md:mx-auto p-4 fixed inset-x-0 bottom-0 z-50 mb-4 mx-4 md:relative shadow-lg">
@@ -55,7 +60,7 @@ const confirmHandle = async () => {
                 <p>The status you delete already use in some tasks please transfer before delete this status</p>
                 <div class="my-3 text-sm text-gray-700 break-all">
                     <ul>
-                        <p >Task already use this status</p>
+                        <p><strong>{{ repeatItem.length }} Task</strong> already use this status</p>
                         <li v-for="r in repeatItem"><strong>ID: {{r.id}} – {{ r.title }}</strong></li>
                     </ul>
                 </div>

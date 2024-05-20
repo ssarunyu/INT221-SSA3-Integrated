@@ -135,44 +135,51 @@ const deleteConfirm = async () => {
     }
 }
 
+const tasks = ref(taskManagement.value.getAllTask())
 const sortStage = ref(0);
 const changeSortStage = () => {
-  sortStage.value = (sortStage.value + 1) % 3;
+    sortStage.value = (sortStage.value + 1) % 3;
 };
 
 const sortTask = computed(() => {
-  const copyTask = [...taskManagement.value.getAllTask()];
+    const copyTask = [...tasks.value];
 
-  const sortFunctions = {
-    0: tasks => tasks,
-    1: tasks => tasks.sort((a, b) => a.status.name.localeCompare(b.status.name)),
-    2: tasks => tasks.sort((a, b) => b.status.name.localeCompare(a.status.name))
-  };
+    const sortFunctions = {
+        0: tasks => tasks,
+        1: tasks => tasks.sort((a, b) => a.status.name.localeCompare(b.status.name)),
+        2: tasks => tasks.sort((a, b) => b.status.name.localeCompare(a.status.name))
+    };
 
-  return sortFunctions[sortStage.value](copyTask);
+    return sortFunctions[sortStage.value](copyTask);
 });
 
 const sortIcon = computed(() => {
-  const icons = {
-    0: 'fa-solid fa-sort',
-    1: 'fa-solid fa-sort-down',
-    2: 'fa-solid fa-sort-up'
-  };
+    const icons = {
+        0: 'fa-solid fa-sort',
+        1: 'fa-solid fa-sort-down',
+        2: 'fa-solid fa-sort-up'
+    };
 
-  return icons[sortStage.value];
+    return icons[sortStage.value];
 });
 
 const allStatusArr = taskManagement.value.getAllStatus()
 const filterSelect = ref([])
 const submitFilter = async () => {
-  console.log(filterSelect.value)
-  if(filterSelect.value) {
-    let URL = ''
-    for(let i = 0; i < filterSelect.value.length; i++) {
-      console.log(filterSelect.value.findIndex(filterSelect.value[i]))
+    let userFilter = ''
+    if(filterSelect.value) {
+        filterSelect.value.map((a) => {
+            const text = `filterStatuses=${a}&`
+            userFilter += text
+        })
     }
-    console.log(URL)
-  }
+    const response = await getData(`${import.meta.env.VITE_TASK_URL}?${userFilter}`)
+    tasks.value = response
+}
+const clearFilter = async () => {
+    filterSelect.value = []
+    const response = await getData(import.meta.env.VITE_TASK_URL)
+    tasks.value = response
 }
 </script>
 
@@ -204,16 +211,19 @@ const submitFilter = async () => {
                 </div>
             </div>
             <details class="dropdown">
-              <summary class="m-1 btn">Filter Tasks</summary>
-              <ul class="shadow menu dropdown-content z-[1] bg-white rounded-box w-52">
-                <div v-for="status in allStatusArr" class="flex justify-between p-2">
-                  <p>{{ status.name }}</p>
-                  <input @change="submitFilter" type="checkbox" v-model="filterSelect" :value="encodeURIComponent(status.name.toLowerCase())">
-                </div>
-              </ul>
+                <summary class="m-1 btn">Filter Tasks</summary>
+                    <ul class="shadow menu dropdown-content z-[1] bg-white rounded-box w-52">
+                        <div class="text-blue-500 underline flex justify-end w-full my-2">
+                            <p class="cursor-pointer" @click="clearFilter">Clear all</p>
+                        </div>
+                        <div v-for="status in allStatusArr" class="flex justify-between p-2">
+                            <p>{{ status.name }}</p>
+                            <input v-model="filterSelect" @change="submitFilter" type="checkbox" :value="encodeURIComponent(status.name.toLowerCase())">
+                        </div>
+                    </ul>
             </details>
             <div v-for="item in sortTask" :key="item.id" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded border">
-                <div class="absolute left-0 w-1 h-10" :class="styleStatus(item.status)"></div>
+                <div class="absolute left-0 w-1 h-10" :class="styleStatus(item.status.name)"></div>
                 <div class="flex items-center space-x-3">
                     <div>
                         <div class="dropdown itbkk-button-action">
@@ -239,7 +249,7 @@ const submitFilter = async () => {
                     </div>
                 </div>
                 <div>
-                    <p class="itbkk-status px-4 py-2 rounded" :class="styleStatus(item.status)">{{ item.status }}</p>
+                    <p class="itbkk-status px-4 py-2 rounded" :class="styleStatus(item.status.name)">{{ item.status.name }}</p>
                 </div>
             </div>
         </div>

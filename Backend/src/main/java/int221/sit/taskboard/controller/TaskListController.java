@@ -36,11 +36,6 @@ public class TaskListController {
         return ResponseEntity.ok(taskListByIdDto);
     }
 
-    @GetMapping("")
-    public List<TaskListDto> getAllTaskListDto(@RequestParam(required = false) String[] param) {
-        return service.getAllTaskListDto();
-    }
-
     @PostMapping("")
     public ResponseEntity<NewTaskListDto> addNewTaskList(@RequestBody NewTaskListDtoV2 newTaskList) {
 

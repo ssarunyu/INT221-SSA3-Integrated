@@ -26,7 +26,7 @@ const confirmHandle = async () => {
         description: createdStatus.description,
     }
     emit('confirmAddStatus', newStatus.value)
-    toastHandle.value = { type: 'success', status: true, message: `Success` }
+    toastHandle.value = { type: 'success', status: true, message: `The status has been added` }
     emit('toastItem', toastHandle.value)
     emit('close') // Close modal after adding status
     } else {

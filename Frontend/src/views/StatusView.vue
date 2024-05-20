@@ -61,8 +61,8 @@ const controlDelete = async (statusId) => {
 
 <template>
     <AddStatusPopup v-if="addStatusShow" @confirmAddStatus="controlAddStatus" @close="addStatusShow = false" @toastItem="controlToast"/>
-    <DeleteStatusPopup v-if="normalDeleteStatusShow" :deleteItem="deleteTarget" @confirmDeleteStatus="controlDelete" @close="normalDeleteStatusShow = false"/>
-    <TransferDeleteStatusPopup v-if="transferDeleteStatusShow" :deleteItem="deleteTarget" @confirmDeleteStatus="controlDelete" @close="transferDeleteStatusShow = false"/>
+    <DeleteStatusPopup v-if="normalDeleteStatusShow" :deleteItem="deleteTarget" @confirmDeleteStatus="controlDelete" @close="normalDeleteStatusShow = false" @toastItem="controlToast"/>
+    <TransferDeleteStatusPopup v-if="transferDeleteStatusShow" :deleteItem="deleteTarget" @confirmDeleteStatus="controlDelete" @close="transferDeleteStatusShow = false" @toastItem="controlToast"/>
     <router-view @updateStatus="controlUpdateStatus" @toastItem="controlToast"></router-view>
     <div class="w-full min-h-screen p-5">
         <h1 class="flex text-2xl font-bold justify-center mb-5">ITBKK SSA3 Taskboard</h1>
