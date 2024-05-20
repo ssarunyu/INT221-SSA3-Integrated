@@ -145,8 +145,8 @@ const sortTask = computed(() => {
 
   const sortFunctions = {
     0: tasks => tasks,
-    1: tasks => tasks.sort((a, b) => b.status.name.localeCompare(a.status.name)),
-    2: tasks => tasks.sort((a, b) => a.status.name.localeCompare(b.status.name))
+    1: tasks => tasks.sort((a, b) => a.status.name.localeCompare(b.status.name)),
+    2: tasks => tasks.sort((a, b) => b.status.name.localeCompare(a.status.name))
   };
 
   return sortFunctions[sortStage.value](copyTask);
@@ -155,12 +155,25 @@ const sortTask = computed(() => {
 const sortIcon = computed(() => {
   const icons = {
     0: 'fa-solid fa-sort',
-    1: 'fa-solid fa-sort-up',
-    2: 'fa-solid fa-sort-down'
+    1: 'fa-solid fa-sort-down',
+    2: 'fa-solid fa-sort-up'
   };
 
   return icons[sortStage.value];
 });
+
+const allStatusArr = taskManagement.value.getAllStatus()
+const filterSelect = ref([])
+const submitFilter = async () => {
+  console.log(filterSelect.value)
+  if(filterSelect.value) {
+    let URL = ''
+    for(let i = 0; i < filterSelect.value.length; i++) {
+      console.log(filterSelect.value.findIndex(filterSelect.value[i]))
+    }
+    console.log(URL)
+  }
+}
 </script>
 
 <template>
@@ -185,13 +198,22 @@ const sortIcon = computed(() => {
                 <p>Assignees</p>
                 <div class="flex items-center space-x-1">
                     <p>Status</p>
-                    <div @click="changeSortStage()"class="p-2 cursor-pointer transition duration-300">
+                    <div @click="changeSortStage()" class="p-2 cursor-pointer transition duration-300">
                         <font-awesome-icon v-if="sortIcon" :icon="sortIcon" />
                     </div>
                 </div>
             </div>
-            <div v-for="item in taskManagement.getAllTask()" :key="item.id" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded border">
-                <div class="absolute left-0 w-1 h-10" :class="styleStatus(item.status.name)"></div>
+            <details class="dropdown">
+              <summary class="m-1 btn">Filter Tasks</summary>
+              <ul class="shadow menu dropdown-content z-[1] bg-white rounded-box w-52">
+                <div v-for="status in allStatusArr" class="flex justify-between p-2">
+                  <p>{{ status.name }}</p>
+                  <input @change="submitFilter" type="checkbox" v-model="filterSelect" :value="encodeURIComponent(status.name.toLowerCase())">
+                </div>
+              </ul>
+            </details>
+            <div v-for="item in sortTask" :key="item.id" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded border">
+                <div class="absolute left-0 w-1 h-10" :class="styleStatus(item.status)"></div>
                 <div class="flex items-center space-x-3">
                     <div>
                         <div class="dropdown itbkk-button-action">
@@ -217,7 +239,7 @@ const sortIcon = computed(() => {
                     </div>
                 </div>
                 <div>
-                    <p class="itbkk-status px-4 py-2 rounded" :class="styleStatus(item.status.name)">{{ item.status.name }}</p>
+                    <p class="itbkk-status px-4 py-2 rounded" :class="styleStatus(item.status)">{{ item.status }}</p>
                 </div>
             </div>
         </div>

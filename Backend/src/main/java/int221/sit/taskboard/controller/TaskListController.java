@@ -28,20 +28,6 @@ public class TaskListController {
     @Autowired
     private TaskListService taskListService;
 
-//    @GetMapping("")
-//    public List<TaskList> getAllTaskList(@RequestParam(required = false) String[] param) {
-//        return service.getAllTaskList(param);
-//    }
-
-//    @GetMapping("/{id}")
-//    public ResponseEntity<Object> getTaskListById(@PathVariable Integer id){
-//        TaskList taskList = service.getTaskListById(id);
-//        if (taskList != null) {
-//            return ResponseEntity.ok(taskList);
-//        } else {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("TaskList " + id + " does not exist !!");
-//        }
-//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getTaskListByIdDto(@PathVariable Integer id){
@@ -50,10 +36,10 @@ public class TaskListController {
         return ResponseEntity.ok(taskListByIdDto);
     }
 
-//    @GetMapping("")
-//    public List<TaskListDto> getAllTaskListDto(@RequestParam(required = false) String[] param) {
-//        return service.getAllTaskListDto();
-//    }
+    @GetMapping("")
+    public List<TaskListDto> getAllTaskListDto(@RequestParam(required = false) String[] param) {
+        return service.getAllTaskListDto();
+    }
 
     @PostMapping("")
     public ResponseEntity<NewTaskListDto> addNewTaskList(@RequestBody NewTaskListDtoV2 newTaskList) {
