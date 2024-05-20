@@ -139,7 +139,11 @@ public class TaskListService {
             tasks = repository.findByStatusNameIn(filterStatuses);
         }
 
-        tasks = sortTasks(tasks, sortBy);
+        try {
+            tasks = sortTasks(tasks, sortBy);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
 
         return tasks.stream()
                 .map(this::convertToDto)
@@ -155,16 +159,17 @@ public class TaskListService {
                 tasks.sort((task1, task2) -> task2.getStatus().getName().compareTo(task1.getStatus().getName()));
                 break;
             case "createdDate":
-            default:
                 tasks.sort(Comparator.comparing(TaskList::getCreatedOn));
                 break;
+            default:
+                throw new IllegalArgumentException("Invalid sort option: " + sortBy);
         }
         return tasks;
     }
 
     private TaskListSortingDto convertToDto(TaskList task) {
         TaskListSortingDto dto = modelMapper.map(task, TaskListSortingDto.class);
-        dto.setStatus(task.getStatus() != null ? task.getStatus().getName() : null);
+        dto.setStatus(task.getStatus() != null ? task.getStatus() : null);
         return dto;
     }
 }

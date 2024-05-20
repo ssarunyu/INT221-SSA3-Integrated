@@ -50,10 +50,10 @@ public class TaskListController {
         return ResponseEntity.ok(taskListByIdDto);
     }
 
-    @GetMapping("")
-    public List<TaskListDto> getAllTaskListDto(@RequestParam(required = false) String[] param) {
-        return service.getAllTaskListDto();
-    }
+//    @GetMapping("")
+//    public List<TaskListDto> getAllTaskListDto(@RequestParam(required = false) String[] param) {
+//        return service.getAllTaskListDto();
+//    }
 
     @PostMapping("")
     public ResponseEntity<NewTaskListDto> addNewTaskList(@RequestBody NewTaskListDtoV2 newTaskList) {
@@ -102,12 +102,11 @@ public class TaskListController {
         return ResponseEntity.ok().body(deletedTaskListDto);
     }
 
-//    @GetMapping("")
-//    public List<TaskListSortingDto> getTasksSortedByStatusName(
-//    @RequestParam(name = "sortBy", defaultValue = "createdDate") String sortBy,
-//    @RequestParam(name = "filterStatuses", required = false) List<String> filterStatuses
-//    ) {
-//        return service.getTasksSortedByStatusName(sortBy, filterStatuses);
-//    }
+    @GetMapping("")
+    public List<TaskListSortingDto> getTasksSortedByStatusName(
+    @RequestParam(name = "sortBy", defaultValue = "createdDate") String sortBy,
+    @RequestParam(name = "filterStatuses", required = false) List<String> filterStatuses ) {
+        return service.getTasksSortedByStatusName(sortBy, filterStatuses);
+    }
 
 }
