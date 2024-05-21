@@ -2,10 +2,12 @@ package int221.sit.taskboard.controller;
 
 import int221.sit.taskboard.DTO.NewTaskListDtoV2;
 import int221.sit.taskboard.entities.StatusList;
+import int221.sit.taskboard.exceptions.BadRequestException;
 import int221.sit.taskboard.exceptions.ItemNotFoundException;
 import int221.sit.taskboard.services.StatusListService;
 import int221.sit.taskboard.services.TaskListService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,14 +37,22 @@ public class StatusListController {
 
     @PostMapping("")
     public ResponseEntity<StatusList> addNewStatus(@RequestBody StatusList newStatus) {
-        StatusList createNewStatus = service.addStatus(newStatus);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createNewStatus);
+        try {
+            StatusList createNewStatus = service.addStatus(newStatus);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createNewStatus);
+        } catch (DataIntegrityViolationException e) {
+            throw new BadRequestException("Status name '" + newStatus.getName() + "' already exists, (must be unique)");
+        }
     }
     
     @PutMapping("/{id}")
     public ResponseEntity<StatusList> updateStatus(@RequestBody StatusList statusList, @PathVariable Integer id){
-        StatusList updateStatus = service.updateStatus(id, statusList);
-        return ResponseEntity.status(HttpStatus.OK).body(updateStatus);
+        try {
+            StatusList updateStatus = service.updateStatus(id, statusList);
+            return ResponseEntity.status(HttpStatus.OK).body(updateStatus);
+        } catch (DataIntegrityViolationException e) {
+            throw new BadRequestException("Status name '" + statusList.getName() + "' already exists, (must be unique)");
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -56,8 +66,8 @@ public class StatusListController {
             NewTaskListDtoV2 transferTask = tasklistService.transferTasking(id, newId);
             service.deleteStatus(id);
             return ResponseEntity.status(HttpStatus.OK).body(transferTask);
-        } catch (ItemNotFoundException e) {
-           throw e;
+        } catch (DataIntegrityViolationException exception) {
+           throw new BadRequestException("destination status for task transfer must be different from current status");
         }
     }
 

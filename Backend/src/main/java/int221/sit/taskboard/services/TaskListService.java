@@ -3,15 +3,16 @@ package int221.sit.taskboard.services;
 import int221.sit.taskboard.DTO.*;
 import int221.sit.taskboard.entities.StatusList;
 import int221.sit.taskboard.entities.TaskList;
+import int221.sit.taskboard.exceptions.BadRequestException;
 import int221.sit.taskboard.exceptions.ItemNotFoundException;
+import int221.sit.taskboard.exceptions.TaskListValidation;
 import int221.sit.taskboard.repositories.StatusListRepository;
 import int221.sit.taskboard.repositories.TaskListRepository;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -44,7 +45,7 @@ public class TaskListService {
     }
 
     public TaskList getTaskListById(Integer id) {
-        return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task " + id + " does not exist !!"));
+        return repository.findById(id).orElseThrow(() -> new ItemNotFoundException("Task " + id + " does not exist !!"));
     }
 
     public List<TaskListDto> getAllTaskListDto() {
@@ -68,20 +69,24 @@ public class TaskListService {
         StatusList statusList;
         if (statusId != null) {
             statusList = statusListRepository.findById(statusId)
-                    .orElseThrow(() -> new ItemNotFoundException("Status id " + statusId + " does not exist!"));
+                    .orElseThrow(() -> new BadRequestException("Status id " + statusId + " does not exist!"));
         } else {
             statusList = statusListRepository.findById(1)
                     .orElseThrow(() -> new ItemNotFoundException("Default status does not exist!"));
         }
 
-
         TaskList taskList = modelMapper.map(newTaskListDto, TaskList.class);
         taskList.setStatus(statusList);
 
-        TaskList savedTaskList = repository.saveAndFlush(taskList);
-        NewTaskListDto taskListDto = modelMapper.map(savedTaskList, NewTaskListDto.class);
+        TaskListValidation.validateTaskDataLength(newTaskListDto);
 
-        return taskListDto;
+        try {
+            TaskList savedTaskList = repository.saveAndFlush(taskList);
+            NewTaskListDto taskListDto = modelMapper.map(savedTaskList, NewTaskListDto.class);
+            return taskListDto;
+        } catch (DataAccessException e) {
+            throw new BadRequestException("Failed to create new task list");
+        }
     }
 
     @Transactional
@@ -99,6 +104,12 @@ public class TaskListService {
     @Transactional
     public NewTaskListDto updateTaskListById(Integer id, NewTaskListDtoV2 newTaskListDto, Integer statusId) {
 
+        if (newTaskListDto.getTitle() != null && !newTaskListDto.getTitle().isEmpty()) {
+            newTaskListDto.setTitle(newTaskListDto.getTitle().trim());
+        } else {
+            throw new BadRequestException("Title must not be null");
+        }
+
         TaskList taskListUpdated = repository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Task id " + id + " does not exist!"));
 
@@ -108,10 +119,11 @@ public class TaskListService {
 
         if (statusId != null) {
             StatusList statusList = statusListRepository.findById(statusId)
-                    .orElseThrow(() -> new ItemNotFoundException("Status id " + statusId + " does not exist!"));
+                    .orElseThrow(() -> new BadRequestException("Status id " + statusId + " does not exist!"));
             taskListUpdated.setStatus(statusList);
         }
 
+        TaskListValidation.validateTaskDataLength(newTaskListDto);
         TaskList updatedTaskList = repository.saveAndFlush(taskListUpdated);
 
         return modelMapper.map(updatedTaskList, NewTaskListDto.class);
@@ -120,7 +132,7 @@ public class TaskListService {
     @Transactional
     public NewTaskListDtoV2 transferTasking(Integer oldStatusId, Integer newStatusId){
         StatusList newStatus = statusListRepository.findById(newStatusId)
-                .orElseThrow(() -> new ItemNotFoundException("New status ID not found"));
+                .orElseThrow(() -> new BadRequestException("the specified status for task transfer does not exist"));
 
         List<TaskList> taskLists = repository.findByStatusId(oldStatusId);
         for (TaskList taskList : taskLists) {
@@ -142,7 +154,7 @@ public class TaskListService {
         try {
             tasks = sortTasks(tasks, sortBy);
         } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+            throw new BadRequestException(e.getMessage());
         }
 
         return tasks.stream()

@@ -16,7 +16,7 @@ public class TaskList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "taskId")
     private Integer id;
-    @Column(name = "title", nullable = true, length = 100)
+    @Column(name = "title", nullable = false, length = 100)
     private String title;
     @Column(name = "description", nullable = false, length = 100)
     private String description;

@@ -1,7 +1,9 @@
 package int221.sit.taskboard.services;
 
 import int221.sit.taskboard.entities.StatusList;
+import int221.sit.taskboard.exceptions.BadRequestException;
 import int221.sit.taskboard.exceptions.ItemNotFoundException;
+import int221.sit.taskboard.exceptions.StatusListValidation;
 import int221.sit.taskboard.repositories.StatusListRepository;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
@@ -34,9 +36,10 @@ public class StatusListService {
     public StatusList addStatus(StatusList newStatus) {
         if(newStatus.getName() != null) {
             newStatus.trimValues();
+            StatusListValidation.validateTaskDataLength(newStatus);
             return repository.saveAndFlush(newStatus);
         } else {
-            throw new RuntimeException("Status name is required");
+            throw new BadRequestException("Status name must not be null");
         }
     }
 
@@ -48,29 +51,38 @@ public class StatusListService {
         statuslist.trimValues();
 
         if (statuslist.getName() == null || statuslist.getName().isEmpty()) {
-            throw new IllegalArgumentException("Status name is required");
+            throw new BadRequestException("Status name must not be null");
         }
 
-        if (existingStatus.getId() == 1) {
-            throw new IllegalArgumentException("Cannot update Status Id 1");
+        if (existingStatus.getId() == 1 || "Done".equals(existingStatus.getName())) {
+            throw new BadRequestException("Cannot be update Status Id : " + id + ", (No Status, Done)");
         }
 
         existingStatus.setName(statuslist.getName());
         existingStatus.setDescription(statuslist.getDescription());
+        StatusListValidation.validateTaskDataLength(statuslist);
 
-        StatusList updatedStatus = repository.save(existingStatus);
-
-        return updatedStatus;
+        return repository.save(existingStatus);
     }
 
     @Transactional
     public ResponseEntity<StatusList> deleteStatus(Integer id) {
         StatusList statusList = repository.findById(id).orElse(null);
-        if(statusList != null){
-            repository.delete(statusList);
-        } else {
+
+        if(statusList == null){
             throw new ItemNotFoundException("Status id " + id + " does not exist!");
         }
+
+        if (statusList.getId() == 1 || "Done".equals(statusList.getName())){
+            throw new BadRequestException("Cannot be delete Status Id : " + id + ", (No Status, Done)");
+        }
+
+        try {
+            repository.delete(statusList);
+        } catch (Exception e){
+            throw new BadRequestException("Cannot be delete Status Id : " + id + ", " + e.getMessage());
+        }
+
         return ResponseEntity.ok(statusList);
     }
 }
