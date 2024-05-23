@@ -148,9 +148,19 @@ public class TaskListService {
         if (filterStatuses == null || filterStatuses.isEmpty()) {
             tasks = repository.findAll();
         } else {
-            tasks = repository.findByStatusNameIn(filterStatuses);
-        }
+            List<String> validStatuses = statusListRepository.findAll().stream()
+                    .map(StatusList::getName)
+                    .map(String::toLowerCase)
+                    .map(String::trim)
+                    .collect(Collectors.toList());
 
+            boolean allValidStatuses = filterStatuses.stream().allMatch(validStatuses::contains);
+            if (allValidStatuses) {
+                tasks = repository.findByStatusNameIn(filterStatuses);
+            } else {
+                throw new BadRequestException("Invalid filterStatuses");
+            }
+        }
         try {
             tasks = sortTasks(tasks, sortBy);
         } catch (IllegalArgumentException e) {
