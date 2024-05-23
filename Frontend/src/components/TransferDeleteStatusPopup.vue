@@ -31,7 +31,7 @@ onMounted(async () => {
 const confirmHandle = async () => {
     const response = await transferData(import.meta.env.VITE_STATUS_URL, props.deleteItem.id, userTransferSelect.value)
     if(response.ok) {
-        emit('confirmDeleteStatus', props.deleteItem.id)
+        emit('confirmDeleteStatus', props.deleteItem)
         toastHandle.value = { type: 'success', status: true, message: `${repeatItem.value.length} task have been transferred and the status has been deleted` }
         emit('toastItem', toastHandle.value)
         emit('close')
