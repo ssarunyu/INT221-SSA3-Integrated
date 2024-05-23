@@ -35,12 +35,12 @@ class TaskManagement {
     const index = this.allStatus.findIndex((item) => item.id === id)
     this.allStatus[index] = status
   }
+  deleteStatus(id) {
+    const index = this.allStatus.findIndex((item) => item.id === id)
+    this.allStatus.splice(index, 1)
+  }
   getAllStatus() {
     return this.allStatus
-  }
-  deleteStatus(id) {
-    const index = this.allTasks.findIndex((item) => item.id === id)
-    this.allStatus.splice(index, 1)
   }
 }
 

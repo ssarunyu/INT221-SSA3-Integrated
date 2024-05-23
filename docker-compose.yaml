@@ -13,11 +13,11 @@ services:
       test: ["CMD", "/healthcheck.sh"]
       interval: 2s
       timeout: 2s
-      retires: 20
+      retries: 20
   backend:
     build: ./Backend/
     environment:
-      - mysql_url: database
+      mysql_url: database
     depends_on:
       database:
         condition: service_healthy
