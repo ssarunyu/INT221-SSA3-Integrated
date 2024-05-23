@@ -73,7 +73,6 @@ const closeEditPopup = () => {
     router.push({ name: 'Home' })
 }
 const updateEdit = async (newEdit) => {
-    console.log(newEdit)
     const response = await updateData(import.meta.env.VITE_TASK_URL,
     {
         title: newEdit.title,

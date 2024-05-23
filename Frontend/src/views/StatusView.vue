@@ -25,6 +25,7 @@ onMounted(async () => {
 // Toast
 const toastHandle = ref()
 
+const statuses = ref(taskManagement.value.getAllStatus())
 const addStatusShow = ref(false)
 const normalDeleteStatusShow = ref(false)
 const transferDeleteStatusShow = ref(false)
@@ -84,7 +85,7 @@ const controlDelete = async (statusId) => {
         </div>
         <Toast :toastObject="toastHandle" @close="toastHandle.status = false"/>
         <div class="space-y-5 mt-5">
-            <div v-for="item in taskManagement.getAllStatus()" class="itbkk-item relative p-2 border rounded">
+            <div v-for="item in statuses" class="itbkk-item relative p-2 border rounded">
                 <div class="grid grid-cols-4 items-center">
                     <!-- Vertical line -->
                     <div class="absolute left-0 w-1 h-10" :class="styleStatus(item.name)"></div>
