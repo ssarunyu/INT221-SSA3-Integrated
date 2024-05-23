@@ -97,7 +97,7 @@ const controlDelete = async (statusId) => {
                     <div class="itbkk-status-description text-lg m-2 break-all" :class="item.description === null ? 'italic text-gray-500' : ''">
                         {{ item.description === null ? 'No description is provided' : item.description }}
                     </div>
-                    <div class="itbkk-status-action flex" v-if="item.name !== 'No Status'">
+                    <div class="itbkk-status-action flex" v-if="item.name !== 'No Status' && item.name !== 'Done'">
                         <div @click="router.push({name: 'EditStatusPopup', params: { editStatusId: item.id }})" class="itbkk-button-edit p-2 px-5 w-35 text-center m-1 rounded cursor-pointer duration-300 bg-gray-300 hover:bg-gray-400 hover:scale-105">
                             Edit
                         </div>

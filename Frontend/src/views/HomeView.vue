@@ -165,21 +165,37 @@ const sortIcon = computed(() => {
 
 const allStatusArr = taskManagement.value.getAllStatus()
 const filterSelect = ref([])
-const submitFilter = async () => {
+const submitFilter = async (userClick) => {
+    const findExist = filterSelect.value.indexOf(userClick)
+    if (findExist !== -1) {
+        filterSelect.value.splice(findExist, 1)
+    } else {
+        filterSelect.value.push(userClick)
+    }
+    await updateTasks()
+}
+
+const updateTasks = async () => {
     let userFilter = ''
-    if(filterSelect.value) {
-        filterSelect.value.map((a) => {
-            const text = `filterStatuses=${a}&`
-            userFilter += text
-        })
+    if (filterSelect.value.length) {
+        userFilter = filterSelect.value.map(a => `filterStatuses=${a}`).join('&')
     }
     const response = await getData(`${import.meta.env.VITE_TASK_URL}?${userFilter}`)
     tasks.value = response
 }
+
 const clearFilter = async () => {
     filterSelect.value = []
     const response = await getData(import.meta.env.VITE_TASK_URL)
     tasks.value = response
+}
+
+const removeFilter = async (r) => {
+    const findExist = filterSelect.value.indexOf(r)
+    if (findExist !== -1) {
+        filterSelect.value.splice(findExist, 1)
+        await updateTasks()
+    }
 }
 </script>
 
@@ -206,50 +222,60 @@ const clearFilter = async () => {
                 <div class="flex items-center space-x-1">
                     <p>Status</p>
                     <div @click="changeSortStage()" class="p-2 cursor-pointer transition duration-300">
-                        <font-awesome-icon v-if="sortIcon" :icon="sortIcon" />
+                        <font-awesome-icon class="itbkk-status-sort" v-if="sortIcon" :icon="sortIcon" />
                     </div>
                 </div>
             </div>
-            <details class="dropdown">
-                <summary class="m-1 btn">Filter Tasks</summary>
-                    <ul class="shadow menu dropdown-content z-[1] bg-white rounded-box w-52">
-                        <div class="text-blue-500 underline flex justify-end w-full my-2">
-                            <p class="cursor-pointer" @click="clearFilter">Clear all</p>
-                        </div>
-                        <div v-for="status in allStatusArr" class="flex justify-between p-2">
-                            <p>{{ status.name }}</p>
-                            <input v-model="filterSelect" @change="submitFilter" type="checkbox" :value="encodeURIComponent(status.name.toLowerCase())">
-                        </div>
-                    </ul>
-            </details>
-            <div v-for="item in sortTask" :key="item.id" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded border">
-                <div class="absolute left-0 w-1 h-10" :class="styleStatus(item.status.name)"></div>
-                <div class="flex items-center space-x-3">
-                    <div>
-                        <div class="dropdown itbkk-button-action">
-                            <p tabindex="0" role="button" class=" btn m-1 border-none font-bold text-2xl">
-                                :
-                            </p>
-                            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-white rounded-box w-40">
-                                <li><a class="itbkk-button-edit" @click="openEditPopup(item.id)">Edit</a></li>
-                                <li><a class="itbkk-button-delete" @click="openDeletePopup(item.id)">Delete</a></li>
-                            </ul>
-                        </div>
+            <div class="flex">
+                <div class="itbkk-status-filter dropdown dropdown-bottom">
+                    <div tabindex="0" role="button" class="btn m-1">Filter Tasks</div>
+                    <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-white rounded-box w-52">
+                    <div class="text-blue-500 underline flex justify-end w-full my-2">
+                        <p class="cursor-pointer" @click="clearFilter">Clear all</p>
                     </div>
-                    <p class="text-xl font-bold">
-                        {{ item.id }}
-                    </p>
-                    <div class="w-full">
-                        <p @click="router.push({ name: 'TaskDetail', params: { detailId: item.id}})" class="itbkk-title break-all font-bold text-xl duration-200 cursor-pointer hover:text-gray-700">
-                            {{ item.title }}
-                        </p>
-                        <p class="itbkk-assignees" :class="item.assignees === null ? 'italic text-gray-500' : ''">
-                            Assignees : {{ item.assignees === null ? 'Unassigned' : item.assignees }}
-                        </p>
+                    <div v-for="status in allStatusArr" class="flex justify-between p-2 rounded duration-300 hover:bg-gray-100 ">
+                        <button class="itbkk-status-choice" @click="submitFilter(status.name)">{{ status.name }}</button> 
+                    </div>
+                    </ul>
+                </div>
+                <!-- Show already filter -->
+                <div class="flex items-center space-x-3 ml-4">
+                    <div v-for="status in filterSelect" class="px-5 py-2 rounded bg-blue-200">
+                    {{ status }}
+                    <font-awesome-icon class="cursor-pointer" @click="removeFilter(status)" icon="fa-solid fa-xmark" />
                     </div>
                 </div>
-                <div>
-                    <p class="itbkk-status px-4 py-2 rounded" :class="styleStatus(item.status.name)">{{ item.status.name }}</p>
+            </div>
+            <div class="space-y-5">
+                <div v-for="item in sortTask" :key="item.id" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded border">
+                    <div class="absolute left-0 w-1 h-10" :class="styleStatus(item.status.name)"></div>
+                    <div class="flex items-center space-x-3">
+                        <div>
+                            <div class="dropdown itbkk-button-action">
+                                <p tabindex="0" role="button" class=" btn m-1 border-none font-bold text-2xl">
+                                    :
+                                </p>
+                                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-white rounded-box w-40">
+                                    <li><a class="itbkk-button-edit" @click="openEditPopup(item.id)">Edit</a></li>
+                                    <li><a class="itbkk-button-delete" @click="openDeletePopup(item.id)">Delete</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <p class="text-xl font-bold">
+                            {{ item.id }}
+                        </p>
+                        <div class="w-full">
+                            <p @click="router.push({ name: 'TaskDetail', params: { detailId: item.id}})" class="itbkk-title break-all font-bold text-xl duration-200 cursor-pointer hover:text-gray-700">
+                                {{ item.title }}
+                            </p>
+                            <p class="itbkk-assignees" :class="item.assignees === null ? 'italic text-gray-500' : ''">
+                                Assignees : {{ item.assignees === null ? 'Unassigned' : item.assignees }}
+                            </p>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="itbkk-status px-4 py-2 rounded" :class="styleStatus(item.status.name)">{{ item.status.name }}</p>
+                    </div>
                 </div>
             </div>
         </div>

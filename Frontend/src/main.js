@@ -11,10 +11,10 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 // Import specific icons
-import { faSortDown, faSortUp, faSort } from '@fortawesome/free-solid-svg-icons';
+import { faSortDown, faSortUp, faSort, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 // Add icons to the library
-library.add(faSortDown, faSortUp, faSort);
+library.add(faSortDown, faSortUp, faSort, faXmark);
 
 const app = createApp(App)
 

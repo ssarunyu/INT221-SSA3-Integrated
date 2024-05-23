@@ -2,7 +2,6 @@ async function getData(url) {
     try {
         const response = await fetch(url, {
             method: "GET",
-            redirect: "follow"
         })
         const result = response.json()
         return result
@@ -16,7 +15,6 @@ async function getDataById(url, id) {
     try {
         const response = await fetch(finalURL, {
             method: "GET",
-            redirect: "follow"
         })
         const result = response.json()
         return result
@@ -32,7 +30,6 @@ async function postData(url, task) {
             headers: {
                 "Content-Type": "application/json"
             },
-            redirect: "follow",
             body: JSON.stringify(task)
         })
         return response
@@ -49,7 +46,6 @@ async function updateData(url, task, id) {
             headers: {
                 "Content-Type": "application/json"
             },
-            redirect: "follow",
             body: JSON.stringify(task)
         })
         return response
@@ -63,7 +59,6 @@ async function deleteData(url, id) {
     try {
         const response = await fetch(finalURL, {
             method: "DELETE",
-            redirect: "follow"
         })
         return response
     } catch (error) {
@@ -76,7 +71,6 @@ async function transferData(url, oldId, newId) {
     try {
         const response = await fetch(finalURL, {
             method: "DELETE",
-            redirect: "follow"
         })
         return response
     } catch (error) {
