@@ -57,7 +57,12 @@ public class StatusListController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<StatusList> deleteStatus(@PathVariable Integer id) {
-        return service.deleteStatus(id);
+        try {
+            return service.deleteStatus(id);
+        } catch (Exception e) {
+            throw new BadRequestException("Cannot be delete Status Id : " + id + " (This Id has using!) ");
+        }
+
     }
 
     @DeleteMapping("/{id}/{newId}")
