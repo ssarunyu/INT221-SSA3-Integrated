@@ -1,8 +1,11 @@
 package int221.sit.taskboard.controller;
 
-import int221.sit.taskboard.DTO.UserDto;
+import int221.sit.taskboard.DTO.UserLogin;
 import int221.sit.taskboard.Jwt.JwtTokenUtil;
 import int221.sit.taskboard.Jwt.JwtUserDetailsService;
+import int221.sit.taskboard.entities.Users;
+import int221.sit.taskboard.exceptions.NotCreatedException;
+import int221.sit.taskboard.repositories.auth.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,27 +22,43 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/login")
 public class AuthController {
-//    For get users by using spring boot
-    @Autowired
-    JwtUserDetailsService jwtUserDetailsService;
 
     @Autowired
-    JwtTokenUtil jwtTokenUtil;
+    private JwtUserDetailsService jwtUserDetailsService;
 
     @Autowired
-    AuthenticationManager authenticationManager;
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping("")
-    public ResponseEntity<Object> login(@RequestBody @Valid UserDto userDto) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword())
-        );
-        if(!authentication.isAuthenticated()) {
-            throw new UsernameNotFoundException("Invalid user or password ! ! !");
-        }
-        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(userDto.getUsername());
-        String token = jwtTokenUtil.generateToken(userDetails);
-        return ResponseEntity.ok(token);
-    }
+    public ResponseEntity<String> createAuthenticationToken(@Valid @RequestBody UserLogin userLogin) {
+        Users user = userRepository.findByUsername(userLogin.getUsername());
 
+        if (user == null) {
+            throw new NotCreatedException("Username or Password is invalid!");
+        }
+
+        try {
+            // Authenticate the user
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(userLogin.getUsername(), userLogin.getPassword())
+            );
+
+            // Load the user details
+            UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(userLogin.getUsername());
+
+            // Generate the JWT token
+            String token = jwtTokenUtil.generateToken(userDetails);
+
+            // Return the token
+            return ResponseEntity.ok(token);
+        } catch (UsernameNotFoundException ex) {
+            return ResponseEntity.status(401).body("Username or Password is invalid!");
+        }
+    }
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 @Getter
 @Setter
@@ -12,6 +13,7 @@ import lombok.Setter;
 public class Users {
     @Id
     @Column(name = "oid")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String userId;
 
     @Size(max = 50)
@@ -31,7 +33,8 @@ public class Users {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    private enum Role {
+    public enum Role {
         LECTURER, STAFF, STUDENT
     }
 }
+

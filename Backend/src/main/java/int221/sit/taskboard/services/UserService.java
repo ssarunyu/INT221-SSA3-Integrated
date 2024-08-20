@@ -1,6 +1,6 @@
 package int221.sit.taskboard.services;
 
-import int221.sit.taskboard.DTO.UserDto;
+import int221.sit.taskboard.DTO.UserLogin;
 import int221.sit.taskboard.entities.Users;
 import int221.sit.taskboard.exceptions.BadRequestException;
 import int221.sit.taskboard.exceptions.NotCreatedException;
@@ -15,7 +15,7 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public UserDto UserLogin(String username, String rawPassword) {
+    public UserLogin userLogin(String username, String rawPassword) {
 
         if (username.isEmpty() || rawPassword.isEmpty() || username == null || rawPassword == null) {
             throw new BadRequestException("Username or Password is incorrect!");
@@ -28,7 +28,7 @@ public class UserService {
             throw new NotCreatedException("Username or Password is incorrect!");
         }
 
-        UserDto userDto = new UserDto();
+        UserLogin userDto = new UserLogin();
         userDto.setUsername("string");
         userDto.setPassword("string");
         return userDto;

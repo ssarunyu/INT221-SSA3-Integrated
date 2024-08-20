@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 @Component
 public class JwtTokenUtil implements Serializable {
-    @Value("asdasdasdasdas")
+    @Value("${jwt.secret}")
     private String SECRET_KEY;
 
     @Value("#{30 * 60 * 1000}")
@@ -36,8 +36,10 @@ public class JwtTokenUtil implements Serializable {
     }
 
     public Claims getAllClaimsFromToken(String token) {
-        Claims claims = Jwts.parser().setSigningKey(SECRET_KEY).
-                parseClaimsJws(token).getBody();
+        Claims claims = Jwts.parser()
+                .setSigningKey(SECRET_KEY)
+                .parseClaimsJws(token)
+                .getBody();
         return claims;
     }
 
@@ -55,10 +57,14 @@ public class JwtTokenUtil implements Serializable {
     }
 
     private String doGenerateToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder().setHeaderParam("typ", "JWT").setClaims(claims).setSubject(subject).
-                setIssuedAt(new Date(System.currentTimeMillis())).
-                setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY)).
-                signWith(signatureAlgorithm, SECRET_KEY).compact();
+        return Jwts.builder()
+                .setHeaderParam("typ", "JWT")
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
+                .signWith(signatureAlgorithm, SECRET_KEY)
+                .compact();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {

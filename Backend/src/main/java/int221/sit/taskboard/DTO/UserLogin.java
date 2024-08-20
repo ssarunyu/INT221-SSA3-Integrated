@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Data
-public class UserDto {
+public class UserLogin {
     @Size(max = 50)
     private String username;
     @Size(max = 14)
