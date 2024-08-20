@@ -1,10 +1,11 @@
-package int221.sit.taskboard.entities;
+package int221.sit.taskboard.project_management;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.Size;
+
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+
 import lombok.Setter;
 
 @Getter
@@ -17,8 +18,12 @@ public class StatusList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "statusId")
     private Integer id;
+
+    @Size(max = 50, message = "name size must be between 0 and 50.")
     @Column(name = "statusName", nullable = false)
     private String name;
+
+    @Size(max = 200, message = "description size must be between 0 and 200.")
     @Column(name = "statusDescription")
     private String description;
 

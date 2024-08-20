@@ -1,6 +1,5 @@
-package int221.sit.taskboard.repositories;
+package int221.sit.taskboard.project_management;
 
-import int221.sit.taskboard.entities.TaskList;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

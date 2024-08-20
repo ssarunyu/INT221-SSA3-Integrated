@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @Data
 @JsonPropertyOrder({"id", "title", "description", "assignees", "status"})
-public class NewTaskListDtoV2 {
+public class TaskAndStatusInt {
     private Integer id;
     private String title;
     private String description;

@@ -1,11 +1,12 @@
 package int221.sit.taskboard.controller;
 
 import int221.sit.taskboard.DTO.*;
-import int221.sit.taskboard.entities.TaskList;
+import int221.sit.taskboard.project_management.TaskList;
 import int221.sit.taskboard.exceptions.BadRequestException;
 import int221.sit.taskboard.exceptions.ItemNotFoundException;
 import int221.sit.taskboard.services.StatusListService;
 import int221.sit.taskboard.services.TaskListService;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,12 +34,12 @@ public class TaskListController {
     @GetMapping("/{id}")
     public ResponseEntity<Object> getTaskListByIdDto(@PathVariable Integer id){
         TaskList taskList = service.findById(id);
-        TaskListByIdDto taskListByIdDto = modelMapper.map(taskList, TaskListByIdDto.class);
-        return ResponseEntity.ok(taskListByIdDto);
+        TaskListDetail taskListDetail = modelMapper.map(taskList, TaskListDetail.class);
+        return ResponseEntity.ok(taskListDetail);
     }
 
     @PostMapping("")
-    public ResponseEntity<NewTaskListDto> addNewTaskList(@RequestBody NewTaskListDtoV2 newTaskList) {
+    public ResponseEntity<TaskAndStatusObject> addNewTaskList(@Valid @RequestBody TaskAndStatusInt newTaskList) {
 
         if (newTaskList.getTitle() != null) {
             newTaskList.setTitle(newTaskList.getTitle().trim());
@@ -65,15 +66,15 @@ public class TaskListController {
         }
 
         Integer status = newTaskList.getStatus();
-        NewTaskListDto createdTaskList = service.createNewTaskList(newTaskList, status);
+        TaskAndStatusObject createdTaskList = service.createNewTaskList(newTaskList, status);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTaskList);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<NewTaskListDto> updateTaskList(@RequestBody NewTaskListDtoV2 taskLists, @PathVariable Integer id) {
+    public ResponseEntity<TaskAndStatusObject> updateTaskList(@Valid @RequestBody TaskAndStatusInt taskLists, @PathVariable Integer id) {
         try {
             Integer status = taskLists.getStatus();
-            NewTaskListDto updatedTask = service.updateTaskListById(id, taskLists, status);
+            TaskAndStatusObject updatedTask = service.updateTaskListById(id, taskLists, status);
             return ResponseEntity.ok(updatedTask);
         } catch (ItemNotFoundException e) {
             throw e;
@@ -81,13 +82,13 @@ public class TaskListController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<TaskListDto> deletedTaskListById(@PathVariable Integer id) {
-        TaskListDto deletedTaskListDto = service.removeTaskListById(id);
+    public ResponseEntity<TaskShortDetail> deletedTaskListById(@PathVariable Integer id) {
+        TaskShortDetail deletedTaskListDto = service.removeTaskListById(id);
         return ResponseEntity.ok().body(deletedTaskListDto);
     }
 
     @GetMapping("")
-    public List<TaskListSortingDto> getTasksSortedByStatusName(
+    public List<TaskShortDetail> getTasksSortedByStatusName(
     @RequestParam(name = "sortBy", defaultValue = "createdDate") String sortBy,
     @RequestParam(name = "filterStatuses", required = false) List<String> filterStatuses ) {
         return service.getTasksSortedByStatusName(sortBy, filterStatuses);

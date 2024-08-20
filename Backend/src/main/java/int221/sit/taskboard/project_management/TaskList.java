@@ -1,7 +1,8 @@
-package int221.sit.taskboard.entities;
+package int221.sit.taskboard.project_management;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,11 +17,17 @@ public class TaskList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "taskId")
     private Integer id;
-    @Column(name = "title", nullable = false, length = 100)
+
+    @Size(max = 100, message = "title size must be between 0 and 100.")
+    @Column(name = "title", nullable = false)
     private String title;
-    @Column(name = "description", nullable = false, length = 100)
+
+    @Size(max = 100, message = "description size must be between 0 and 500.")
+    @Column(name = "description", nullable = false)
     private String description;
-    @Column(name = "assignees", nullable = false, length = 100)
+
+    @Size(max = 30, message = "assignees size must be between 0 and 30.")
+    @Column(name = "assignees", nullable = false)
     private String assignees;
 
     @JsonIgnore

@@ -1,6 +1,6 @@
 package int221.sit.taskboard.DTO;
 
-import int221.sit.taskboard.entities.StatusList;
+import int221.sit.taskboard.project_management.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Data
-public class TaskListSortingDto {
+public class TaskSorting {
     private Integer id;
     private String title;
     private String assignees;

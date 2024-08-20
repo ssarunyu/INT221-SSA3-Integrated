@@ -1,10 +1,8 @@
 package int221.sit.taskboard.services;
 
-import int221.sit.taskboard.entities.StatusList;
 import int221.sit.taskboard.exceptions.BadRequestException;
 import int221.sit.taskboard.exceptions.ItemNotFoundException;
-import int221.sit.taskboard.exceptions.StatusListValidation;
-import int221.sit.taskboard.repositories.StatusListRepository;
+import int221.sit.taskboard.project_management.*;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +34,7 @@ public class StatusListService {
     public StatusList addStatus(StatusList newStatus) {
         if(newStatus.getName() != null) {
             newStatus.trimValues();
-            StatusListValidation.validateTaskDataLength(newStatus);
+//            StatusListValidation.validateTaskDataLength(newStatus);
             return repository.saveAndFlush(newStatus);
         } else {
             throw new BadRequestException("Status name must not be null");
@@ -60,7 +58,7 @@ public class StatusListService {
 
         existingStatus.setName(statuslist.getName());
         existingStatus.setDescription(statuslist.getDescription());
-        StatusListValidation.validateTaskDataLength(statuslist);
+//        StatusListValidation.validateTaskDataLength(statuslist);
 
         return repository.save(existingStatus);
     }
