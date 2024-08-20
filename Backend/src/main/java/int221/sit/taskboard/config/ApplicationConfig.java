@@ -12,11 +12,4 @@ public class ApplicationConfig {
     public ModelMapper modelMapper() {
         return new ModelMapper();
     }
-
-//    @Bean
-//    @ConfigurationProperties("spring.datasource.todolist")
-//    public DataSourceProperties datasourceProperties() {
-//        return new DataSourceProperties();
-//    }
-
 }

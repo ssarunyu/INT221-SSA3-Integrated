@@ -1,10 +1,10 @@
 package int221.sit.taskboard.services;
 
 import int221.sit.taskboard.DTO.UserDto;
-import int221.sit.taskboard.users_account.Users;
+import int221.sit.taskboard.entities.Users;
 import int221.sit.taskboard.exceptions.BadRequestException;
 import int221.sit.taskboard.exceptions.NotCreatedException;
-import int221.sit.taskboard.users_account.UserRepository;
+import int221.sit.taskboard.repositories.auth.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,13 +24,7 @@ public class UserService {
         Users users = userRepository.findByUsername(username);
         Argon2PasswordEncoder passwordEncoder = new Argon2PasswordEncoder(16, 32, 1, 6000, 10);
 
-        if (users == null || passwordEncoder.matches(rawPassword
-
-
-
-
-
-                , users.getPassword())) {
+        if (users == null || passwordEncoder.matches(rawPassword, users.getPassword())) {
             throw new NotCreatedException("Username or Password is incorrect!");
         }
 

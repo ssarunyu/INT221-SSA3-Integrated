@@ -2,7 +2,8 @@ package int221.sit.taskboard.services;
 
 import int221.sit.taskboard.exceptions.BadRequestException;
 import int221.sit.taskboard.exceptions.ItemNotFoundException;
-import int221.sit.taskboard.project_management.*;
+import int221.sit.taskboard.entities.*;
+import int221.sit.taskboard.repositories.task.StatusListRepository;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

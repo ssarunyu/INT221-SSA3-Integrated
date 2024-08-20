@@ -1,7 +1,7 @@
 package int221.sit.taskboard.controller;
 
 import int221.sit.taskboard.DTO.*;
-import int221.sit.taskboard.project_management.TaskList;
+import int221.sit.taskboard.entities.TaskList;
 import int221.sit.taskboard.exceptions.BadRequestException;
 import int221.sit.taskboard.exceptions.ItemNotFoundException;
 import int221.sit.taskboard.services.StatusListService;

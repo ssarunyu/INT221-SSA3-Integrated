@@ -1,4 +1,4 @@
-package int221.sit.taskboard.users_account;
+package int221.sit.taskboard.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;

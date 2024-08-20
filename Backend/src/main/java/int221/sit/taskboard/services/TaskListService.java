@@ -1,9 +1,10 @@
 package int221.sit.taskboard.services;
 
 import int221.sit.taskboard.DTO.*;
-import int221.sit.taskboard.project_management.*;
+import int221.sit.taskboard.entities.*;
 import int221.sit.taskboard.exceptions.*;
-import int221.sit.taskboard.project_management.StatusListRepository;
+import int221.sit.taskboard.repositories.task.StatusListRepository;
+import int221.sit.taskboard.repositories.task.TaskListRepository;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
