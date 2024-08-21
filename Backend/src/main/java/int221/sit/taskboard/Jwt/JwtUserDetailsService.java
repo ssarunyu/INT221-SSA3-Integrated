@@ -1,10 +1,12 @@
 package int221.sit.taskboard.Jwt;
 
 import int221.sit.taskboard.entities.Users;
+import int221.sit.taskboard.exceptions.NotCreatedException;
 import int221.sit.taskboard.repositories.auth.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,15 +23,20 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Users user = userRepository.findByUsername(username);
+            Users user = userRepository.findByUsername(username);
+            if (user == null) {
+                throw new NotCreatedException("The Username or Password is incorrect");
+            }
+//        List<GrantedAuthority> roles = new ArrayList<>();
+//        GrantedAuthority grantedAuthority = new GrantedAuthority() {
+//            @Override
+//            public String getAuthority() {
+//                return user.getRole();
+//            }
+//        };
+//        roles.add(grantedAuthority);
 
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found with username: " + username);
+            UserDetails userDetails = new AuthUser(username, user.getPassword());
+            return userDetails;
         }
-
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(user.getRole().name()));
-
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
-    }
 }

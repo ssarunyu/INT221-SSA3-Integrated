@@ -1,6 +1,7 @@
 package int221.sit.taskboard.controller;
 
 import int221.sit.taskboard.DTO.UserLogin;
+import int221.sit.taskboard.Jwt.AuthResponse;
 import int221.sit.taskboard.Jwt.JwtTokenUtil;
 import int221.sit.taskboard.Jwt.JwtUserDetailsService;
 import int221.sit.taskboard.entities.Users;
@@ -8,16 +9,19 @@ import int221.sit.taskboard.exceptions.NotCreatedException;
 import int221.sit.taskboard.repositories.auth.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/login")
@@ -36,29 +40,20 @@ public class AuthController {
     private UserRepository userRepository;
 
     @PostMapping("")
-    public ResponseEntity<String> createAuthenticationToken(@Valid @RequestBody UserLogin userLogin) {
-        Users user = userRepository.findByUsername(userLogin.getUsername());
-
-        if (user == null) {
-            throw new NotCreatedException("Username or Password is invalid!");
-        }
-
+    public ResponseEntity<AuthResponse> login(@RequestBody @Valid UserLogin userlogin) {
         try {
-            // Authenticate the user
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(userLogin.getUsername(), userLogin.getPassword())
+                    new UsernamePasswordAuthenticationToken(userlogin.getUsername(), userlogin.getPassword())
             );
 
-            // Load the user details
-            UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(userLogin.getUsername());
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            Users user = userRepository.findByUsername(userlogin.getUsername());
 
-            // Generate the JWT token
             String token = jwtTokenUtil.generateToken(user);
 
-            // Return the token
-            return ResponseEntity.ok(token);
-        } catch (UsernameNotFoundException ex) {
-            return ResponseEntity.status(401).body("Username or Password is invalid!");
+            return ResponseEntity.ok(new AuthResponse(token));
+        } catch (Exception ex) {
+            throw new NotCreatedException("Username or Password is invalid !");
         }
     }
 }

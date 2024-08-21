@@ -6,6 +6,7 @@ import int221.sit.taskboard.exceptions.BadRequestException;
 import int221.sit.taskboard.exceptions.NotCreatedException;
 import int221.sit.taskboard.repositories.auth.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
 
