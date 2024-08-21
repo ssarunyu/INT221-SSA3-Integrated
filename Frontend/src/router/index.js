@@ -6,11 +6,16 @@ import EditStatusPopup from '@/components/EditStatusPopup.vue'
 
 import Notfound from '@/views/Notfound.vue'
 import StatusView from '@/views/StatusView.vue'
+import LoginView from '@/views/LoginView.vue'
 
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+     { path: '/login',
+       name: 'Login',
+       component: LoginView,
+    },
     {
       path: '/',
       name: 'RootPath',
