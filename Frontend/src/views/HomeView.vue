@@ -1,7 +1,6 @@
 <script setup>
 import { ref, watch, onMounted, computed } from 'vue';
 import { getData, getDataById, deleteData, postData, updateData } from '@/lib/fetchMethod.js';
-import { TaskManagement } from '@/lib/TaskManagement.js'
 import router from '@/router';
 import Toast from '@/components/Toast.vue'
 import AddPopup from '@/components/AddPopup.vue';
@@ -9,19 +8,24 @@ import EditPopup from '@/components/EditPopup.vue'
 import DeletePopup from '@/components/DeletePopup.vue'
 import { styleStatus } from '@/lib/styleStatus';
 
-const taskManagement = ref(new TaskManagement())
+// Store
+import { useTaskStore } from '@/stores/TaskStore.js'
+import { useStatusStore } from '@/stores/StatusStore.js'
+
+const taskManagement = useTaskStore()
+const statusManagement = useStatusStore()
 
 const fetch = async() => {
     // Fetch task
     const allTask = await getData(import.meta.env.VITE_TASK_URL)
-    taskManagement.value.addAllTask(allTask)
+    taskManagement.addAllTask(allTask)
 
     // Fetch status
     const allStatus = await getData(import.meta.env.VITE_STATUS_URL)
-    taskManagement.value.addAllStatus(allStatus)
+    statusManagement.addAllStatus(allStatus)
 }
 
-const items = taskManagement.value.getAllTask()
+const items = taskManagement.getAllTask()
 watch(items, (newItems) => {
     newItems.forEach(item => {
         switch(item.status) {
@@ -84,7 +88,7 @@ const updateEdit = async (newEdit) => {
         // Toast
         toastHandle.value = {type: 'success', status: true, message: `Task successfully edited to ${newEdit.title} !`}
         // Front-end
-        taskManagement.value.updateTask(newEdit, newEdit.id)
+        taskManagement.updateTask(newEdit, newEdit.id)
         editPopupStatus.value = false
         router.push({ name: 'Home' })
     }
@@ -105,7 +109,7 @@ const confirmAdd = async (newTask) => {
         // Add Toast
         toastHandle.value = {type: 'success', status: true, message: `${newTask.title} task added successfully!`}
         // Front-end
-        taskManagement.value.addTask(await response.json())
+        taskManagement.addTask(await response.json())
         addPopupStatus.value = false
     }
 }
@@ -125,16 +129,16 @@ const deleteConfirm = async () => {
     if(response.ok) {
         toastHandle.value = {type: 'success', status: true, message: `The task has been deleted`}
         // Front-end
-        taskManagement.value.deleteTask(deleteTarget.value.id)
+        taskManagement.deleteTask(deleteTarget.value.id)
         deletePopupStatus.value = false
     } else {
         toastHandle.value = {type: 'error', status: true, message: `Task doesn't exist`}
-        taskManagement.value.deleteTask(deleteTarget.value.id)
+        taskManagement.deleteTask(deleteTarget.value.id)
         deletePopupStatus.value = false
     }
 }
 
-const tasks = ref(taskManagement.value.getAllTask())
+const tasks = ref(taskManagement.getAllTask())
 const sortStage = ref(0);
 const changeSortStage = () => {
     sortStage.value = (sortStage.value + 1) % 3;
@@ -162,7 +166,7 @@ const sortIcon = computed(() => {
     return icons[sortStage.value];
 });
 
-const allStatusArr = taskManagement.value.getAllStatus()
+const allStatusArr = statusManagement.getAllStatus()
 const filterSelect = ref([])
 const submitFilter = async (userClick) => {
     const findExist = filterSelect.value.indexOf(userClick)

@@ -78,4 +78,27 @@ async function transferData(url, oldId, newId) {
     }  
 }
 
-export { getData, getDataById, postData, updateData, deleteData, transferData}
+async function postLogin(url, obj) {
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(
+                {username: obj.username, password: obj.password}
+            )
+        })
+        if(response.status === 200) {
+            const token = await response.text()
+            const tokenArr = token.split('.')
+            const tokenPayload = JSON.parse(atob(tokenArr[1]))
+            localStorage.setItem('payload', tokenPayload)
+            localStorage.setItem('token', token)
+        }
+    } catch (error) {
+        console.log(error) 
+    }
+}
+
+export { getData, getDataById, postData, updateData, deleteData, transferData, postLogin}

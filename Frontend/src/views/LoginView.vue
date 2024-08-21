@@ -1,10 +1,18 @@
 <script setup>
 import { ref } from 'vue'
-import Toast from '@/components/Toast.vue'
 import router from '@/router';
+import { postLogin } from '@/lib/fetchMethod.js'
 
-
-
+const user = ref({})
+const username = ref('')
+const password = ref('')
+const userLogin = async () => {
+  user.value = {
+    username: username.value,
+    password: password.value
+  }
+  const res = await postLogin('http://localhost:8080/login', user.value) 
+}
 </script>
 
 <template>
@@ -16,16 +24,16 @@ import router from '@/router';
             <p class="font-bold mb-2 text-lg text-center ">Sign in Taskboard</p>
             <!-- Username -->
             <div>
-            <input class="itbkk-username rounded-lg p-2 border border-black w-full mb-4" placeholder="Username"
+            <input v-model="username" class="itbkk-username rounded-lg p-2 border border-black w-full mb-4" placeholder="Username"
                 type="text" required />
             </div>
             
             <!-- Password -->
-            <input class="itbkk-password rounded-lg p-2 border border-black w-full mb-4" placeholder="Password"
+            <input v-model="password" class="itbkk-password rounded-lg p-2 border border-black w-full mb-4" placeholder="Password"
                 type="password" required />
             <!-- Button Login -->
-            <button v-on:click="loginBtn"
-                class="bg-green-500 itbkk-button-signin border rounded-3xl w-full py-2 text-white hover:bg-green-600">Login
+            <button @click="userLogin"> 
+              Login
             </button>
         </div>
     </div>

@@ -2,20 +2,22 @@
 import { onMounted, ref } from 'vue'
 import router from '@/router';
 import { styleStatus } from '@/lib/styleStatus'
-import { TaskManagement } from '@/lib/TaskManagement.js'
 import { getData, deleteData } from '@/lib/fetchMethod.js'
 import AddStatusPopup from '@/components/AddStatusPopup.vue'
 import Toast from '@/components/Toast.vue'
 import DeleteStatusPopup from '@/components/DeleteStatusPopup.vue';
 import TransferDeleteStatusPopup from '@/components/TransferDeleteStatusPopup.vue';
 
-const taskManagement = ref(new TaskManagement())
+// Store
+import { useStatusStore } from '@/stores/StatusStore.js'
+
+const statusManagement = useStatusStore()
 
 const fetch = async() => {
     // Fetch data
     const response = await getData(import.meta.env.VITE_STATUS_URL)
     // Front-end
-    taskManagement.value.addAllStatus(response)
+    statusManagement.addAllStatus(response)
 }
 
 onMounted(async () => {
@@ -25,17 +27,17 @@ onMounted(async () => {
 // Toast
 const toastHandle = ref()
 
-const statuses = ref(taskManagement.value.getAllStatus())
+const statuses = ref(statusManagement.getAllStatus())
 const addStatusShow = ref(false)
 const normalDeleteStatusShow = ref(false)
 const transferDeleteStatusShow = ref(false)
 const deleteTarget = ref()
 
 const controlAddStatus = (newStatus) => {
-    taskManagement.value.addStatus(newStatus)
+    statusManagement.addStatus(newStatus)
 }
 const controlUpdateStatus = (updateNewStatus) => {
-    taskManagement.value.updateStatus(updateNewStatus, updateNewStatus.id)
+    statusManagement.updateStatus(updateNewStatus, updateNewStatus.id)
 }
 const controlToast = (newToast) => {
     toastHandle.value = newToast
@@ -55,7 +57,7 @@ const sendDeleteStatus = async (obj) => {
     }
 }
 const controlDelete = async (statusId) => {
-    taskManagement.value.deleteStatus(statusId.id)
+    statusManagement.deleteStatus(statusId.id)
 }
 </script>
 
