@@ -78,7 +78,10 @@ async function transferData(url, oldId, newId) {
     }  
 }
 
+// User stores
+import { useUserStore } from "@/stores/UserStore"
 async function postLogin(url, obj) {
+const userStore = useUserStore()
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -93,9 +96,12 @@ async function postLogin(url, obj) {
             const token = await response.text()
             const tokenArr = token.split('.')
             const tokenPayload = JSON.parse(atob(tokenArr[1]))
-            localStorage.setItem('payload', tokenPayload)
-            localStorage.setItem('token', token)
+            userStore.setToken(token) 
+            userStore.setPayload(tokenPayload)
+            // log user
+            console.log(userStore.getUser())
         }
+      return response
     } catch (error) {
         console.log(error) 
     }

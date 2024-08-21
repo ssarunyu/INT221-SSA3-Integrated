@@ -15,7 +15,8 @@ const userLogin = async () => {
   try {
     const res = await postLogin('http://localhost:8080/login', user.value)
 
-    if (res.success) {
+    console.log(res)
+    if (res.ok) {
       router.push('/task')
     } else {
       userIncorrect.value = "Username or Password is incorrect"
