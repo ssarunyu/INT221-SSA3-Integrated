@@ -22,11 +22,12 @@ public class JwtUserDetailsService implements UserDetailsService {
     private UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-            Users user = userRepository.findByUsername(username);
+    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+            Users user = userRepository.findByUsername(userName);
             if (user == null) {
                 throw new NotCreatedException("The Username or Password is incorrect");
             }
+
 //        List<GrantedAuthority> roles = new ArrayList<>();
 //        GrantedAuthority grantedAuthority = new GrantedAuthority() {
 //            @Override
@@ -36,7 +37,7 @@ public class JwtUserDetailsService implements UserDetailsService {
 //        };
 //        roles.add(grantedAuthority);
 
-            UserDetails userDetails = new AuthUser(username, user.getPassword());
+            UserDetails userDetails = new AuthUser(userName, user.getPassword());
             return userDetails;
         }
 }

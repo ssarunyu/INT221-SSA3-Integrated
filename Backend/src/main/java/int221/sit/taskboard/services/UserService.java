@@ -1,12 +1,11 @@
 package int221.sit.taskboard.services;
 
-import int221.sit.taskboard.DTO.UserLogin;
+import int221.sit.taskboard.Jwt.JwtRequestUser;
 import int221.sit.taskboard.entities.Users;
 import int221.sit.taskboard.exceptions.BadRequestException;
 import int221.sit.taskboard.exceptions.NotCreatedException;
 import int221.sit.taskboard.repositories.auth.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +15,7 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public UserLogin userLogin(String username, String rawPassword) {
+    public JwtRequestUser userLogin(String username, String rawPassword) {
 
         if (username.isEmpty() || rawPassword.isEmpty() || username == null || rawPassword == null) {
             throw new BadRequestException("Username or Password is incorrect!");
@@ -29,8 +28,8 @@ public class UserService {
             throw new NotCreatedException("Username or Password is incorrect!");
         }
 
-        UserLogin userDto = new UserLogin();
-        userDto.setUsername("string");
+        JwtRequestUser userDto = new JwtRequestUser();
+        userDto.setUserName("string");
         userDto.setPassword("string");
         return userDto;
     }

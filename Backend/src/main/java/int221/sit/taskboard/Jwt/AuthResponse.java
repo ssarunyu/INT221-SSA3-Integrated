@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class AuthResponse {
-    private String token;
+    private final String access_token;
 
 }
 
