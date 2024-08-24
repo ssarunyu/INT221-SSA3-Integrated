@@ -21,6 +21,7 @@ public class JwtTokenUtil implements Serializable {
     private String SECRET_KEY;
     SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
+
     @Value("#{${jwt.max-token-interval-hour}*30*30*1000}")
     private long JWT_TOKEN_VALIDITY;
 
@@ -76,5 +77,4 @@ public class JwtTokenUtil implements Serializable {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 }
-
 

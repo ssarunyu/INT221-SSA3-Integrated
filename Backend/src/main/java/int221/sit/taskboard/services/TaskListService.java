@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@org.springframework.transaction.annotation.Transactional("taskBoardTransactionManager")
 public class TaskListService {
     @Autowired
     private TaskListRepository repository;

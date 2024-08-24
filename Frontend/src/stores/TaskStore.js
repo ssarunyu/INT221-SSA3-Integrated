@@ -8,7 +8,7 @@ export const useTaskStore = defineStore("taskStore", () => {
   });
 
   function addTask(item) {
-   state.allTasks.push(item);
+    state.allTasks.push(item);
   }
 
   function addAllTask(items) {

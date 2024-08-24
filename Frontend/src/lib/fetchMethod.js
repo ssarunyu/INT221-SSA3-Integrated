@@ -1,9 +1,14 @@
 async function getData(url) {
+    const token = JSON.parse(localStorage.getItem('token'))
+    console.log(token.access_token)
     try {
         const response = await fetch(url, {
             method: "GET",
+            headers: {
+                'Authorization': `Bearer ${token.access_token}`
+            }
         })
-        const result = response.json()
+        const result = await response.json()
         return result
     } catch (error) {
         console.log(error)
@@ -12,9 +17,13 @@ async function getData(url) {
 
 async function getDataById(url, id) {
     const finalURL = `${url}/${id}`
+    const token = JSON.parse(localStorage.getItem('token'))
     try {
         const response = await fetch(finalURL, {
             method: "GET",
+            headers: {
+                Authorization: `${token.access_token}`
+            }
         })
         const result = response.json()
         return result
@@ -89,7 +98,7 @@ const userStore = useUserStore()
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(
-                {username: obj.username, password: obj.password}
+                {userName: obj.username, password: obj.password}
             )
         })
         if(response.status === 200) {
@@ -99,8 +108,11 @@ const userStore = useUserStore()
             // NOTE: payload replace token should change to collect both
             userStore.setToken(token) 
             userStore.setPayload(tokenPayload)
+            // NOTE: Set to localstorage
+            localStorage.setItem('token', token)
+            localStorage.setItem('payload', JSON.stringify(tokenPayload))
         }
-      return response
+        return response
     } catch (error) {
         console.log(error) 
     }

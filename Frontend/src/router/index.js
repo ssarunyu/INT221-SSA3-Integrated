@@ -12,9 +12,9 @@ import LoginView from '@/views/LoginView.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-     { path: '/login',
-       name: 'Login',
-       component: LoginView,
+    { path: '/login',
+      name: 'Login',
+      component: LoginView,
     },
     {
       path: '/',
@@ -43,7 +43,7 @@ const router = createRouter({
 // Navigation Guard
 // TODO: Check with real auth
 router.beforeEach((to, from, next) => {
-  if (to.name !== 'Login') next({ name: 'Login' })
+  if (to.name !== 'Login' && !localStorage.getItem('token')) next({ name: 'Login' })
   else next()
 })
 

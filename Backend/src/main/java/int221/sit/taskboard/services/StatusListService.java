@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@org.springframework.transaction.annotation.Transactional("taskBoardTransactionManager")
 public class StatusListService {
     @Autowired
     private StatusListRepository repository;

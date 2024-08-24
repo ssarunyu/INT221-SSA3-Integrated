@@ -18,7 +18,7 @@ const userLogin = async () => {
   try {
     const res = await postLogin('http://localhost:8080/login', user.value)
     if (res.ok) {
-      console.log(userStore.getUser())
+      router.push({name: 'Home'})
     } else {
       userIncorrect.value = "Username or Password is incorrect"
     }
