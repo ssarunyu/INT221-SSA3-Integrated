@@ -1,6 +1,6 @@
 package int221.sit.taskboard.controller;
 
-import int221.sit.taskboard.Jwt.JwtRequestUser;
+import int221.sit.taskboard.DTO.JwtRequestUser;
 import int221.sit.taskboard.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

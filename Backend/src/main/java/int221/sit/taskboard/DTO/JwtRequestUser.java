@@ -1,4 +1,4 @@
-package int221.sit.taskboard.Jwt;
+package int221.sit.taskboard.DTO;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

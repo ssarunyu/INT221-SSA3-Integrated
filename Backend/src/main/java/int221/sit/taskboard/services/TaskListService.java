@@ -5,7 +5,7 @@ import int221.sit.taskboard.entities.*;
 import int221.sit.taskboard.exceptions.*;
 import int221.sit.taskboard.repositories.task.StatusListRepository;
 import int221.sit.taskboard.repositories.task.TaskListRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -27,6 +27,7 @@ public class TaskListService {
     @Autowired
     public ModelMapper modelMapper;
 
+    @Transactional("taskBoardTransactionManager")
     public List<TaskList> getAllTaskList(String[] param) {
         if (param == null) {
             return repository.findAll();
@@ -35,23 +36,25 @@ public class TaskListService {
         }
     }
 
+    @Transactional("taskBoardTransactionManager")
     public TaskList findById(Integer id) {
         return repository.findById(id).orElseThrow(
                 () -> new ItemNotFoundException(
                         "Task id " + id + " does not exist!"));
     }
 
+    @Transactional("taskBoardTransactionManager")
     public TaskList getTaskListById(Integer id) {
         return repository.findById(id).orElseThrow(() -> new ItemNotFoundException("Task " + id + " does not exist !!"));
     }
-
+    @Transactional("taskBoardTransactionManager")
     public List<TaskShortDetail> getAllTaskListDto() {
         List<TaskList> taskLists = repository.findAll();
         return taskLists.stream()
                 .map(taskList -> modelMapper.map(taskList, TaskShortDetail.class))
                 .collect(Collectors.toList());
     }
-
+    @Transactional("taskBoardTransactionManager")
     public TaskListDetail getTaskListByIdDto(Integer id) {
         TaskList taskList = repository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Task id" + id + "does not exist!"));
@@ -59,7 +62,7 @@ public class TaskListService {
         return modelMapper.map(taskListSingleton, TaskListDetail.class);
     }
 
-    @Transactional
+    @Transactional("taskBoardTransactionManager")
     public TaskAndStatusObject createNewTaskList(TaskAndStatusInt newTaskListDto, Integer statusId) {
         newTaskListDto.trimValues();
 
@@ -86,7 +89,7 @@ public class TaskListService {
         }
     }
 
-    @Transactional
+    @Transactional("taskBoardTransactionManager")
     public TaskShortDetail removeTaskListById(Integer id) {
         TaskList taskList = repository.findById(id).orElse(null);
         if (taskList != null) {
@@ -98,7 +101,7 @@ public class TaskListService {
         }
     }
 
-    @Transactional
+    @Transactional("taskBoardTransactionManager")
     public TaskAndStatusObject updateTaskListById(Integer id, TaskAndStatusInt newTaskListDto, Integer statusId) {
 
         if (newTaskListDto.getTitle() != null && !newTaskListDto.getTitle().isEmpty()) {
@@ -126,7 +129,7 @@ public class TaskListService {
         return modelMapper.map(updatedTaskList, TaskAndStatusObject.class);
     }
 
-    @Transactional
+    @Transactional("taskBoardTransactionManager")
     public TaskAndStatusInt transferTasking(Integer oldStatusId, Integer newStatusId){
         StatusList newStatus = statusListRepository.findById(newStatusId)
                 .orElseThrow(() -> new BadRequestException("the specified status for task transfer does not exist"));
@@ -139,6 +142,7 @@ public class TaskListService {
         return null;
     }
 
+    @Transactional("taskBoardTransactionManager")
     public List<TaskShortDetail> getTasksSortedByStatusName(String sortBy, List<String> filterStatuses) {
         List<TaskList> tasks;
 
@@ -169,7 +173,8 @@ public class TaskListService {
                 .collect(Collectors.toList());
     }
 
-    private List<TaskList> sortTasks(List<TaskList> tasks, String sortBy) {
+    @Transactional("taskBoardTransactionManager")
+    public List<TaskList> sortTasks(List<TaskList> tasks, String sortBy) {
         switch (sortBy) {
             case "status.name":
                 tasks.sort(Comparator.comparing(task -> task.getStatus().getName()));

@@ -30,11 +30,9 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(csrf -> csrf.disable())
                 .authorizeRequests(authorize -> authorize
-                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/login","/decode-token","/v2/**").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(withDefaults());
-
-        // Add the JwtAuthFilter before UsernamePasswordAuthenticationFilter
         httpSecurity.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }

@@ -1,6 +1,6 @@
 package int221.sit.taskboard.controller;
 
-import int221.sit.taskboard.Jwt.JwtRequestUser;
+import int221.sit.taskboard.DTO.JwtRequestUser;
 import int221.sit.taskboard.Jwt.AuthResponse;
 import int221.sit.taskboard.Jwt.JwtTokenUtil;
 import int221.sit.taskboard.Jwt.JwtUserDetailsService;
@@ -46,7 +46,7 @@ public class AuthController {
             return ResponseEntity.ok(authResponse);
 
         } catch (BadCredentialsException ex) {
-            throw new BadCredentialsException ("user password incorrect !");
+            throw new BadCredentialsException ("User Password is incorrect !");
         }
     }
 }

@@ -1,6 +1,6 @@
 package int221.sit.taskboard.services;
 
-import int221.sit.taskboard.Jwt.JwtRequestUser;
+import int221.sit.taskboard.DTO.JwtRequestUser;
 import int221.sit.taskboard.entities.Users;
 import int221.sit.taskboard.exceptions.BadRequestException;
 import int221.sit.taskboard.exceptions.NotCreatedException;
@@ -8,6 +8,7 @@ import int221.sit.taskboard.repositories.auth.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
@@ -15,6 +16,7 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Transactional("userAuthTransactionManager")
     public JwtRequestUser userLogin(String username, String rawPassword) {
 
         if (username.isEmpty() || rawPassword.isEmpty() || username == null || rawPassword == null) {
