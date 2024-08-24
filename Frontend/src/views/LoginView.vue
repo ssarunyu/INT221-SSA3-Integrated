@@ -16,7 +16,7 @@ const userLogin = async () => {
     password: password.value
   }
   try {
-    const res = await postLogin('http://localhost:8080/login', user.value)
+    const res = await postLogin(import.meta.env.VITE_AUTH_URL, user.value)
     if (res.ok) {
       router.push({name: 'Home'})
     } else {

@@ -1,6 +1,5 @@
 async function getData(url) {
     const token = JSON.parse(localStorage.getItem('token'))
-    console.log(token.access_token)
     try {
         const response = await fetch(url, {
             method: "GET",
@@ -22,10 +21,10 @@ async function getDataById(url, id) {
         const response = await fetch(finalURL, {
             method: "GET",
             headers: {
-                Authorization: `${token.access_token}`
+                'Authorization': `Bearer ${token.access_token}`
             }
         })
-        const result = response.json()
+        const result = await response.json()
         return result
     } catch (error) {
         console.log(error)
@@ -87,10 +86,9 @@ async function transferData(url, oldId, newId) {
     }  
 }
 
-// User stores
+// NOTE: Change to use user stores
 import { useUserStore } from "@/stores/UserStore"
 async function postLogin(url, obj) {
-const userStore = useUserStore()
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -105,9 +103,6 @@ const userStore = useUserStore()
             const token = await response.text()
             const tokenArr = token.split('.')
             const tokenPayload = JSON.parse(atob(tokenArr[1]))
-            // NOTE: payload replace token should change to collect both
-            userStore.setToken(token) 
-            userStore.setPayload(tokenPayload)
             // NOTE: Set to localstorage
             localStorage.setItem('token', token)
             localStorage.setItem('payload', JSON.stringify(tokenPayload))

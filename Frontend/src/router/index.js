@@ -41,7 +41,6 @@ const router = createRouter({
 })
 
 // Navigation Guard
-// TODO: Check with real auth
 router.beforeEach((to, from, next) => {
   if (to.name !== 'Login' && !localStorage.getItem('token')) next({ name: 'Login' })
   else next()

@@ -11,6 +11,10 @@ import { styleStatus } from '@/lib/styleStatus';
 // Store
 import { useTaskStore } from '@/stores/TaskStore.js'
 import { useStatusStore } from '@/stores/StatusStore.js'
+// NOTE: Will change to use store
+const userAuthItem = JSON.parse(localStorage.getItem('payload'))
+console.log(userAuthItem)
+
 
 const taskManagement = useTaskStore()
 const statusManagement = useStatusStore()
@@ -218,6 +222,9 @@ const removeFilter = async (r) => {
                     + Add New Task
                 </div>
                 <router-link class="itbkk-manage-status p-2 bg-gray-300 rounded w-[150px] text-center duration-300 hover:bg-gray-400" :to="{ name: 'StatusView' }">Manage Status</router-link>
+            </div>
+            <div class="text-2xl font-bold">
+                <h1>Hi!, {{ userAuthItem.name }}</h1>
             </div>
             <div class="flex w-full items-center justify-between font-xl font-bold text-white border-b border-gray-300 p-3 bg-blue-400 rounded">
                 <p>Title</p>
