@@ -40,4 +40,11 @@ const router = createRouter({
   ],
 })
 
+// Navigation Guard
+// TODO: Check with real auth
+router.beforeEach((to, from, next) => {
+  if (to.name !== 'Login') next({ name: 'Login' })
+  else next()
+})
+
 export default router

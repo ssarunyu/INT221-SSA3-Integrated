@@ -2,6 +2,9 @@
 import { ref } from 'vue'
 import router from '@/router';
 import { postLogin } from '@/lib/fetchMethod.js'
+import { useUserStore } from '@/stores/UserStore.js'
+
+const userStore = useUserStore()
 
 const user = ref({})
 const username = ref('')
@@ -14,9 +17,8 @@ const userLogin = async () => {
   }
   try {
     const res = await postLogin('http://localhost:8080/login', user.value)
-
-    if (res.success) {
-      router.push('/task')
+    if (res.ok) {
+      console.log(userStore.getUser())
     } else {
       userIncorrect.value = "Username or Password is incorrect"
     }

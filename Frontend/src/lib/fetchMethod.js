@@ -96,10 +96,9 @@ const userStore = useUserStore()
             const token = await response.text()
             const tokenArr = token.split('.')
             const tokenPayload = JSON.parse(atob(tokenArr[1]))
+            // NOTE: payload replace token should change to collect both
             userStore.setToken(token) 
             userStore.setPayload(tokenPayload)
-            // log user
-            console.log(userStore.getUser())
         }
       return response
     } catch (error) {
