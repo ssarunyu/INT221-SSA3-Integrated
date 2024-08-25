@@ -91,8 +91,9 @@ const controlDelete = async (statusId) => {
       <div>
         <h1 class="text-2xl font-bold mb-5">ITBKK SSA3 Taskboard</h1>
       </div>
-      <div>
-        <h1>Profile</h1>
+      <div class="flex items-center">
+        <h1 class="mr-3">profile_name</h1>
+        <img src="../assets/profile-icon.png" alt="profile_pic" width="40" height="40">
       </div>
     </div>
     <div class="flex justify-center items-center">
