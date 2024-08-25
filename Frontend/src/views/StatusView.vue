@@ -89,10 +89,10 @@ const controlDelete = async (statusId) => {
   <div class="w-full min-h-screen p-5">
     <div class="p-5 flex justify-between">
       <div>
-        <h1 class="text-2xl font-bold mb-5">ITBKK SSA3 Taskboard</h1>
+        <h1 class="text-2xl font-bold mb-5">ITBKK-SSA3 Taskboard</h1>
       </div>
-      <div class="flex items-center">
-        <h1 class="mr-3">profile_name</h1>
+      <div class="flex items-center border-solid border-gray-100 border-2 rounded-lg p-2">
+        <h1 class="mr-3 ml-2 font-semibold">profile_name</h1>
         <img src="../assets/profile-icon.png" alt="profile_pic" width="40" height="40">
       </div>
     </div>
@@ -101,7 +101,7 @@ const controlDelete = async (statusId) => {
         <h3>Hi, <span class="font-bold">Arin</span> Here are all your statuses.</h3>
       </div>
     </div>
-    <div class="flex w-full justify-between">
+    <!-- <div class="flex w-full justify-between">
       <div class="flex p-3">
         <router-link
           :to="{ name: 'Home' }"
@@ -121,32 +121,35 @@ const controlDelete = async (statusId) => {
       >
         + Add Status
       </div>
-    </div>
+    </div> -->
+    <div class="mt-5 flex justify-center">
     <div
-      class="grid grid-cols-4 font-xl font-bold text-white border-b border-gray-300 p-3 bg-blue-400 rounded"
+      class="grid grid-cols-4 font-xl font-bold text-black p-3 rounded w-full max-w-screen-xl text-center"
     >
       <p>ID</p>
       <p>Name</p>
       <p>Description</p>
       <p>Action</p>
     </div>
+  </div>
     <Toast :toastObject="toastHandle" @close="toastHandle.status = false" />
-    <div class="space-y-5 mt-5">
+    <div class="mt-5 flex justify-center">
+      <div class="w-full max-w-screen-xl space-y-5 ">
       <div
         v-for="item in statuses"
-        class="itbkk-item relative p-2 border rounded"
+        class="itbkk-item relative p-2"
       >
         <div class="grid grid-cols-4 items-center">
           <!-- Vertical line -->
           <div
-            class="absolute left-0 w-1 h-10"
+            class="absolute left-0 w-2 h-full rounded-l-lg"
             :class="styleStatus(item.name)"
           ></div>
           <div class="text-lg font-bold text-center">
             {{ item.id }}
           </div>
           <div
-            class="itbkk-status-name font-medium text-lg px-4 mx-4 py-2 rounded break-all"
+            class="itbkk-status-name font-medium text-lg px-5 ml-4 mr-6 py-2 rounded-full break-all"
             :class="styleStatus(item.name)"
           >
             {{ item.name }}
@@ -162,7 +165,7 @@ const controlDelete = async (statusId) => {
             }}
           </div>
           <div
-            class="itbkk-status-action flex"
+            class="itbkk-status-action flex justify-center"
             v-if="item.name !== 'No Status' && item.name !== 'Done'"
           >
             <div
@@ -172,18 +175,27 @@ const controlDelete = async (statusId) => {
                   params: { editStatusId: item.id },
                 })
               "
-              class="itbkk-button-edit p-2 px-5 w-35 text-center m-1 rounded cursor-pointer duration-300 bg-gray-300 hover:bg-gray-400 hover:scale-105"
+              class="itbkk-button-edit p-2 px-5 w-35 text-center m-1 rounded-lg cursor-pointer duration-300 bg-gray-300 hover:bg-gray-400 hover:scale-105"
             >
               Edit
             </div>
             <div
               @click="sendDeleteStatus(item)"
-              class="itbkk-button-delete p-2 px-3 w-35 m-1 rounded cursor-pointer text-center duration-300 bg-gray-300 hover:bg-gray-400 hover:scale-105"
+              class="itbkk-button-delete p-2 px-3 w-35 m-1 rounded-lg cursor-pointer text-center duration-300 bg-red-300 hover:bg-red-500 hover:scale-105"
             >
               Delete
             </div>
           </div>
         </div>
+      </div>
+    </div>
+    </div>
+    <div class="flex justify-center mt-5">
+    <div
+        @click="addStatusShow = true"
+        class="itbkk-button-add p-2 w-35 m-1 rounded-full cursor-pointer duration-300 bg-gray-200 hover:bg-gray-300 hover:scale-105 w-full max-w-screen-md text-center"
+      >
+        Add Status
       </div>
     </div>
   </div>

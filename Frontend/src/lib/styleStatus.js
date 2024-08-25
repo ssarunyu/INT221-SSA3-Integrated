@@ -1,4 +1,10 @@
 function styleStatus(name) {
+
+    const storedColor = localStorage.getItem(`statusColor_${name}`);
+    if (storedColor) {
+      return `bg-[${storedColor}]`;
+    }
+    
     if(name === 'No Status') {
         return 'bg-gray-300'
     }
