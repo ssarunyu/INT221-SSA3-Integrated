@@ -19,7 +19,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'RootPath',
-      redirect: { name: 'Home' }
+      redirect: { name: 'Login' }
     },
     { path: '/task', name: 'Home', component: HomeView,
       children: [
