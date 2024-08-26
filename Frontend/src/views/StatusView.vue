@@ -10,8 +10,9 @@ import TransferDeleteStatusPopup from "@/components/TransferDeleteStatusPopup.vu
 
 // Store
 import { useStatusStore } from "@/stores/StatusStore.js";
-
 const statusManagement = useStatusStore();
+// NOTE: Will change to use store
+const userAuthItem = JSON.parse(localStorage.getItem('payload'))
 
 const fetch = async () => {
   // Fetch data
@@ -98,7 +99,7 @@ const controlDelete = async (statusId) => {
     </div>
     <div class="flex justify-center items-center">
       <div>
-        <h3>Hi, <span class="font-bold">Arin</span> Here are all your statuses.</h3>
+        <h3>Hi, <span class="font-bold">{{ userAuthItem.name }}</span> Here are all your statuses.</h3>
       </div>
     </div>
     <!-- <div class="flex w-full justify-between">

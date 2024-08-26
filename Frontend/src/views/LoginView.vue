@@ -40,33 +40,34 @@ const userLogin = async () => {
           <div>
             <p>Username</p>
             <input v-model="username" class="itbkk-username rounded-md p-2 border border-gray-400 w-full mb-4"
-              placeholder="Username" type="text" required />
+              placeholder="Username" type="text" required maxlength="50"/>
           </div>
 
           <!-- Password -->
           <div>
             <p>Password</p>
             <input v-model="password" class="itbkk-password rounded-md p-2 border border-gray-400 w-full mb-4"
-              placeholder="Password" type="password" required />
+              placeholder="Password" type="password" required maxlength="14" />
           </div>
           <!-- Button Login -->
           <div>
             <button @click="userLogin"
-              class="bg-green-500 itbkk-button-signin font-bold rounded-md w-full py-2 text-white hover:bg-green-600">
+              :disabled="!username || !password"
+              class="bg-green-500 itbkk-button-signin font-bold rounded-md w-full py-2 text-white hover:bg-green-600 disabled:bg-green-300">
               Login
             </button>
           </div>
           <!-- Message Incorrect -->
 
-            <p v-if="userIncorrect" class=" text-red-500 mt-2">{{ userIncorrect }}</p>
+            <p v-if="userIncorrect" class="itbkk-message text-red-500 mt-2">{{ userIncorrect }}</p>
 
         </div>
 
       </div>
     </div>
-    <div class="hidden md:block">
+    <div class="md:block">
       <!-- <p class="bg-black h-full w-full object-cover"></p> -->
-      <img src="../assets/555.png" alt="sky" class="h-full w-full object-cover">
+      <img src="../assets/abyan-athif-K0U0eSAjFGU-unsplash.jpg" alt="sky" class="h-full w-full object-cover">
     </div>
   </div>
 </template>

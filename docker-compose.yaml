@@ -5,6 +5,8 @@ services:
       MYSQL_USER: dev1
       MYSQL_PASSWORD: dev1
       MYSQL_ROOT_PASSWORD: sb;,k,jk
+      MYSQL_AUTH_USER: authuser
+      MYSQL_AUTH_PASSWORD: VT4eTSRo
     ports:
       - "3307:3306"
     volumes:

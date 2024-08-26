@@ -13,7 +13,6 @@ import { useTaskStore } from '@/stores/TaskStore.js'
 import { useStatusStore } from '@/stores/StatusStore.js'
 // NOTE: Will change to use store
 const userAuthItem = JSON.parse(localStorage.getItem('payload'))
-console.log(userAuthItem)
 
 
 const taskManagement = useTaskStore()
