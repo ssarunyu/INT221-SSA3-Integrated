@@ -23,7 +23,7 @@ public class JwtTokenUtil implements Serializable {
 
 
     @Value("#{${jwt.max-token-interval-hour}*30*30*1000}")
-    private long JWT_TOKEN_VALIDITY;
+    private int JWT_TOKEN_VALIDITY;
 
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
