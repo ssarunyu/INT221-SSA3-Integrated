@@ -93,7 +93,7 @@ const controlDelete = async (statusId) => {
         <h1 class="text-2xl font-bold mb-5">ITBKK-SSA3 Taskboard</h1>
       </div>
       <div class="flex items-center border-solid border-gray-100 border-2 rounded-lg p-2">
-        <h1 class="mr-3 ml-2 font-semibold">profile_name</h1>
+        <h1 class="mr-3 ml-2 font-semibold">{{ userAuthItem.name }}</h1>
         <img src="../assets/profile-icon.png" alt="profile_pic" width="40" height="40">
       </div>
     </div>
