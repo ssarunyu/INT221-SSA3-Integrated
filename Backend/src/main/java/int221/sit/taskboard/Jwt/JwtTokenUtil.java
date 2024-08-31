@@ -22,7 +22,7 @@ public class JwtTokenUtil implements Serializable {
     SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
 
-    @Value("#{${jwt.max-token-interval-hour}*30*30*1000}")
+    @Value("#{${jwt.max-token-interval-hour}*20}")
     private int JWT_TOKEN_VALIDITY;
 
     public String getUsernameFromToken(String token) {

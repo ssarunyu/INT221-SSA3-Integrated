@@ -1,5 +1,6 @@
 package int221.sit.taskboard.exceptions;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -38,16 +39,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(NotCreatedException.class)
-    public ResponseEntity<ErrorResponse> handleNotCreatedException(NotCreatedException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                ZonedDateTime.now(),
-                HttpStatus.UNAUTHORIZED.value(),
-                "Not Created",
-                ex.getMessage()
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
-    }
+        @ExceptionHandler(NotCreatedException.class)
+        public ResponseEntity<ErrorResponse> handleNotCreatedException(NotCreatedException ex, HttpServletRequest request) {
+            ErrorResponse errorResponse = new ErrorResponse(
+                    ZonedDateTime.now(),
+                    HttpStatus.UNAUTHORIZED.value(),
+                    ex.getMessage(),
+                    request.getRequestURI()
+            );
+            return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+        }
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex) {
