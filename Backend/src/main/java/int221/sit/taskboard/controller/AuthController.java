@@ -3,7 +3,7 @@ package int221.sit.taskboard.controller;
 import int221.sit.taskboard.DTO.JwtRequestUser;
 import int221.sit.taskboard.Jwt.AuthResponse;
 import int221.sit.taskboard.Jwt.JwtTokenUtil;
-import int221.sit.taskboard.Jwt.JwtUserDetailsService;
+import int221.sit.taskboard.services.JwtUserDetailsService;
 import int221.sit.taskboard.repositories.auth.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ public class AuthController {
             return ResponseEntity.ok(authResponse);
 
         } catch (BadCredentialsException ex) {
-            throw new BadCredentialsException ("User Password is incorrect !");
+            throw new BadCredentialsException ("Username or Password is incorrect !!!");
         }
     }
 }

@@ -1,14 +1,17 @@
 package int221.sit.taskboard.Jwt;
 
 import int221.sit.taskboard.entities.Users;
+import int221.sit.taskboard.exceptions.NotCreatedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.security.SignatureException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,8 +24,7 @@ public class JwtTokenUtil implements Serializable {
     private String SECRET_KEY;
     SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
-
-    @Value("#{${jwt.max-token-interval-hour}*20}")
+    @Value("#{${jwt.max-token-interval-hour}*60*60*1000}")
     private int JWT_TOKEN_VALIDITY;
 
     public String getUsernameFromToken(String token) {
@@ -40,7 +42,7 @@ public class JwtTokenUtil implements Serializable {
 
     public Claims getAllClaimsFromToken(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -54,6 +56,7 @@ public class JwtTokenUtil implements Serializable {
 
     public String generateToken(Users userInfo) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("sub", userInfo.getUsername());
         claims.put("name", userInfo.getName());
         claims.put("oid", userInfo.getUserId());
         claims.put("email", userInfo.getEmail());
@@ -68,13 +71,14 @@ public class JwtTokenUtil implements Serializable {
                 .setIssuer("https://intproj23.sit.kmutt.ac.th/ssa3/")
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
-                .signWith(signatureAlgorithm, SECRET_KEY)
+                .signWith(signatureAlgorithm, Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
                 .compact();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        final String usernameFromToken = getUsernameFromToken(token);
+        return (usernameFromToken != null && usernameFromToken.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+
 }
 
