@@ -40,9 +40,34 @@ const router = createRouter({
   ],
 })
 
+// Check token expired
+function isTokenExpired(payload) {
+  // JWT token exp time is seconds
+  const currentTime = Math.floor(Date.now() / 1000)
+  console.log(currentTime)
+  console.log(payload.exp)
+  if(payload.exp < currentTime) {
+    return true // Already expired
+  } else {
+    return false
+  }
+}
+
 // Navigation Guard
 router.beforeEach((to, from, next) => {
-  if (to.name !== 'Login' && !localStorage.getItem('token')) next({ name: 'Login' })
+  const token = JSON.parse(localStorage.getItem('token'))
+  const payload = JSON.parse(localStorage.getItem('payload'))
+  if(token && payload) {
+    if(isTokenExpired(payload)) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('payload');
+      next({ name: 'Login' });
+      return;
+    }
+  }
+  if (to.name !== 'Login' && !localStorage.getItem('token')) {
+    next({ name: 'Login' })
+  }
   else next()
 })
 
