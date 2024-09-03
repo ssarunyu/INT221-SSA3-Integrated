@@ -44,8 +44,8 @@ const router = createRouter({
 function isTokenExpired(payload) {
   // JWT token exp time is seconds
   const currentTime = Math.floor(Date.now() / 1000)
-  console.log(currentTime)
-  console.log(payload.exp)
+  console.log('now time', currentTime)
+  console.log('exp time', payload.exp)
   if(payload.exp < currentTime) {
     return true // Already expired
   } else {
@@ -59,9 +59,10 @@ router.beforeEach((to, from, next) => {
   const payload = JSON.parse(localStorage.getItem('payload'))
   if(token && payload) {
     if(isTokenExpired(payload)) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('payload');
-      next({ name: 'Login' });
+      // If token expired remove from localStorage
+      localStorage.removeItem('token')
+      localStorage.removeItem('payload')
+      next({ name: 'Login' })
       return;
     }
   }
