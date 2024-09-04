@@ -1,7 +1,4 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
-name: nodejs
+name: Node.js
 
 on:
   push:
@@ -9,20 +6,25 @@ on:
   pull_request:
     branches: [ "main" ]
 
-steps:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20.12.2
+          node-version: '20.12.2'
 
-      - name: Run Super-Linter 
+      - name: Run Super-Linter
         uses: github/super-linter@v4
         env:
-            DEFAULT_BRANCH: main
-            GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Install dependencies
         run: npm install
 
@@ -32,22 +34,23 @@ steps:
       - name: Build the project
         run: npm run build
 
-    deploy:
+  deploy:
     needs: build
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Deploy to Server
         env:
-          SSH_KEY: ${{ secrets.SSH_KEY }} 
-          SERVER_USER: ${{ secrets.SERVER_USER }} 
-          SERVER_IP: ${{ secrets.SERVER_IP }} 
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
         run: |
           echo "$SSH_KEY" | tr -d '\r' | ssh-add - > /dev/null
           ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP << 'EOF'
-            cd /path/to/your/app
+            cd /path/to/your/app  # Adjust this path to your server's app location.
             git pull origin main
             npm install
             npm run build
