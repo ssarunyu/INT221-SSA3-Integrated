@@ -21,6 +21,8 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./INT221-SSA3-Integrated/Frontend
+        run: npm install
+
       - name: Run tests
         working-directory: ./INT221-SSA3-Integrated/Frontend
         run: npm test
