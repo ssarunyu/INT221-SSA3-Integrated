@@ -2,9 +2,9 @@ name: Node.js
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "veerapat" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "veerapat" ]
 
 jobs:
   build:
@@ -20,13 +20,13 @@ jobs:
           node-version: '20.12.2' 
 
       - name: Install dependencies
-        working-directory: ./INT221-SSA3-Integrated 
+        working-directory: ./INT221-SSA3-Integrated/Frontend
       - name: Run tests
-        working-directory: ./INT221-SSA3-Integrated 
+        working-directory: ./INT221-SSA3-Integrated/Frontend
         run: npm test
 
       - name: Build the project
-        working-directory: ./INT221-SSA3-Integrated
+        working-directory: ./INT221-SSA3-Integrated/Frontend
         run: npm run build
 
   deploy:
