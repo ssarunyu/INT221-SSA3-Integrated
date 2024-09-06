@@ -3,11 +3,9 @@ name: Node.js
 on:
   push:
     branches: [ "veerapat" ]
-  pull_request:
-    branches: [ "veerapat" ]
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,39 +15,16 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20.12.2' 
+          node-version: '20.12.2'  # Use the Node.js version required by your Vue.js project
 
       - name: Install dependencies
-        working-directory: ./INT221-SSA3-Integrated/Frontend
         run: npm install
 
-      - name: Run tests
-        working-directory: ./INT221-SSA3-Integrated/Frontend
-        run: npm test
-
-      - name: Build the project
-        working-directory: ./INT221-SSA3-Integrated/Frontend
+      - name: Build
         run: npm run build
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Deploy to Server
-        env:
-          SSH_KEY: ${{ secrets.SSH_KEY }}
-          SERVER_USER: ${{ secrets.SERVER_USER }}
-          SERVER_IP: ${{ secrets.SERVER_IP }}
-        run: |
-          echo "$SSH_KEY" | tr -d '\r' | ssh-add - > /dev/null
-          ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP << 'EOF'
-            cd /path/to/your/app  # Adjust this path to your server's app location.
-            git pull origin main
-            npm install
-            npm run build
-            pm2 restart your-app-name  # Adjust according to your process manager or server restart command.
-          EOF
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
