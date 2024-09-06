@@ -12,18 +12,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: List files
+        run: ls -R
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20.12.2'  
+          node-version: '20.12.2'  # Use the Node.js version required by your Vue.js project
 
       - name: Install dependencies
         run: npm install
-        working-directory: ./ 
+        working-directory: ./  # Ensure npm is run in the correct directory
 
       - name: Build
         run: npm run build
-        working-directory: ./ 
+        working-directory: ./  # Ensure the build command is run in the correct directory
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
