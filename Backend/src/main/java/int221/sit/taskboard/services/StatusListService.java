@@ -53,7 +53,7 @@ public class StatusListService {
             throw new BadRequestException("Status name must not be null");
         }
 
-        if (existingStatus.getId() == 1 || "Done".equals(existingStatus.getName())) {
+        if (existingStatus.getName().equals("No Status") || "Done".equals(existingStatus.getName())) {
             throw new BadRequestException("Cannot be update Status Id : " + id + ", (No Status, Done)");
         }
 
@@ -72,7 +72,7 @@ public class StatusListService {
             throw new ItemNotFoundException("Status id " + id + " does not exist!");
         }
 
-        if (statusList.getId() == 1 || "Done".equals(statusList.getName())){
+        if (statusList.getName().equals("No Status") || "Done".equals(statusList.getName())){
             throw new BadRequestException("Cannot be delete Status Id : " + id + ", (No Status, Done)");
         }
 

@@ -19,34 +19,38 @@ public class TaskList {
     private Integer id;
 
     //  New DB
-//    @Size(max = 100, message = "title size must be between 0 and 100.")
-//    @Column(name = "taskTitle", nullable = false)
-//    private String title;
-
-    // Old DB
     @Size(max = 100, message = "title size must be between 0 and 100.")
-    @Column(name = "title", nullable = false)
+    @Column(name = "taskTitle", nullable = false)
     private String title;
 
-    //  New DB
-//    @Size(max = 100, message = "description size must be between 0 and 500.")
-//    @Column(name = "taskDescription", nullable = false)
-//    private String description;
+    // Old DB
+//    @Size(max = 100, message = "title size must be between 0 and 100.")
+//    @Column(name = "title", nullable = false)
+//    private String title;
 
-    //  Old DB
+    //  New DB
     @Size(max = 100, message = "description size must be between 0 and 500.")
-    @Column(name = "description", nullable = false)
+    @Column(name = "taskDescription", nullable = false)
     private String description;
 
+    //  Old DB
+//    @Size(max = 100, message = "description size must be between 0 and 500.")
+//    @Column(name = "description", nullable = false)
+//    private String description;
+
     //  New DB
-//    @Size(max = 30, message = "assignees size must be between 0 and 30.")
-//    @Column(name = "taskAssignee", nullable = false)
-//    private String assignees;
+    @Size(max = 30, message = "assignees size must be between 0 and 30.")
+    @Column(name = "taskAssignee", nullable = false)
+    private String assignees;
 
     //  Old DB
-    @Size(max = 30, message = "assignees size must be between 0 and 30.")
-    @Column(name = "assignees", nullable = false)
-    private String assignees;
+//    @Size(max = 30, message = "assignees size must be between 0 and 30.")
+//    @Column(name = "assignees", nullable = false)
+//    private String assignees;
+
+    @ManyToOne
+    @JoinColumn(name = "boardId")
+    private Boards board;
 
     @JsonIgnore
     @ManyToOne

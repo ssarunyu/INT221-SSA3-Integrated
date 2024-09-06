@@ -2,7 +2,6 @@ package int221.sit.taskboard.services;
 
 import int221.sit.taskboard.Jwt.AuthUser;
 import int221.sit.taskboard.entities.Users;
-import int221.sit.taskboard.exceptions.NotCreatedException;
 import int221.sit.taskboard.repositories.auth.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

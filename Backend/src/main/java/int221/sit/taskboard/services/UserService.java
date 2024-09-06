@@ -35,4 +35,8 @@ public class UserService {
         userDto.setPassword("string");
         return userDto;
     }
+
+    public Users getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
 }

@@ -1,6 +1,5 @@
 package int221.sit.taskboard.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -9,13 +8,13 @@ import lombok.Getter;
 
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @Entity
+@Embeddable
 @JsonPropertyOrder({"id", "name", "description"})
-@Table(name = "statuses")
+@Table(name = "statuses",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"boardId", "statusName"}))
 public class StatusList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +29,9 @@ public class StatusList {
     @Column(name = "statusDescription")
     private String description;
 
-    @OneToMany(mappedBy = "status", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TaskList> tasks;
+    @ManyToOne
+    @JoinColumn(name = "boardId")
+    private Boards board;
 
     public void trimValues() {
         if (this.name != null) {
