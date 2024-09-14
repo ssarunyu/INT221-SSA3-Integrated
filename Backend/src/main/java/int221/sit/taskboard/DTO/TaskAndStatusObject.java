@@ -1,7 +1,7 @@
 package int221.sit.taskboard.DTO;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import int221.sit.taskboard.entities.*;
+import int221.sit.taskboard.entities.itbkk_db.StatusList;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.Getter;
@@ -20,4 +20,5 @@ public class TaskAndStatusObject {
     @Size(max = 30, message = "assignees size must be between 0 and 30.")
     private String assignees;
     private StatusList status;
+    private BoardDTO board;
 }

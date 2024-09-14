@@ -29,7 +29,7 @@ public class TaskBoardDataSourceJpaConfig {
             @Qualifier("taskBoardDataSource") DataSource dataSource,
             EntityManagerFactoryBuilder builder) {
                 return builder.dataSource(dataSource)
-                        .packages("int221.sit.taskboard.entities")
+                        .packages("int221.sit.taskboard.entities.itbkk_db")
                         .build();
     }
 

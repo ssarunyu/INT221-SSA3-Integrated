@@ -1,7 +1,7 @@
 package int221.sit.taskboard.DTO;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import int221.sit.taskboard.entities.*;
+import int221.sit.taskboard.entities.itbkk_db.StatusList;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;

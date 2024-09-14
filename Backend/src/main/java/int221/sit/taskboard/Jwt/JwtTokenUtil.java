@@ -1,7 +1,6 @@
 package int221.sit.taskboard.Jwt;
 
-import int221.sit.taskboard.entities.Users;
-import int221.sit.taskboard.exceptions.NotCreatedException;
+import int221.sit.taskboard.entities.itbkk_shared.Users;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -11,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.security.SignatureException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;

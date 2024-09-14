@@ -26,7 +26,7 @@ public class UserAuthDataSourceJpaConfig {
             @Qualifier("userAuthDataSource") DataSource dataSource,
             EntityManagerFactoryBuilder builder) {
         return builder.dataSource(dataSource)
-                .packages("int221.sit.taskboard.entities")
+                .packages("int221.sit.taskboard.entities.itbkk_shared")
                 .build();
     }
 

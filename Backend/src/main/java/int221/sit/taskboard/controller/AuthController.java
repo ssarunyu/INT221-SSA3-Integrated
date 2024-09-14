@@ -1,10 +1,11 @@
 package int221.sit.taskboard.controller;
 
 import int221.sit.taskboard.DTO.JwtRequestUser;
-import int221.sit.taskboard.Jwt.AuthResponse;
+import int221.sit.taskboard.Jwt.ResponseToken;
 import int221.sit.taskboard.Jwt.JwtTokenUtil;
 import int221.sit.taskboard.services.JwtUserDetailsService;
 import int221.sit.taskboard.repositories.auth.UserRepository;
+import int221.sit.taskboard.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,9 @@ public class AuthController {
     private JwtUserDetailsService jwtUserDetailsService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
@@ -41,9 +45,9 @@ public class AuthController {
 
             UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(jwtRequestUser.getUserName());
             String token = jwtTokenUtil.generateToken(userRepository.findByUsername(userDetails.getUsername()));
-            AuthResponse authResponse = new AuthResponse(token);
+            ResponseToken responseToken = new ResponseToken(token);
 
-            return ResponseEntity.ok(authResponse);
+            return ResponseEntity.ok(responseToken);
 
         } catch (BadCredentialsException ex) {
             throw new BadCredentialsException ("Username or Password is incorrect !!!");

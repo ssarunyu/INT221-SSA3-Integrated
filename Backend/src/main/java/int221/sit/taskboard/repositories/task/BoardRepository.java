@@ -1,12 +1,16 @@
 package int221.sit.taskboard.repositories.task;
 
-import int221.sit.taskboard.entities.Boards;
-import int221.sit.taskboard.entities.Users;
+import int221.sit.taskboard.entities.itbkk_db.Boards;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
 public interface BoardRepository extends JpaRepository<Boards, String> {
-    List<Boards> findByOwner(Users owner);
-    List<Boards> findByOwnerUsername(String username);
+    @Query("SELECT sb.board FROM SharedBoard sb WHERE sb.owner.userListId = :userId")
+    List<Boards> findAllByOwnerId(@Param("userId") String userId);
+
+    Boards findByBoardId(String boardId);
+
 }

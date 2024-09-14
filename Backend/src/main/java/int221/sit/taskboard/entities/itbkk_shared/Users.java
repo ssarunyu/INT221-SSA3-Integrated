@@ -1,5 +1,6 @@
-package int221.sit.taskboard.entities;
+package int221.sit.taskboard.entities.itbkk_shared;
 
+import int221.sit.taskboard.entities.itbkk_db.Boards;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -8,9 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -38,9 +37,6 @@ public class Users {
 
     @Enumerated(EnumType.STRING)
     private Role role;
-
-    @OneToMany(mappedBy = "owner")
-    private List<Boards> boards;
 
     public enum Role {
         LECTURER, STAFF, STUDENT

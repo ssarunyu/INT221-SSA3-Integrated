@@ -1,4 +1,4 @@
-package int221.sit.taskboard.entities;
+package int221.sit.taskboard.entities.itbkk_db;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;

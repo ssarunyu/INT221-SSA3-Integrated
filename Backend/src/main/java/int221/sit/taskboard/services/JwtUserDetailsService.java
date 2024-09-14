@@ -1,8 +1,10 @@
 package int221.sit.taskboard.services;
 
 import int221.sit.taskboard.Jwt.AuthUser;
-import int221.sit.taskboard.entities.Users;
+import int221.sit.taskboard.entities.itbkk_db.UserList;
+import int221.sit.taskboard.entities.itbkk_shared.Users;
 import int221.sit.taskboard.repositories.auth.UserRepository;
+import int221.sit.taskboard.repositories.task.UserListRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,13 +16,24 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserListRepository userListRepository;
 
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         Users user = userRepository.findByUsername(userName);
+
         if (user == null) {
             throw new UsernameNotFoundException("The Username or Password is incorrect");
         }
+
+        UserList userList = new UserList();
+        userList.setUserListId(user.getUserId());
+        userList.setUsername(user.getUsername());
+        userList.setName(user.getName());
+        userList.setEmail(user.getEmail());
+        userList.setRole(user.getRole());
+        userListRepository.save(userList);
 
         return new AuthUser(user.getUsername(), user.getPassword(), user.getAuthorities());
     }

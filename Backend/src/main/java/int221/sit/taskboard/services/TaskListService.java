@@ -1,7 +1,8 @@
 package int221.sit.taskboard.services;
 
 import int221.sit.taskboard.DTO.*;
-import int221.sit.taskboard.entities.*;
+import int221.sit.taskboard.entities.itbkk_db.StatusList;
+import int221.sit.taskboard.entities.itbkk_db.TaskList;
 import int221.sit.taskboard.exceptions.*;
 import int221.sit.taskboard.repositories.task.StatusListRepository;
 import int221.sit.taskboard.repositories.task.TaskListRepository;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;

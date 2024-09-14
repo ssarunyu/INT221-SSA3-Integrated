@@ -1,7 +1,7 @@
 package int221.sit.taskboard.controller;
 
 import int221.sit.taskboard.DTO.TaskAndStatusInt;
-import int221.sit.taskboard.entities.*;
+import int221.sit.taskboard.entities.itbkk_db.StatusList;
 import int221.sit.taskboard.exceptions.BadRequestException;
 import int221.sit.taskboard.services.StatusListService;
 import int221.sit.taskboard.services.TaskListService;

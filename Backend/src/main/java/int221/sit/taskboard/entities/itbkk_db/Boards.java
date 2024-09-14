@@ -1,16 +1,12 @@
-package int221.sit.taskboard.entities;
+package int221.sit.taskboard.entities.itbkk_db;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.viascom.nanoid.NanoId;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Setter
 @Getter
@@ -25,9 +21,8 @@ public class Boards {
     @Size(max = 120)
     private String boardName;
 
-    @ManyToOne
-    @JoinColumn(name = "ownerId", nullable = false)
-    private Users owner;
+    @OneToMany(mappedBy = "board")
+    private List<SharedBoard> sharedBoards;
 
     @PrePersist
     private void prePersist() {

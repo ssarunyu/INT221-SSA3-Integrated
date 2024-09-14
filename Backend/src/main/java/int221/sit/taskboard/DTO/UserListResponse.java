@@ -1,6 +1,7 @@
 package int221.sit.taskboard.DTO;
 
-import int221.sit.taskboard.entities.Users;
+import int221.sit.taskboard.entities.itbkk_db.UserList;
+import int221.sit.taskboard.entities.itbkk_shared.Users;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,9 +9,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Data
-public class UserDTO {
+public class UserListResponse {
     private String username;
     private String name;
     private String email;
-    private Users.Role role;
+    private UserList.Role role;
 }
