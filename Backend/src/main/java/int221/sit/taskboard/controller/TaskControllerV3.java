@@ -2,6 +2,9 @@ package int221.sit.taskboard.controller;
 
 import int221.sit.taskboard.DTO.TaskAndStatusInt;
 import int221.sit.taskboard.DTO.TaskAndStatusObject;
+import int221.sit.taskboard.DTO.TaskListDetail;
+import int221.sit.taskboard.DTO.TaskShortDetail;
+import int221.sit.taskboard.entities.itbkk_db.TaskList;
 import int221.sit.taskboard.exceptions.BadRequestException;
 import int221.sit.taskboard.services.BoardService;
 import int221.sit.taskboard.services.StatusListService;
@@ -18,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v3/boards")
-@CrossOrigin(origins = {"http://localhost:5173","http://ip23ssa3.sit.kmutt.ac.th"})
+@CrossOrigin(origins = {"http://localhost:5173", "http://ip23ssa3.sit.kmutt.ac.th"})
 public class TaskControllerV3 {
     @Autowired
     private ModelMapper modelMapper;
@@ -32,7 +35,7 @@ public class TaskControllerV3 {
     @Autowired
     private TaskServiceV3 service;
 
-    @PostMapping("/{board_id}/tasks")
+    @PostMapping("/{board_id}/task")
     public ResponseEntity<TaskAndStatusObject> addNewTask(@PathVariable String board_id,
                                                           @Valid @RequestBody TaskAndStatusInt newtask) {
         if (newtask.getTitle() != null) {
@@ -64,8 +67,17 @@ public class TaskControllerV3 {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTaskList);
     }
 
-//    @GetMapping("/{board_id}/tasks")
-//    public ResponseEntity<List<TaskAndStatusObject>> getAllTasksByBoardId(@PathVariable String board_id) {
-//
-//    }
+    @GetMapping("/{board_id}/tasks")
+    public List<TaskShortDetail> getAllTasks(
+            @PathVariable("board_id") String boardId,
+            @RequestParam(value = "status", required = false) List<String> statuses,
+            @RequestParam(value = "sortDirection", defaultValue = "asc") String sortDirection,
+            @RequestParam(value = "sortBy", defaultValue = "createdOn") String sortBy) {
+        return service.getAllTasksSortedAndFilterForBoard(boardId, statuses, sortDirection, sortBy);
+    }
+
+    @GetMapping("/{board_id}/tasks/{task_id}")
+    public TaskListDetail getTaskById(@PathVariable("board_id") String boardId, @PathVariable("task_id") Integer taskId) {
+        return service.getTaskById(boardId, taskId);
+    }
 }

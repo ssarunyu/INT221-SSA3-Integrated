@@ -19,4 +19,13 @@ public class TaskShortDetail {
     @Size(max = 30, message = "assignees size must be between 0 and 30.")
     private String assignees;
     private StatusList status;
+
+    public void trimValues() {
+        if (this.title != null) {
+            this.title = this.title.trim();
+        }
+        if (this.assignees != null) {
+            this.assignees = this.assignees.trim();
+        }
+    }
 }

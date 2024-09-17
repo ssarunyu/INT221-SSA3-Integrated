@@ -1,7 +1,6 @@
 package int221.sit.taskboard.services;
 
-import int221.sit.taskboard.DTO.TaskAndStatusInt;
-import int221.sit.taskboard.DTO.TaskAndStatusObject;
+import int221.sit.taskboard.DTO.*;
 import int221.sit.taskboard.entities.itbkk_db.Boards;
 import int221.sit.taskboard.entities.itbkk_db.StatusList;
 import int221.sit.taskboard.entities.itbkk_db.TaskList;
@@ -13,12 +12,16 @@ import int221.sit.taskboard.repositories.task.TaskListRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskServiceV3 {
@@ -74,6 +77,36 @@ public class TaskServiceV3 {
         } catch (DataAccessException e) {
             throw new BadRequestException("Failed to create new task list: " + e.getMessage());
         }
+    }
+
+    @Transactional("taskBoardTransactionManager")
+    public List<TaskShortDetail> getAllTasksSortedAndFilterForBoard(String boardId, List<String> filterStatuses, String sortDirection, String sortBy) {
+        List<TaskList> tasks;
+        if ("desc".equalsIgnoreCase(sortDirection)) {
+            tasks = repository.findAllByBoardIdOrderAndFilterByDesc(boardId, filterStatuses, sortBy);
+        } else {
+            tasks = repository.findAllByBoardIdOrderAndFilterByAsc(boardId, filterStatuses, sortBy);
+        }
+        List<TaskShortDetail> taskDTOs = new ArrayList<>();
+        for (TaskList task : tasks) {
+            TaskShortDetail taskShortDetail = new TaskShortDetail();
+            taskShortDetail.setId(task.getId());
+            taskShortDetail.setTitle(task.getTitle());
+            taskShortDetail.setAssignees(task.getAssignees());
+            taskShortDetail.setStatus(task.getStatus());
+            taskShortDetail.trimValues();
+            taskDTOs.add(taskShortDetail);
+        }
+        return taskDTOs;
+    }
+
+    @Transactional("taskBoardTransactionManager")
+    public TaskListDetail getTaskById(String boardId, Integer taskId) {
+        TaskList taskList = repository.findByBoardIdAndTaskId(boardId, taskId)
+                .orElseThrow(() -> new ItemNotFoundException("Task id " + taskId + " does not exist!"));
+
+        TaskListDetail taskListDetail = modelMapper.map(taskList, TaskListDetail.class);
+        return taskListDetail;
     }
 
 

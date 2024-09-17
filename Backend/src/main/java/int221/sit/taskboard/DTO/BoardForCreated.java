@@ -1,5 +1,4 @@
 package int221.sit.taskboard.DTO;
-
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.Getter;
@@ -8,10 +7,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @Data
-public class BoardDTO {
+public class BoardForCreated {
     @Size(max = 10)
-    private String boardId;
+    private String id;
     @Size(max = 120)
-    private String boardName;
+    private String name;
     private UserListResponse owner;
 }

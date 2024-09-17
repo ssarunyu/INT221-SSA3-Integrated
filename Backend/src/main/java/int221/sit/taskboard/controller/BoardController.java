@@ -1,6 +1,7 @@
 package int221.sit.taskboard.controller;
 
 import int221.sit.taskboard.DTO.BoardDTO;
+import int221.sit.taskboard.DTO.BoardForCreated;
 import int221.sit.taskboard.Jwt.JwtTokenUtil;
 import int221.sit.taskboard.entities.itbkk_db.Boards;
 import int221.sit.taskboard.entities.itbkk_db.UserList;
@@ -57,8 +58,8 @@ public class BoardController {
 
 
     @PostMapping("/boards")
-    public ResponseEntity<BoardDTO> createBoard(@Valid @RequestBody(required = false) BoardDTO boardDTO, HttpServletRequest request) {
-        if (boardDTO == null) {
+    public ResponseEntity<BoardForCreated> createBoard(@Valid @RequestBody(required = false) BoardForCreated bfc, HttpServletRequest request) {
+        if (bfc == null) {
             throw new BadRequestException("Please fill in the board information completely!");
         }
 
@@ -70,9 +71,9 @@ public class BoardController {
             throw new NotCreatedException("User " + username + " not found");
         }
 
-        Boards newBoard = modelMapper.map(boardDTO, Boards.class);
+        Boards newBoard = modelMapper.map(bfc, Boards.class);
 
-        BoardDTO createdBoard = boardService.createBoard(boardDTO, token);
+        BoardForCreated createdBoard = boardService.createBoard(bfc, token);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdBoard);
     }
 }

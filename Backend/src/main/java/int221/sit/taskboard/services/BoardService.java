@@ -1,6 +1,7 @@
 package int221.sit.taskboard.services;
 
 import int221.sit.taskboard.DTO.BoardDTO;
+import int221.sit.taskboard.DTO.BoardForCreated;
 import int221.sit.taskboard.DTO.UserListResponse;
 import int221.sit.taskboard.Jwt.JwtTokenUtil;
 import int221.sit.taskboard.entities.itbkk_db.Boards;
@@ -51,7 +52,7 @@ public class BoardService {
     private final List<String> defaultStatuses = List.of("TODO", "DOING", "DONE", "NO STATUS");
 
     @Transactional("taskBoardTransactionManager")
-    public BoardDTO createBoard(BoardDTO boardDTO, String token) {
+    public BoardForCreated createBoard(BoardForCreated bfc, String token) {
 
         String username = jwtTokenUtil.getUsernameFromToken(token);
         UserList owner = userListRepository.findByUsername(username);
@@ -61,7 +62,7 @@ public class BoardService {
         }
 
         Boards newBoard = new Boards();
-        newBoard.setBoardName(boardDTO.getBoardName());
+        newBoard.setBoardName(bfc.getName());
         newBoard.setOwnerId(owner.getUserListId()); // Set the owner ID
         newBoard.setCreatedOn(ZonedDateTime.now()); // Set created time
         newBoard.setUpdatedOn(ZonedDateTime.now()); // Set updated time
@@ -81,7 +82,9 @@ public class BoardService {
             statusListRepository.save(status);
         }
 
-        BoardDTO resultDTO = modelMapper.map(newBoard, BoardDTO.class);
+        BoardForCreated resultDTO = new BoardForCreated();
+        resultDTO.setId(newBoard.getBoardId());
+        resultDTO.setName(newBoard.getBoardName());
 
         UserListResponse ownerResponse = modelMapper.map(owner, UserListResponse.class);
         resultDTO.setOwner(ownerResponse);
