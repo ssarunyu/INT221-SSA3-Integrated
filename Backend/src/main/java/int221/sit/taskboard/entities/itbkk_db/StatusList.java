@@ -1,5 +1,6 @@
 package int221.sit.taskboard.entities.itbkk_db;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -7,6 +8,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 import lombok.Setter;
+
+import java.time.ZonedDateTime;
 
 @Getter
 @Setter
@@ -29,8 +32,15 @@ public class StatusList {
     @Column(name = "statusDescription")
     private String description;
 
+    @Column(name = "created_on")
+    private ZonedDateTime createdOn;
+
+    @Column(name = "updated_on")
+    private ZonedDateTime updatedOn;
+
     @ManyToOne
     @JoinColumn(name = "boardId")
+    @JsonIgnore
     private Boards board;
 
     public void trimValues() {

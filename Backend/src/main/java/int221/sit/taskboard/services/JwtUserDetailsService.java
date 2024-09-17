@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
+
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
 
@@ -32,9 +34,10 @@ public class JwtUserDetailsService implements UserDetailsService {
         userList.setUsername(user.getUsername());
         userList.setName(user.getName());
         userList.setEmail(user.getEmail());
-        userList.setRole(user.getRole());
+        userList.setCreatedOn(ZonedDateTime.now());
+        userList.setUpdatedOn(ZonedDateTime.now());
         userListRepository.save(userList);
 
-        return new AuthUser(user.getUsername(), user.getPassword(), user.getAuthorities());
+        return new AuthUser(user.getUsername(), user.getPassword());
     }
 }

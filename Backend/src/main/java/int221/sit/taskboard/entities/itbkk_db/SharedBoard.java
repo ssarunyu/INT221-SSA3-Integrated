@@ -14,10 +14,10 @@ public class SharedBoard {
     private Long sharedId;
 
     @ManyToOne
-    @JoinColumn(name = "ownerOid")
+    @JoinColumn(name = "ownerOid", nullable = false)
     private UserList owner;
 
     @ManyToOne
-    @JoinColumn(name = "boardId")
+    @JoinColumn(name = "boardId", nullable = false)
     private Boards board;
 }

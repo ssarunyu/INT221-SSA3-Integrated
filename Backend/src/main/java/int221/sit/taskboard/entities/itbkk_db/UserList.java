@@ -8,13 +8,14 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "users_store")
+@Table(name = "users")
 public class UserList {
     @Id
     @Column(name = "oid")
@@ -30,18 +31,13 @@ public class UserList {
     @Column(name = "email")
     private String email;
 
-    @Enumerated(EnumType.STRING)
-    private Users.Role role;
+    @Column(name = "created_on", nullable = false)
+    private ZonedDateTime createdOn;
+
+    @Column(name = "updated_on", nullable = false)
+    private ZonedDateTime updatedOn;
 
     @OneToMany(mappedBy = "owner")
     private List<SharedBoard> sharedBoards;
-
-    public enum Role {
-        LECTURER, STAFF, STUDENT
-    }
-
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role));
-    }
 
 }

@@ -1,6 +1,5 @@
 package int221.sit.taskboard.DTO;
 
-import int221.sit.taskboard.entities.itbkk_db.UserList;
 import int221.sit.taskboard.entities.itbkk_shared.Users;
 import lombok.Data;
 import lombok.Getter;
@@ -13,5 +12,5 @@ public class UserListResponse {
     private String username;
     private String name;
     private String email;
-    private UserList.Role role;
+    private Users.Role role;
 }

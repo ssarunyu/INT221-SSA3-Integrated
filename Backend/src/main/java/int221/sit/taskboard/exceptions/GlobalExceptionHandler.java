@@ -9,6 +9,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpServletRequest request) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
@@ -36,7 +37,8 @@ public class GlobalExceptionHandler {
                 ZonedDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
                 "Validation Failed",
-                errorMessages
+                errorMessages,
+                request.getRequestURI()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
@@ -46,6 +48,7 @@ public class GlobalExceptionHandler {
             ErrorResponse errorResponse = new ErrorResponse(
                     ZonedDateTime.now(),
                     HttpStatus.UNAUTHORIZED.value(),
+                    "Not Created Exception",
                     ex.getMessage(),
                     request.getRequestURI()
             );
@@ -53,46 +56,62 @@ public class GlobalExceptionHandler {
         }
 
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex) {
+    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 ZonedDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
                 "Bad Request",
-                ex.getMessage()
+                ex.getMessage(),
+                request.getRequestURI()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorResponse> handleAuthenticationFailedException(BadCredentialsException  ex) {
+    public ResponseEntity<ErrorResponse> handleAuthenticationFailedException(BadCredentialsException  ex, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 ZonedDateTime.now(),
                 HttpStatus.UNAUTHORIZED.value(),
                 "Authentication Failed",
-                ex.getMessage()
+                ex.getMessage(),
+                request.getRequestURI()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(SignatureException.class)
-    public ResponseEntity<ErrorResponse> handleSignatureException(SignatureException ex) {
+    public ResponseEntity<ErrorResponse> handleSignatureException(SignatureException ex, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 ZonedDateTime.now(),
                 HttpStatus.UNAUTHORIZED.value(),
                 "Authentication Failed",
-                ex.getMessage()
+                ex.getMessage(),
+                request.getRequestURI()
         );
         return  new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseEntity<ErrorResponse> handleExpiredJwtException(ExpiredJwtException ex) {
+    public ResponseEntity<ErrorResponse> handleExpiredJwtException(ExpiredJwtException ex, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 ZonedDateTime.now(),
                 HttpStatus.UNAUTHORIZED.value(),
                 "Authentication Failed",
-                ex.getMessage()
+                ex.getMessage(),
+                request.getRequestURI()
         );
         return  new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<ErrorResponse> handleMissingHeader(MissingRequestHeaderException ex, HttpServletRequest request) {
+                ErrorResponse errorResponse = new ErrorResponse(
+                        ZonedDateTime.now(),
+                        HttpStatus.UNAUTHORIZED.value(),
+                        "Missing Header",
+                        "Required header '" + ex.getHeaderName() + "' is not present.",
+                        request.getRequestURI()
+                );
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 }

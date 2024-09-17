@@ -7,7 +7,6 @@ import int221.sit.taskboard.entities.itbkk_db.Boards;
 import int221.sit.taskboard.entities.itbkk_db.SharedBoard;
 import int221.sit.taskboard.entities.itbkk_db.StatusList;
 import int221.sit.taskboard.entities.itbkk_db.UserList;
-import int221.sit.taskboard.entities.itbkk_shared.Users;
 import int221.sit.taskboard.repositories.auth.UserRepository;
 import int221.sit.taskboard.repositories.task.BoardRepository;
 import int221.sit.taskboard.repositories.task.SharedBoardRepository;
@@ -18,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,6 +62,9 @@ public class BoardService {
 
         Boards newBoard = new Boards();
         newBoard.setBoardName(boardDTO.getBoardName());
+        newBoard.setOwnerId(owner.getUserListId()); // Set the owner ID
+        newBoard.setCreatedOn(ZonedDateTime.now()); // Set created time
+        newBoard.setUpdatedOn(ZonedDateTime.now()); // Set updated time
         boardRepository.save(newBoard);
 
         SharedBoard sharedBoard = new SharedBoard();
@@ -73,6 +76,8 @@ public class BoardService {
             StatusList status = new StatusList();
             status.setName(statusName);
             status.setBoard(newBoard);
+            status.setCreatedOn(ZonedDateTime.now());
+            status.setUpdatedOn(ZonedDateTime.now());
             statusListRepository.save(status);
         }
 

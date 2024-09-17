@@ -1,11 +1,13 @@
 package int221.sit.taskboard.entities.itbkk_db;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.viascom.nanoid.NanoId;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Setter
@@ -21,7 +23,17 @@ public class Boards {
     @Size(max = 120)
     private String boardName;
 
+    @Column(name = "created_on", nullable = false)
+    private ZonedDateTime createdOn;
+
+    @Column(name = "updated_on", nullable = false)
+    private ZonedDateTime updatedOn;
+
+    @Column(name = "owner_id")
+    private String ownerId;
+
     @OneToMany(mappedBy = "board")
+    @JsonIgnore
     private List<SharedBoard> sharedBoards;
 
     @PrePersist

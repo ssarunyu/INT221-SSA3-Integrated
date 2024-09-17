@@ -2,10 +2,13 @@ package int221.sit.taskboard.DTO;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import int221.sit.taskboard.entities.itbkk_db.StatusList;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.ZonedDateTime;
 
 @Getter
 @Setter
@@ -20,5 +23,7 @@ public class TaskAndStatusObject {
     @Size(max = 30, message = "assignees size must be between 0 and 30.")
     private String assignees;
     private StatusList status;
-    private BoardDTO board;
+    private String boardId;
+    private ZonedDateTime createdOn;
+    private ZonedDateTime updatedOn;
 }
