@@ -32,7 +32,7 @@ public class TaskControllerV3 {
     @Autowired
     private TaskServiceV3 service;
 
-    @PostMapping("/{board_id}/task")
+    @PostMapping("/{board_id}/tasks")
     public ResponseEntity<TaskAndStatusObject> addNewTask(@PathVariable String board_id,
                                                           @Valid @RequestBody TaskAndStatusInt newtask) {
         if (newtask.getTitle() != null) {
@@ -60,7 +60,12 @@ public class TaskControllerV3 {
         }
 
         Integer status = newtask.getStatus();
-        TaskAndStatusObject createdTaskList = service.createNewTask(newtask, board_id,  status);
+        TaskAndStatusObject createdTaskList = service.createNewTask(newtask, board_id, status);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTaskList);
     }
+
+//    @GetMapping("/{board_id}/tasks")
+//    public ResponseEntity<List<TaskAndStatusObject>> getAllTasksByBoardId(@PathVariable String board_id) {
+//
+//    }
 }

@@ -35,7 +35,8 @@ public class WebSecurityConfig {
         httpSecurity.csrf(csrf -> csrf.disable())
                 .authorizeRequests(authorize -> authorize
                         .requestMatchers("/login", "/decode-token").permitAll()
-                        .requestMatchers("/v2/**").authenticated())
+                        .requestMatchers("/v2/**").authenticated()
+                        .requestMatchers("/v3/**").authenticated())
                         .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) ->
                                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized access !!!")))
