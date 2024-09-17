@@ -30,12 +30,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String requestTokenHeader = request.getHeader("Authorization");
+        String username = null;
+        String jwtToken = null;
 
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            String jwtToken = requestTokenHeader.substring(7);
-            try {
-                String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+            jwtToken = requestTokenHeader.substring(7);
 
+            if (!isValidJwtStructure(jwtToken)) {
+                throw new BadRequestException("Invalid JWT Token Structure");
+            }
+
+            try {
+                username = jwtTokenUtil.getUsernameFromToken(jwtToken);
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
                     if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
@@ -45,15 +51,19 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
                     }
                 }
-            } catch (SignatureException ex) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT signature");
-                return;
-            } catch (ExpiredJwtException ex) {
+            }  catch (ExpiredJwtException ex) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT Token has expired");
+                return;
+            }   catch (SignatureException ex) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT signature " + ex.getMessage());
                 return;
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isValidJwtStructure(String jwtToken) {
+        return jwtToken.matches("[A-Za-z0-9-]+\\.[A-Za-z0-9-]+\\.[A-Za-z0-9-_]+");
     }
 }
 
