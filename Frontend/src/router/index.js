@@ -7,6 +7,7 @@ import EditStatusPopup from '@/components/EditStatusPopup.vue'
 import Notfound from '@/views/Notfound.vue'
 import StatusView from '@/views/StatusView.vue'
 import LoginView from '@/views/LoginView.vue'
+import BoardView from '@/views/BoardView.vue'
 
 
 const router = createRouter({
@@ -20,6 +21,9 @@ const router = createRouter({
       path: '/',
       name: 'RootPath',
       redirect: { name: 'Login' }
+    },
+    {
+      path: '/board', name: 'Board', component: BoardView
     },
     { path: '/task', name: 'Home', component: HomeView,
       children: [
@@ -44,8 +48,6 @@ const router = createRouter({
 function isTokenExpired(payload) {
   // JWT token exp time is seconds
   const currentTime = Math.floor(Date.now() / 1000)
-  console.log('now time', currentTime)
-  console.log('exp time', payload.exp)
   if(payload.exp < currentTime) {
     return true // Already expired
   } else {
