@@ -22,8 +22,8 @@ public class TaskAndStatusObject {
     private String description;
     @Size(max = 30, message = "assignees size must be between 0 and 30.")
     private String assignees;
-    private StatusList status;
-    private String boardId;
     private ZonedDateTime createdOn;
     private ZonedDateTime updatedOn;
+    private StatusList status;
+    private String boardId;
 }

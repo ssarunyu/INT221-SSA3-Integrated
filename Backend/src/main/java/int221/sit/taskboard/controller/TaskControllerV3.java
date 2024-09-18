@@ -6,6 +6,7 @@ import int221.sit.taskboard.DTO.TaskListDetail;
 import int221.sit.taskboard.DTO.TaskShortDetail;
 import int221.sit.taskboard.entities.itbkk_db.TaskList;
 import int221.sit.taskboard.exceptions.BadRequestException;
+import int221.sit.taskboard.exceptions.ItemNotFoundException;
 import int221.sit.taskboard.services.BoardService;
 import int221.sit.taskboard.services.StatusListService;
 import int221.sit.taskboard.services.TaskListService;
@@ -76,8 +77,25 @@ public class TaskControllerV3 {
         return service.getAllTasksSortedAndFilterForBoard(boardId, statuses, sortDirection, sortBy);
     }
 
-    @GetMapping("/{board_id}/tasks/{task_id}")
+    @GetMapping("/{board_id}/task/{task_id}")
     public TaskListDetail getTaskById(@PathVariable("board_id") String boardId, @PathVariable("task_id") Integer taskId) {
         return service.getTaskById(boardId, taskId);
+    }
+
+    @PutMapping("/{board_id}/task/{task_id}")
+    public ResponseEntity<TaskAndStatusObject> updateTask(@Valid @PathVariable("board_id") String boardId, @PathVariable Integer task_id, @RequestBody TaskAndStatusInt taskLists) {
+        try {
+            Integer status = taskLists.getStatus();
+            TaskAndStatusObject updatedTask = service.updateTaskListById(boardId, task_id, taskLists, status);
+            return ResponseEntity.ok(updatedTask);
+        } catch (ItemNotFoundException e) {
+            throw new ItemNotFoundException("Task is not found");
+        }
+    }
+
+    @DeleteMapping("/{board_id}/task/{task_id}")
+    public ResponseEntity<TaskShortDetail> deletedTaskListById(@Valid @PathVariable("board_id") String boardId, @PathVariable Integer task_id) {
+        TaskShortDetail deletedTaskListDto = service.removeTaskById(boardId, task_id);
+        return ResponseEntity.ok().body(deletedTaskListDto);
     }
 }

@@ -109,5 +109,71 @@ public class TaskServiceV3 {
         return taskListDetail;
     }
 
+    @Transactional("taskBoardTransactionManager")
+    public TaskAndStatusObject updateTaskListById(String boardId, Integer id, TaskAndStatusInt newTaskListDto, Integer statusId) {
+        Boards board = boardRepository.findByBoardId(boardId);
+        if (board == null) {
+            throw new ItemNotFoundException("Board not found!");
+        }
+
+        if (newTaskListDto.getTitle() != null && !newTaskListDto.getTitle().isEmpty()) {
+            newTaskListDto.setTitle(newTaskListDto.getTitle().trim());
+        } else {
+            throw new BadRequestException("Title must not be null");
+        }
+
+        TaskList taskListUpdated = repository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException("Task id " + id + " does not exist!"));
+
+        taskListUpdated.setTitle(newTaskListDto.getTitle());
+        taskListUpdated.setDescription(newTaskListDto.getDescription());
+        taskListUpdated.setAssignees(newTaskListDto.getAssignees());
+
+        if (statusId != null) {
+            StatusList statusList = statusListRepository.findById(statusId)
+                    .orElseThrow(() -> new BadRequestException("Status id " + statusId + " does not exist!"));
+            taskListUpdated.setStatus(statusList);
+        }
+
+        TaskList updatedTaskList = repository.saveAndFlush(taskListUpdated);
+
+        return convertToDTO(updatedTaskList); // ใช้เมธอดแปลงข้อมูลที่เขียนด้วยมือ
+    }
+
+    public TaskAndStatusObject convertToDTO(TaskList taskList) {
+        TaskAndStatusObject taskAndStatusObject = new TaskAndStatusObject();
+        taskAndStatusObject.setId(taskList.getId());
+        taskAndStatusObject.setTitle(taskList.getTitle());
+        taskAndStatusObject.setDescription(taskList.getDescription());
+        taskAndStatusObject.setAssignees(taskList.getAssignees());
+        taskAndStatusObject.setBoardId(taskList.getBoard().getBoardId());
+        taskAndStatusObject.setCreatedOn(taskList.getCreatedOn());
+        taskAndStatusObject.setUpdatedOn(taskList.getUpdatedOn());
+        taskAndStatusObject.setStatus(taskList.getStatus());
+
+        return taskAndStatusObject;
+    }
+
+    @Transactional("taskBoardTransactionManager")
+    public TaskShortDetail removeTaskById(String boardId, Integer taskId) {
+        // ค้นหา TaskList โดย id
+        TaskList taskList = repository.findById(taskId)
+                .orElseThrow(() -> new ItemNotFoundException("Task id " + taskId + " does not exist!"));
+
+        // ตรวจสอบว่า TaskList เป็นของ boardId ที่กำหนดหรือไม่
+        if (!taskList.getBoard().getBoardId().equals(boardId)) {
+            throw new BadRequestException("Task id " + taskId + " does not belong to board " + boardId);
+        }
+
+        // แปลง TaskList เป็น TaskShortDetail ก่อนลบ
+        TaskShortDetail deletedTaskListDto = modelMapper.map(taskList, TaskShortDetail.class);
+
+        // ลบ TaskList
+        repository.delete(taskList);
+
+        // ส่งคืน TaskShortDetail ที่แปลงแล้ว
+        return deletedTaskListDto;
+    }
+
 
 }

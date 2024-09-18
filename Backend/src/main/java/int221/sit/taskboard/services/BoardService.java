@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class BoardService {
@@ -93,18 +94,20 @@ public class BoardService {
     }
 
     public List<BoardDTO> getAllBoardsForUser(String userId) {
-        List<Boards> boards = boardRepository.findAllByOwnerId(userId);
-
-        return boards.stream()
-                .map(board -> {
-                    BoardDTO boardDTO = modelMapper.map(board, BoardDTO.class);
-                    SharedBoard sharedBoard = sharedBoardRepository.findByBoard(board);
-                    UserList owner = sharedBoard.getOwner();
-                    UserListResponse ownerDTO = modelMapper.map(owner, UserListResponse.class);
-                    boardDTO.setOwner(ownerDTO);
-                    return boardDTO;
-                })
+        List<Boards> ownedBoards = boardRepository.findAllBoardByUserId(userId);
+        return ownedBoards.stream()
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    private BoardDTO convertToDTO(Boards board) {
+        BoardDTO boardDTO = new BoardDTO();
+        boardDTO.setBoardId(board.getBoardId());
+        boardDTO.setBoardName(board.getBoardName());
+        UserListResponse owner = userService.getUserById(board.getOwnerId());
+        boardDTO.setOwner(owner);
+
+        return boardDTO;
     }
 
     public BoardDTO getBoardById(String boardId, String userId) {

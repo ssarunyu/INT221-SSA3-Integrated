@@ -1,6 +1,7 @@
 package int221.sit.taskboard.services;
 
 import int221.sit.taskboard.DTO.JwtRequestUser;
+import int221.sit.taskboard.DTO.UserListResponse;
 import int221.sit.taskboard.entities.itbkk_db.UserList;
 import int221.sit.taskboard.entities.itbkk_shared.Users;
 import int221.sit.taskboard.exceptions.BadRequestException;
@@ -40,6 +41,19 @@ public class UserService {
         userDto.setUserName("string");
         userDto.setPassword("string");
         return userDto;
+    }
+
+    public UserListResponse getUserById(String userId) {
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        UserListResponse response = new UserListResponse();
+        response.setUsername(user.getUsername());
+        response.setName(user.getName());
+        response.setEmail(user.getEmail());
+        response.setRole(user.getRole());
+
+        return response;
     }
 
     public Users getUserByUsername(String username) {

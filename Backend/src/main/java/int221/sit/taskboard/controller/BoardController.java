@@ -36,11 +36,18 @@ public class BoardController {
     private UserListRepository userListRepository;
 
     @GetMapping("/boards")
-    public List<BoardDTO> getAllBoardsForUser(@RequestHeader("Authorization") String token) {
-        String jwtToken = token.substring(7);
-        String userId = jwtTokenUtil.getUserIdFromToken(jwtToken);
-        return boardService.getAllBoardsForUser(userId);
+    public ResponseEntity<List<BoardDTO>> getAllBoardsForUser(@RequestHeader("Authorization") String token) {
+        if (token != null && token.startsWith("Bearer ")) {
+            String jwtToken = token.substring(7);
+            String userId = jwtTokenUtil.getUserIdFromToken(jwtToken);
+            List<BoardDTO> boards = boardService.getAllBoardsForUser(userId);
+
+            return ResponseEntity.ok(boards);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
+
 
     @GetMapping("/boards/{board_id}")
     public ResponseEntity<BoardDTO> getBoardById(@PathVariable("board_id") String boardId, @RequestHeader("Authorization") String token) {
