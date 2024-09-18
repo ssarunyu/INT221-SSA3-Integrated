@@ -24,14 +24,14 @@ public class StatusListService {
         return repository.findAll();
     }
 
-    @Transactional
+    @Transactional("taskBoardTransactionManager")
     public StatusList findById(Integer id) {
         return repository.findById(id).orElseThrow(() ->
                 new ItemNotFoundException("Statuses id " + id + " does not exist !!")
         );
     }
 
-    @Transactional
+    @Transactional("taskBoardTransactionManager")
     public StatusList addStatus(StatusList newStatus) {
         if(newStatus.getName() != null) {
             newStatus.trimValues();
@@ -42,7 +42,7 @@ public class StatusListService {
         }
     }
 
-    @Transactional
+    @Transactional("taskBoardTransactionManager")
     public StatusList updateStatus(Integer id, StatusList statuslist){
         StatusList existingStatus = repository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Status id " + id + " does not exist!"));
@@ -64,7 +64,7 @@ public class StatusListService {
         return repository.save(existingStatus);
     }
 
-    @Transactional
+    @Transactional("taskBoardTransactionManager")
     public ResponseEntity<StatusList> deleteStatus(Integer id) {
         StatusList statusList = repository.findById(id).orElse(null);
 

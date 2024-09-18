@@ -65,7 +65,10 @@ function isTokenExpired(payload) {
 // TODO: Not-Well form
 router.beforeEach((to, from, next) => {
   const token = JSON.parse(localStorage.getItem('token'))
+  console.log(token);
   const payload = JSON.parse(localStorage.getItem('payload'))
+  console.log(payload);
+  
   if(token && payload) {
     if(isTokenExpired(payload)) {
       // If token expired remove from localStorage

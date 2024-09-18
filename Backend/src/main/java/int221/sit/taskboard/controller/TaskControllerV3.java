@@ -36,7 +36,7 @@ public class TaskControllerV3 {
     @Autowired
     private TaskServiceV3 service;
 
-    @PostMapping("/{board_id}/task")
+    @PostMapping("/{board_id}/tasks")
     public ResponseEntity<TaskAndStatusObject> addNewTask(@PathVariable String board_id,
                                                           @Valid @RequestBody TaskAndStatusInt newtask) {
         if (newtask.getTitle() != null) {

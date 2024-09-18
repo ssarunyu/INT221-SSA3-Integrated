@@ -259,7 +259,7 @@ const removeFilter = async (r) => {
                     </div>
                 </div>
             </div>
-            <div class="w-full flex justify-center items-center space-y-5">
+            <div class="w-full flex flex-col justify-center items-center space-y-5">
                 <div @click="router.push({ name: 'AddTask' })"
                 class="itbkk-button-add w-2/3 rounded-md p-5 bg-slate-200 text-slate-500 cursor-pointer duration-300 hover:bg-slate-300 hover:text-slate-700">
                     + Add New Task
