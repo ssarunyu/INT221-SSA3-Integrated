@@ -210,22 +210,25 @@ const removeFilter = async (r) => {
     <router-view></router-view>
     <!-- Components -->
     <DeletePopup v-show="deletePopupStatus" v-if="deleteTarget" :deleteItem="deleteTarget" @close="deletePopupStatus = false" @confirm="deleteConfirm()"/>
-    <AddPopup v-show="addPopupStatus" @close="closeAddPopup()" @confirm="confirmAdd"/>
     <EditPopup v-show="editPopupStatus" v-if="editTaskTarget" :itemData="editTaskTarget" :statusData="taskManagement.getAllStatus()" @update="updateEdit" @close="closeEditPopup()"/>
-    <div class="w-full min-h-screen p-5">
-        <h1 class="flex text-2xl font-bold justify-center mb-5">ITBKK SSA3 Taskboard</h1>
-        <div class="flex flex-col space-y-3">
+    <div class="w-full min-h-screen">
+        <!-- Nav -->
+        <div class="flex justify-between items-center bg-slate-800 p-5">
+            <h1 class="font-bold text-2xl text-white">ITBKK SSA3 Taskboard</h1>
+            <!-- NOTE: Need fix -->
+            <div class="text-right text-white">
+                <h1 class="font-semibold">{{ userAuthItem.sub }}</h1>
+                <h1 class="text-xs">{{ userAuthItem.email }}</h1>
+            </div>
+        </div>
+        <div class="flex flex-col">
             <Toast :toastObject="toastHandle" @close="toastHandle.status = false"/>
-            <div class="flex w-full justify-between font-xl ">
-                <div @click="openAddPopup()" class="itbkk-button-add w-40 text-center p-2 bg-green-300 rounded cursor-pointer duration-300 hover:bg-green-400 hover:scale-105">
-                    + Add New Task
-                </div>
-                <router-link class="itbkk-manage-status p-2 bg-gray-300 rounded w-[150px] text-center duration-300 hover:bg-gray-400" :to="{ name: 'StatusView' }">Manage Status</router-link>
+            <!-- Status Page button -->
+            <div class="flex justify-end">
+                <router-link class="itbkk-manage-status text-white p-3 bg-slate-700 rounded w-[150px] text-center" :to="{ name: 'StatusView' }">Manage Status</router-link>
             </div>
-            <div class="text-2xl font-bold">
-                <h1>Hi!, {{ userAuthItem.name }}</h1>
-            </div>
-            <div class="flex w-full items-center justify-between font-xl font-bold text-white border-b border-gray-300 p-3 bg-blue-400 rounded">
+            <!-- Head of table -->
+            <div class="flex w-full items-center justify-between font-xl font-bold text-white p-3 bg-slate-600">
                 <p>Title</p>
                 <p>Assignees</p>
                 <div class="flex items-center space-x-1">
@@ -235,6 +238,7 @@ const removeFilter = async (r) => {
                     </div>
                 </div>
             </div>
+            <!-- Filter -->
             <div class="flex">
                 <div class="itbkk-status-filter dropdown dropdown-bottom">
                     <div tabindex="0" role="button" class="btn m-1">Filter Tasks</div>
@@ -255,7 +259,11 @@ const removeFilter = async (r) => {
                     </div>
                 </div>
             </div>
-            <div class="space-y-5">
+            <div class="w-full flex justify-center items-center space-y-5">
+                <div @click="router.push({ name: 'AddTask' })"
+                class="itbkk-button-add w-2/3 rounded-md p-5 bg-slate-200 text-slate-500 cursor-pointer duration-300 hover:bg-slate-300 hover:text-slate-700">
+                    + Add New Task
+                </div>
                 <div v-for="item in sortTask" :key="item.id" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded border">
                     <div class="absolute left-0 w-1 h-10" :class="styleStatus(item.status.name)"></div>
                     <div class="flex items-center space-x-3">
@@ -265,7 +273,8 @@ const removeFilter = async (r) => {
                                     :
                                 </p>
                                 <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-white rounded-box w-40">
-                                    <li><a class="itbkk-button-edit" @click="openEditPopup(item.id)">Edit</a></li>
+                                    <!-- NOTE: Edit must send params -->
+                                    <li><a class="itbkk-button-edit" @click="router.push({name: 'EditPopup'})">Edit</a></li>
                                     <li><a class="itbkk-button-delete" @click="openDeletePopup(item.id)">Delete</a></li>
                                 </ul>
                             </div>

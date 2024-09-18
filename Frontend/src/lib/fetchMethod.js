@@ -1,4 +1,5 @@
 import router from '@/router';
+import { jwtDecode } from "jwt-decode";
 
 async function getData(url) {
     const token = JSON.parse(localStorage.getItem('token'))
@@ -9,9 +10,6 @@ async function getData(url) {
                 'Authorization': `Bearer ${token.access_token}`
             }
         })
-        if(response.status === 401) {
-            router.push({ name : 'Login' })
-        }
         const result = await response.json()
         return result
     } catch (error) {
@@ -29,9 +27,6 @@ async function getDataById(url, id) {
                 'Authorization': `Bearer ${token.access_token}`
             }
         })
-        if(response.status === 401) {
-            router.push({ name : 'Login' })
-        }
         const result = await response.json()
         return result
     } catch (error) {
@@ -48,9 +43,6 @@ async function postData(url, task) {
             },
             body: JSON.stringify(task)
         })
-        if(response.status === 401) {
-            router.push({ name : 'Login' })
-        }
         return response
     } catch (error) {
         console.log(error)
@@ -67,9 +59,6 @@ async function updateData(url, task, id) {
             },
             body: JSON.stringify(task)
         })
-        if(response.status === 401) {
-            router.push({ name : 'Login' })
-        }
         return response
     } catch (error) {
         console.log(error)
@@ -82,9 +71,6 @@ async function deleteData(url, id) {
         const response = await fetch(finalURL, {
             method: "DELETE",
         })
-        if(response.status === 401) {
-            router.push({ name : 'Login' })
-        }
         return response
     } catch (error) {
         console.log(error)
@@ -97,9 +83,6 @@ async function transferData(url, oldId, newId) {
         const response = await fetch(finalURL, {
             method: "DELETE",
         })
-        if(response.status === 401) {
-            router.push({ name : 'Login' })
-        }
         return response
     } catch (error) {
         console.log(error)
@@ -121,11 +104,9 @@ async function postLogin(url, obj) {
         })
         if(response.status === 200) {
             const token = await response.text()
-            const tokenArr = token.split('.')
-            const tokenPayload = JSON.parse(atob(tokenArr[1]))
             // NOTE: Set to localstorage
             localStorage.setItem('token', token)
-            localStorage.setItem('payload', JSON.stringify(tokenPayload))
+            localStorage.setItem('payload', JSON.stringify(jwtDecode(token)))
         }
         return response
     } catch (error) {

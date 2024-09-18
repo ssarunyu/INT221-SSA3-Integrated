@@ -1,7 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+
+import HomeView from '@/views/HomeView.vue'
 import TaskDetail from '@/components/TaskDetail.vue'
+import AddPopup from '@/components/AddPopup.vue'
 import EditPopup from '@/components/EditPopup.vue'
+
 import EditStatusPopup from '@/components/EditStatusPopup.vue'
 
 import Notfound from '@/views/Notfound.vue'
@@ -9,6 +12,8 @@ import StatusView from '@/views/StatusView.vue'
 import LoginView from '@/views/LoginView.vue'
 import BoardView from '@/views/BoardView.vue'
 
+
+import { jwtDecode } from "jwt-decode";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,6 +32,7 @@ const router = createRouter({
     },
     { path: '/task', name: 'Home', component: HomeView,
       children: [
+        { path: 'add', name: 'AddTask', component: AddPopup},
         { path: ':detailId', name: 'TaskDetail', component: TaskDetail, },
         { path: ':editId/edit', name: 'EditPopup', component: EditPopup, },
       ]
@@ -56,6 +62,7 @@ function isTokenExpired(payload) {
 }
 
 // Navigation Guard
+// TODO: Not-Well form
 router.beforeEach((to, from, next) => {
   const token = JSON.parse(localStorage.getItem('token'))
   const payload = JSON.parse(localStorage.getItem('payload'))
@@ -68,10 +75,9 @@ router.beforeEach((to, from, next) => {
       return;
     }
   }
-  if (to.name !== 'Login' && !localStorage.getItem('token')) {
+  if (to.name !== 'Login' && !token) {
     next({ name: 'Login' })
-  }
-  else next()
+  } else next()
 })
 
 export default router

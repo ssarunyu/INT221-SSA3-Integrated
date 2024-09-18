@@ -2,6 +2,7 @@
 import { onMounted, computed, watch } from 'vue';
 import { getData } from '@/lib/fetchMethod';
 import { ref } from 'vue'
+import router from '@/router';
 
 const addTitle = ref('')
 const addDescription = ref(null)
@@ -62,6 +63,7 @@ const confirmHandle = () => {
 }
 
 const closeHandle = () => {
+  router.go(-1)
   emit('close')
   // Clear form when open again
   addTitle.value = ''
