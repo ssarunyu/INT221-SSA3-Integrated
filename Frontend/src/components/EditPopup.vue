@@ -1,34 +1,43 @@
 <script setup>
-import { ref } from "vue"
+import { getDataById, updateData } from "@/lib/fetchMethod";
+import { onMounted, ref } from "vue"
+import { useRoute } from 'vue-router'
+import router from '@/router';
+const route = useRoute()
+const disabled = ref(true)
+const itemData = ref()
+const toastHandle = ref()
+const emit = defineEmits(['updateTask', 'toastItem'])
 
-const props = defineProps({
-    itemData: {
-        type: Object
-    },
-    statusData: {
-      type: Object
-    }
+onMounted(async () => {
+  const response = await getDataById(import.meta.env.VITE_TASK_URL, route.params.editId)
+  if(response.status === 404) {
+    // NOTE: Give data to variables cause need to show the popup
+    itemData.value = await response
+    toastHandle.value = { type: 'error', status: true, message: `An error has occurred, the status does not exist` }
+    emit('toastItem', toastHandle.value)
+  } else {
+    itemData.value = await response
+  }
 })
 
-const disabled = ref(true)
-const emit = defineEmits(['close', 'update'])
-const closeHandle = () => {
-    disabled.value = true
-    emit('close')
+const updateHandle = async () => {
+  itemData.value.name = itemData.value.name ? itemData.value.name.trim() : itemData.value.name
+  itemData.value.description = itemData.value.description ? itemData.value.description.trim() : null
+  const response = await updateData(import.meta.env.VITE_STATUS_URL, itemData.value, route.params.editStatusId)
+  if(response.ok) {
+    emit('updateTask', itemData.value)
+    router.push({ name : 'HomeView' })
+  }
 }
 
-const updateHandle = () => {
-  props.itemData.title = props.itemData.title ? props.itemData.title.trim() : null
-  props.itemData.description = props.itemData.description ? props.itemData.description.trim() : null
-  props.itemData.assignees = props.itemData.assignees ? props.itemData.assignees.trim() : null
-  props.itemData.status = props.itemData.status
-  emit('update', props.itemData)
-  disabled.value = true
+const closeHandle = () => {
+  router.go(-1)
 }
 </script>
 
 <template>
-  <div v-if="props.itemData && props.statusData" class="fixed z-10 inset-0 overflow-y-auto">
+  <div v-if="itemData" class="fixed z-10 inset-0 overflow-y-auto">
     <div class="flex items-center justify-center h-screen">
       <!-- Overlay -->
       <div class="fixed inset-0 bg-gray-500 bg-opacity-75 backdrop-blur"></div>
@@ -57,7 +66,7 @@ const updateHandle = () => {
               <div class="flex items-center space-x-3 ">
                   <p>Status</p>
                   <select @change="disabled = false" class="itbkk-status rounded px-3 py-1 border border-gray-300" v-model="itemData.status" name="" id="">
-                    <option v-for="status in statusData" :value="status">{{ status.name }}</option>
+                    <option v-for="status in itemData" :value="status">{{ status.name }}</option>
                   </select>
               </div>
               <div class="flex flex-col">

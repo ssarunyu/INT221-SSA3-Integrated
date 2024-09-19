@@ -193,7 +193,7 @@ const controlDelete = async (statusId) => {
     </div>
     <div class="flex justify-center mt-5">
     <div
-        @click="addStatusShow = true"
+        @click="router.push({name: 'AddStatus'})"
         class="itbkk-button-add p-2 w-35 m-1 rounded-full cursor-pointer duration-300 bg-gray-200 hover:bg-gray-300 hover:scale-105 w-full max-w-screen-md text-center"
       >
         Add Status

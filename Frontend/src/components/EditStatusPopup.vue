@@ -12,7 +12,8 @@ const emit = defineEmits(['updateStatus', 'toastItem'])
 onMounted(async () => {
   const response = await getDataById(import.meta.env.VITE_STATUS_URL, route.params.editStatusId)
   if(response.status === 404) {
-    router.push({ name: 'StatusView' })
+    // NOTE: Give data to variables cause need to show the popup
+    itemData.value = await response
     toastHandle.value = { type: 'error', status: true, message: `An error has occurred, the status does not exist` }
     emit('toastItem', toastHandle.value)
   } else {

@@ -217,12 +217,11 @@ const removeFilter = async (r) => {
             <h1 class="font-bold text-2xl text-white">ITBKK SSA3 Taskboard</h1>
             <!-- NOTE: Need fix -->
             <div class="text-right text-white">
-                <h1 class="font-semibold">{{ userAuthItem.sub }}</h1>
+                <h1 class="font-semibold">{{ userAuthItem.name }}</h1>
                 <h1 class="text-xs">{{ userAuthItem.email }}</h1>
             </div>
         </div>
         <div class="flex flex-col">
-            <Toast :toastObject="toastHandle" @close="toastHandle.status = false"/>
             <!-- Status Page button -->
             <div class="flex justify-end">
                 <router-link class="itbkk-manage-status text-white p-3 bg-slate-700 rounded w-[150px] text-center" :to="{ name: 'StatusView' }">Manage Status</router-link>
@@ -243,39 +242,50 @@ const removeFilter = async (r) => {
                 <div class="itbkk-status-filter dropdown dropdown-bottom">
                     <div tabindex="0" role="button" class="btn m-1">Filter Tasks</div>
                     <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-white rounded-box w-52">
-                    <div class="text-blue-500 underline flex justify-end w-full my-2">
-                        <p class="cursor-pointer" @click="clearFilter">Clear all</p>
-                    </div>
-                    <div v-for="status in allStatusArr" class="flex justify-between p-2 rounded duration-300 hover:bg-gray-100 ">
-                        <button class="itbkk-status-choice" @click="submitFilter(status.name)">{{ status.name }}</button> 
-                    </div>
+                        <div class="text-blue-500 underline flex justify-end w-full my-2">
+                            <p class="cursor-pointer" @click="clearFilter">Clear all</p>
+                        </div>
+                        <div v-for="status in allStatusArr" class="flex justify-between p-2 rounded duration-300 hover:bg-gray-100 ">
+                            <button class="itbkk-status-choice" @click="submitFilter(status.name)">{{ status.name }}</button> 
+                        </div>
                     </ul>
                 </div>
                 <!-- Show already filter -->
                 <div class="flex items-center space-x-3 ml-4">
                     <div v-for="status in filterSelect" class="px-5 py-2 rounded bg-blue-200">
-                    {{ status }}
-                    <font-awesome-icon class="cursor-pointer" @click="removeFilter(status)" icon="fa-solid fa-xmark" />
+                        {{ status }}
+                        <font-awesome-icon class="cursor-pointer" @click="removeFilter(status)" icon="fa-solid fa-xmark" />
                     </div>
                 </div>
             </div>
             <div class="w-full flex flex-col justify-center items-center space-y-5">
                 <div @click="router.push({ name: 'AddTask' })"
                 class="itbkk-button-add w-2/3 rounded-md p-5 bg-slate-200 text-slate-500 cursor-pointer duration-300 hover:bg-slate-300 hover:text-slate-700">
-                    + Add New Task
-                </div>
-                <div v-for="item in sortTask" :key="item.id" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded border">
-                    <div class="absolute left-0 w-1 h-10" :class="styleStatus(item.status.name)"></div>
-                    <div class="flex items-center space-x-3">
-                        <div>
-                            <div class="dropdown itbkk-button-action">
-                                <p tabindex="0" role="button" class=" btn m-1 border-none font-bold text-2xl">
-                                    :
-                                </p>
-                                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-white rounded-box w-40">
-                                    <!-- NOTE: Edit must send params -->
-                                    <li><a class="itbkk-button-edit" @click="router.push({name: 'EditPopup'})">Edit</a></li>
-                                    <li><a class="itbkk-button-delete" @click="openDeletePopup(item.id)">Delete</a></li>
+                + Add New Task
+            </div>
+            <Toast :toastObject="toastHandle" @close="toastHandle.status = false"/>
+            <div v-for="item in sortTask" :key="item.id" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded border">
+                <div class="absolute left-0 w-1 h-10" :class="styleStatus(item.status.name)"></div>
+                <div class="flex items-center space-x-3">
+                    <div>
+                        <div class="dropdown itbkk-button-action">
+                            <p tabindex="0" role="button" class=" btn m-1 border-none font-bold text-2xl">
+                                :
+                            </p>
+                            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-white rounded-box w-40">
+                                <!-- NOTE: Edit must send params -->
+                                <li>
+                                    <a class="itbkk-button-edit"
+                                    @click="router.push({name: 'EditPopup', params: { editId: item.id }})">
+                                    Edit
+                                </a>
+                            </li>
+                            <li>
+                                        <a class="itbkk-button-delete"
+                                        @click="openDeletePopup(item.id)">
+                                        Delete
+                                        </a>
+                                    </li>
                                 </ul>
                             </div>
                         </div>

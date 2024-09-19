@@ -10,6 +10,11 @@ async function getData(url) {
                 'Authorization': `Bearer ${token.access_token}`
             }
         })
+        if(response.status === 401) {
+            localStorage.removeItem('token')
+            localStorage.removeItem('payload')
+            router.push({ name: 'Login' })
+        }
         const result = await response.json()
         return result
     } catch (error) {
@@ -27,6 +32,11 @@ async function getDataById(url, id) {
                 'Authorization': `Bearer ${token.access_token}`
             }
         })
+        if(response.status === 401) {
+            localStorage.removeItem('token')
+            localStorage.removeItem('payload')
+            router.push({ name: 'Login' })
+        }
         const result = await response.json()
         return result
     } catch (error) {
@@ -43,6 +53,11 @@ async function postData(url, task) {
             },
             body: JSON.stringify(task)
         })
+        if(response.status === 401) {
+            localStorage.removeItem('token')
+            localStorage.removeItem('payload')
+            router.push({ name: 'Login' })
+        }
         return response
     } catch (error) {
         console.log(error)
@@ -59,6 +74,11 @@ async function updateData(url, task, id) {
             },
             body: JSON.stringify(task)
         })
+        if(response.status === 401) {
+            localStorage.removeItem('token')
+            localStorage.removeItem('payload')
+            router.push({ name: 'Login' })
+        }
         return response
     } catch (error) {
         console.log(error)
@@ -71,6 +91,11 @@ async function deleteData(url, id) {
         const response = await fetch(finalURL, {
             method: "DELETE",
         })
+        if(response.status === 401) {
+            localStorage.removeItem('token')
+            localStorage.removeItem('payload')
+            router.push({ name: 'Login' })
+        }
         return response
     } catch (error) {
         console.log(error)
@@ -83,6 +108,11 @@ async function transferData(url, oldId, newId) {
         const response = await fetch(finalURL, {
             method: "DELETE",
         })
+        if(response.status === 401) {
+            localStorage.removeItem('token')
+            localStorage.removeItem('payload')
+            router.push({ name: 'Login' })
+        }
         return response
     } catch (error) {
         console.log(error)

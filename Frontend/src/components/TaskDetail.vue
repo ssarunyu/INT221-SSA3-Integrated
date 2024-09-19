@@ -17,7 +17,6 @@ onMounted(async () => {
   fetch.createdOn = new Date(fetch.createdOn).toLocaleString('en-AU', options)
   fetch.updatedOn = new Date(fetch.updatedOn).toLocaleString('en-AU', options)
   item.value = await fetch
-  
 })
 </script>
 

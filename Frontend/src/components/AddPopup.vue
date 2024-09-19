@@ -30,7 +30,6 @@ watch(addTitle, (valTitle) => {
   }
 })
 watch(addDescription, (valDesc) => {
-  console.log(valDesc.length)
   if(valDesc.length > 500 || valDesc === '') {
     disabled.value = false
   } else {

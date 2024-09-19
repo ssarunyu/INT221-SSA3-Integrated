@@ -5,6 +5,7 @@ import TaskDetail from '@/components/TaskDetail.vue'
 import AddPopup from '@/components/AddPopup.vue'
 import EditPopup from '@/components/EditPopup.vue'
 
+import AddStatusPopup from '@/components/AddStatusPopup.vue'
 import EditStatusPopup from '@/components/EditStatusPopup.vue'
 
 import Notfound from '@/views/Notfound.vue'
@@ -39,6 +40,7 @@ const router = createRouter({
     },
     { path: '/status', name: 'StatusView', component: StatusView,
       children: [
+        { path: 'add', name: 'AddStatus', component: AddStatusPopup},
         { path: ':editStatusId/edit', name: 'EditStatusPopup', component: EditStatusPopup },
       ],
     },
@@ -65,9 +67,7 @@ function isTokenExpired(payload) {
 // TODO: Not-Well form
 router.beforeEach((to, from, next) => {
   const token = JSON.parse(localStorage.getItem('token'))
-  console.log(token);
   const payload = JSON.parse(localStorage.getItem('payload'))
-  console.log(payload);
   
   if(token && payload) {
     if(isTokenExpired(payload)) {
