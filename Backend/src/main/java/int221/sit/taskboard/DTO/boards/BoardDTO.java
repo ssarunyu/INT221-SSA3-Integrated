@@ -1,5 +1,6 @@
-package int221.sit.taskboard.DTO;
+package int221.sit.taskboard.DTO.boards;
 
+import int221.sit.taskboard.DTO.UserListResponse;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.Getter;

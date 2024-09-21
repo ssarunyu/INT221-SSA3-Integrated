@@ -1,6 +1,6 @@
 package int221.sit.taskboard.services;
 
-import int221.sit.taskboard.DTO.*;
+import int221.sit.taskboard.DTO.tasks.*;
 import int221.sit.taskboard.entities.itbkk_db.Boards;
 import int221.sit.taskboard.entities.itbkk_db.StatusList;
 import int221.sit.taskboard.entities.itbkk_db.TaskList;
@@ -12,24 +12,21 @@ import int221.sit.taskboard.repositories.task.TaskListRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class TaskServiceV3 {
     @Autowired
-    private TaskListRepository repository;
+    private TaskListRepository taskRepository;
 
     @Autowired
-    public StatusListRepository statusListRepository;
+    public StatusListRepository statusRepository;
 
     @Autowired
     private BoardRepository boardRepository;
@@ -49,10 +46,13 @@ public class TaskServiceV3 {
         StatusList statusList;
 
         if (statusId != null) {
-            statusList = statusListRepository.findById(statusId)
+            statusList = statusRepository.findById(statusId)
                     .orElseThrow(() -> new BadRequestException("Status id " + statusId + " does not exist!"));
+            if (!statusList.getBoard().getBoardId().equals(boardId)) {
+                throw new BadRequestException("Status does not belong to the specified board!");
+            }
         } else {
-            statusList = statusListRepository.findById(1)
+            statusList = statusRepository.findById(1)
                     .orElseThrow(() -> new ItemNotFoundException("Default status does not exist!"));
         }
 
@@ -63,7 +63,7 @@ public class TaskServiceV3 {
         taskList.setUpdatedOn(ZonedDateTime.now());
 
         try {
-            TaskList savedTaskList = repository.saveAndFlush(taskList);
+            TaskList savedTaskList = taskRepository.saveAndFlush(taskList);
             TaskAndStatusObject taskAndStatusObject = new TaskAndStatusObject();
             taskAndStatusObject.setId(savedTaskList.getId());
             taskAndStatusObject.setTitle(savedTaskList.getTitle());
@@ -83,9 +83,9 @@ public class TaskServiceV3 {
     public List<TaskShortDetail> getAllTasksSortedAndFilterForBoard(String boardId, List<String> filterStatuses, String sortDirection, String sortBy) {
         List<TaskList> tasks;
         if ("desc".equalsIgnoreCase(sortDirection)) {
-            tasks = repository.findAllByBoardIdOrderAndFilterByDesc(boardId, filterStatuses, sortBy);
+            tasks = taskRepository.findAllByBoardIdOrderAndFilterByDesc(boardId, filterStatuses, sortBy);
         } else {
-            tasks = repository.findAllByBoardIdOrderAndFilterByAsc(boardId, filterStatuses, sortBy);
+            tasks = taskRepository.findAllByBoardIdOrderAndFilterByAsc(boardId, filterStatuses, sortBy);
         }
         List<TaskShortDetail> taskDTOs = new ArrayList<>();
         for (TaskList task : tasks) {
@@ -102,7 +102,7 @@ public class TaskServiceV3 {
 
     @Transactional("taskBoardTransactionManager")
     public TaskListDetail getTaskById(String boardId, Integer taskId) {
-        TaskList taskList = repository.findByBoardIdAndTaskId(boardId, taskId)
+        TaskList taskList = taskRepository.findByBoardIdAndTaskId(boardId, taskId)
                 .orElseThrow(() -> new ItemNotFoundException("Task id " + taskId + " does not exist!"));
 
         TaskListDetail taskListDetail = modelMapper.map(taskList, TaskListDetail.class);
@@ -122,7 +122,7 @@ public class TaskServiceV3 {
             throw new BadRequestException("Title must not be null");
         }
 
-        TaskList taskListUpdated = repository.findById(id)
+        TaskList taskListUpdated = taskRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Task id " + id + " does not exist!"));
 
         taskListUpdated.setTitle(newTaskListDto.getTitle());
@@ -130,12 +130,15 @@ public class TaskServiceV3 {
         taskListUpdated.setAssignees(newTaskListDto.getAssignees());
 
         if (statusId != null) {
-            StatusList statusList = statusListRepository.findById(statusId)
+            StatusList statusList = statusRepository.findById(statusId)
                     .orElseThrow(() -> new BadRequestException("Status id " + statusId + " does not exist!"));
+            if (!statusList.getBoard().getBoardId().equals(boardId)) {
+                throw new BadRequestException("Status does not belong to the specified board!");
+            }
             taskListUpdated.setStatus(statusList);
         }
 
-        TaskList updatedTaskList = repository.saveAndFlush(taskListUpdated);
+        TaskList updatedTaskList = taskRepository.saveAndFlush(taskListUpdated);
 
         return convertToDTO(updatedTaskList); // ใช้เมธอดแปลงข้อมูลที่เขียนด้วยมือ
     }
@@ -157,7 +160,7 @@ public class TaskServiceV3 {
     @Transactional("taskBoardTransactionManager")
     public TaskShortDetail removeTaskById(String boardId, Integer taskId) {
         // ค้นหา TaskList โดย id
-        TaskList taskList = repository.findById(taskId)
+        TaskList taskList = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ItemNotFoundException("Task id " + taskId + " does not exist!"));
 
         // ตรวจสอบว่า TaskList เป็นของ boardId ที่กำหนดหรือไม่
@@ -169,11 +172,35 @@ public class TaskServiceV3 {
         TaskShortDetail deletedTaskListDto = modelMapper.map(taskList, TaskShortDetail.class);
 
         // ลบ TaskList
-        repository.delete(taskList);
+        taskRepository.delete(taskList);
 
         // ส่งคืน TaskShortDetail ที่แปลงแล้ว
         return deletedTaskListDto;
     }
 
+    @Transactional("taskBoardTransactionManager")
+    public List<TaskAndStatusObjShort> transferTasking(String boardId, Integer statusId, Integer statusNewId) {
+        StatusList status = statusRepository.findByIdAndBoard(statusId, boardId)
+                .orElseThrow(() -> new ItemNotFoundException("Status id " + statusId + " does not exist for board " + boardId));
+        StatusList newStatus = statusRepository.findByIdAndBoard(statusNewId, boardId)
+                .orElseThrow(() -> new BadRequestException("The specified status id " + statusNewId + " for task transfer does not exist!"));
+
+        List<TaskList> tasksToTransfer = taskRepository.findByStatusIdAndBoard(statusId, boardId);
+
+        List<TaskAndStatusObjShort> transferredTasks = tasksToTransfer.stream().map(task -> {
+            task.setStatus(newStatus);
+
+            TaskAndStatusObjShort dto = new TaskAndStatusObjShort();
+            dto.setId(task.getId());
+            dto.setTitle(task.getTitle());
+            dto.setDescription(task.getDescription());
+            dto.setAssignees(task.getAssignees());
+            dto.setStatus(newStatus);
+            return dto;
+        }).collect(Collectors.toList());
+
+        taskRepository.saveAll(tasksToTransfer);
+        return transferredTasks;
+    }
 
 }

@@ -38,6 +38,9 @@ public class StatusList {
     @Column(name = "updated_on")
     private ZonedDateTime updatedOn;
 
+    @Column(name = "statusColor")
+    private String statusColor;
+
     @ManyToOne
     @JoinColumn(name = "boardId")
     @JsonIgnore

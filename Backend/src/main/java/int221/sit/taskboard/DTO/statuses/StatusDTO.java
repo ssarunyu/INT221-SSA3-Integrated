@@ -1,4 +1,4 @@
-package int221.sit.taskboard.DTO;
+package int221.sit.taskboard.DTO.statuses;
 
 import lombok.Data;
 import lombok.Getter;

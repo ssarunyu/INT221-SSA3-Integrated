@@ -1,7 +1,7 @@
 package int221.sit.taskboard.services;
 
-import int221.sit.taskboard.DTO.BoardDTO;
-import int221.sit.taskboard.DTO.BoardForCreated;
+import int221.sit.taskboard.DTO.boards.BoardDTO;
+import int221.sit.taskboard.DTO.boards.BoardForCreated;
 import int221.sit.taskboard.DTO.UserListResponse;
 import int221.sit.taskboard.Jwt.JwtTokenUtil;
 import int221.sit.taskboard.entities.itbkk_db.Boards;
@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class BoardService {

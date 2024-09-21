@@ -1,4 +1,4 @@
-package int221.sit.taskboard.DTO;
+package int221.sit.taskboard.DTO.tasks;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 

@@ -1,6 +1,9 @@
 package int221.sit.taskboard.services;
 
-import int221.sit.taskboard.DTO.*;
+import int221.sit.taskboard.DTO.tasks.TaskAndStatusInt;
+import int221.sit.taskboard.DTO.tasks.TaskAndStatusObject;
+import int221.sit.taskboard.DTO.tasks.TaskListDetail;
+import int221.sit.taskboard.DTO.tasks.TaskShortDetail;
 import int221.sit.taskboard.entities.itbkk_db.StatusList;
 import int221.sit.taskboard.entities.itbkk_db.TaskList;
 import int221.sit.taskboard.exceptions.*;

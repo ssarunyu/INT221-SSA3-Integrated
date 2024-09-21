@@ -1,4 +1,4 @@
-package int221.sit.taskboard.DTO;
+package int221.sit.taskboard.DTO.tasks;
 
 import int221.sit.taskboard.entities.itbkk_db.StatusList;
 import lombok.Data;

@@ -1,7 +1,5 @@
 package int221.sit.taskboard.repositories.task;
 
-import int221.sit.taskboard.entities.itbkk_db.Boards;
-import int221.sit.taskboard.entities.itbkk_db.StatusList;
 import int221.sit.taskboard.entities.itbkk_db.TaskList;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -52,5 +50,13 @@ public interface TaskListRepository extends JpaRepository<TaskList, Integer> {
 
     @Query("SELECT t FROM TaskList t WHERE t.board.boardId = :boardId AND t.id = :taskId")
     Optional<TaskList> findByBoardIdAndTaskId(@Param("boardId") String boardId, @Param("taskId") Integer taskId);
+
+    @Query("SELECT t.status.id, COUNT(t) FROM TaskList t WHERE t.board.boardId = :boardId GROUP BY t.status.id")
+    List<Object[]> countTasksByStatusForBoard(@Param("boardId") String boardId);
+
+    boolean existsByStatusId(Integer statusId);
+
+    @Query("SELECT t FROM TaskList t WHERE t.status.id = :statusId AND t.board.boardId = :boardId")
+    List<TaskList> findByStatusIdAndBoard(@Param("statusId") Integer statusId, @Param("boardId") String boardId);
 
 }

@@ -1,7 +1,7 @@
 package int221.sit.taskboard.controller;
 
-import int221.sit.taskboard.DTO.BoardDTO;
-import int221.sit.taskboard.DTO.BoardForCreated;
+import int221.sit.taskboard.DTO.boards.BoardDTO;
+import int221.sit.taskboard.DTO.boards.BoardForCreated;
 import int221.sit.taskboard.Jwt.JwtTokenUtil;
 import int221.sit.taskboard.entities.itbkk_db.Boards;
 import int221.sit.taskboard.entities.itbkk_db.UserList;

@@ -17,9 +17,6 @@ public class StatusListService {
     @Autowired
     private StatusListRepository repository;
 
-    @Autowired
-    private ModelMapper modelMapper;
-
     public List<StatusList> getALl() {
         return repository.findAll();
     }
@@ -72,7 +69,7 @@ public class StatusListService {
             throw new ItemNotFoundException("Status id " + id + " does not exist!");
         }
 
-        if (statusList.getName().equals("No Status") || "Done".equals(statusList.getName())){
+        if (statusList.getName().equals("No Status") || statusList.getName().equals("DONE")){
             throw new BadRequestException("Cannot be delete Status Id : " + id + ", (No Status, Done)");
         }
 

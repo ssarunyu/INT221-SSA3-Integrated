@@ -1,15 +1,13 @@
 package int221.sit.taskboard.controller;
 
-import int221.sit.taskboard.DTO.TaskAndStatusInt;
-import int221.sit.taskboard.DTO.TaskAndStatusObject;
-import int221.sit.taskboard.DTO.TaskListDetail;
-import int221.sit.taskboard.DTO.TaskShortDetail;
-import int221.sit.taskboard.entities.itbkk_db.TaskList;
+import int221.sit.taskboard.DTO.tasks.TaskAndStatusInt;
+import int221.sit.taskboard.DTO.tasks.TaskAndStatusObject;
+import int221.sit.taskboard.DTO.tasks.TaskListDetail;
+import int221.sit.taskboard.DTO.tasks.TaskShortDetail;
 import int221.sit.taskboard.exceptions.BadRequestException;
 import int221.sit.taskboard.exceptions.ItemNotFoundException;
 import int221.sit.taskboard.services.BoardService;
 import int221.sit.taskboard.services.StatusListService;
-import int221.sit.taskboard.services.TaskListService;
 import int221.sit.taskboard.services.TaskServiceV3;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
