@@ -69,6 +69,16 @@ public class StatusServiceV3 {
     }
 
     @Transactional("taskBoardTransactionManager")
+    public List<StatusList> getStatusByIdAndBoardId(String boardId, Integer statusId) {
+        List<StatusList> status = statusRepository.findStatusByIdAndBoard(statusId, boardId);
+        if (status == null) {
+            throw new ItemNotFoundException("Status " + statusId + "is not found!, please try again.");
+        }
+        System.out.println(status);
+        return status;
+    }
+
+    @Transactional("taskBoardTransactionManager")
     public StatusList addNewStatus(String boardId, StatusList newStatus){
 
         if(newStatus.getName() != null || !newStatus.getName().isEmpty()) {

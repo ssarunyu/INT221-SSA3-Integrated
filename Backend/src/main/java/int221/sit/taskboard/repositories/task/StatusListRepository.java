@@ -19,6 +19,9 @@ public interface StatusListRepository extends JpaRepository<StatusList, Integer>
     @Query("SELECT s FROM StatusList s WHERE s.id = :statusId AND s.board.boardId = :boardId")
     Optional<StatusList> findByIdAndBoard(Integer statusId, String boardId);
 
+    @Query("SELECT s FROM StatusList s WHERE s.id = :statusId AND s.board.boardId = :boardId")
+    List<StatusList> findStatusByIdAndBoard(Integer statusId, String boardId);
+
     @Modifying
     @Transactional
     @Query("DELETE FROM StatusList s WHERE s.id = :statusId AND s.board.boardId = :boardId")

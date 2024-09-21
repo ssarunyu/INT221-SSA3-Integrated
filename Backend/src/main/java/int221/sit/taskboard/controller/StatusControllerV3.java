@@ -37,9 +37,15 @@ public class StatusControllerV3 {
     }
 
     //ใช้ status name ในการแสดงเฉพาะ status ที่ต้องการ
-    @GetMapping("/{board_id}/statuses/{status_name}")
-    public List<StatusList> getStatusByName(@PathVariable("board_id") String boardId, @PathVariable("status_name") String statusName) {
-        return statusService.getStatusByNameAndBoardId(boardId, statusName);
+//    @GetMapping("/{board_id}/statuses/{status_name}")
+//    public List<StatusList> getStatusByName(@PathVariable("board_id") String boardId, @PathVariable("status_name") String statusName) {
+//        return statusService.getStatusByNameAndBoardId(boardId, statusName);
+//    }
+
+    //ใช้ status id ในการแสดงเฉพาะ status ที่ต้องการ
+    @GetMapping("/{board_id}/statuses/{status_id}")
+    public List<StatusList> getStatusById(@PathVariable("board_id") String boardId, @PathVariable("status_id") Integer statusId) {
+        return statusService.getStatusByIdAndBoardId(boardId, statusId);
     }
 
     //สร้าง status ของบอร์ดนั้นๆ
