@@ -36,7 +36,7 @@ public class TaskList {
     private Boards board;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name ="statusId", referencedColumnName = "statusId")
     private StatusList status;
 

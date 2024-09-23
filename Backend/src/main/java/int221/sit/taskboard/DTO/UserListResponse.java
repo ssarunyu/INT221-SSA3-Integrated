@@ -9,8 +9,9 @@ import lombok.Setter;
 @Setter
 @Data
 public class UserListResponse {
+    private String userId;
     private String username;
     private String name;
     private String email;
-    private Users.Role role;
+//    private Users.Role role;
 }

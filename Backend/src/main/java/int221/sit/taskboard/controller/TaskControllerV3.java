@@ -1,9 +1,12 @@
 package int221.sit.taskboard.controller;
 
+import int221.sit.taskboard.DTO.boards.BoardDTO;
 import int221.sit.taskboard.DTO.tasks.TaskAndStatusInt;
 import int221.sit.taskboard.DTO.tasks.TaskAndStatusObject;
 import int221.sit.taskboard.DTO.tasks.TaskListDetail;
 import int221.sit.taskboard.DTO.tasks.TaskShortDetail;
+import int221.sit.taskboard.Jwt.JwtTokenUtil;
+import int221.sit.taskboard.exceptions.AccessDeniedException;
 import int221.sit.taskboard.exceptions.BadRequestException;
 import int221.sit.taskboard.exceptions.ItemNotFoundException;
 import int221.sit.taskboard.services.BoardService;
@@ -33,6 +36,9 @@ public class TaskControllerV3 {
 
     @Autowired
     private TaskServiceV3 service;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @PostMapping("/{board_id}/tasks")
     public ResponseEntity<TaskAndStatusObject> addNewTask(@PathVariable String board_id,
@@ -67,32 +73,125 @@ public class TaskControllerV3 {
     }
 
     @GetMapping("/{board_id}/tasks")
-    public List<TaskShortDetail> getAllTasks(
+    public ResponseEntity<Object> getAllTasks(
             @PathVariable("board_id") String boardId,
+            @RequestHeader("Authorization") String token,
             @RequestParam(value = "status", required = false) List<String> statuses,
             @RequestParam(value = "sortDirection", defaultValue = "asc") String sortDirection,
             @RequestParam(value = "sortBy", defaultValue = "createdOn") String sortBy) {
-        return service.getAllTasksSortedAndFilterForBoard(boardId, statuses, sortDirection, sortBy);
+
+        // ดึง userId จาก JWT token
+        String jwtToken = token.substring(7);
+        String userId = jwtTokenUtil.getUserIdFromToken(jwtToken);
+
+        // ตรวจสอบบอร์ดและดึงข้อมูลบอร์ด
+        BoardDTO boardDTO = boardService.getBoardById(boardId);
+
+        // ถ้าไม่เจอบอร์ด ให้ส่ง response ว่าไม่พบข้อมูล
+        if (boardDTO == null) {
+            throw new ItemNotFoundException("Board not found !!!");
+        }
+
+        // ตรวจสอบว่าผู้ใช้เป็นเจ้าของบอร์ดหรือไม่
+        boolean isOwner = boardDTO.getOwner().getUserId().equals(userId);
+        boolean isPublic = "public".equalsIgnoreCase(boardDTO.getVisibility());
+
+        // ถ้าบอร์ดเป็น private และผู้ใช้ไม่ใช่เจ้าของ ให้ส่ง response ว่า access denied
+        if (!isOwner && !isPublic) {
+            throw new AccessDeniedException("Access denied!!");
+        }
+
+        // ถ้าผู้ใช้มีสิทธิ์เข้าถึงบอร์ดนี้ ให้ดึง task list และส่งข้อมูลกลับไป
+        List<TaskShortDetail> tasks = service.getAllTasksSortedAndFilterForBoard(boardId, statuses, sortDirection, sortBy);
+        return ResponseEntity.ok(tasks);
     }
 
-    @GetMapping("/{board_id}/task/{task_id}")
-    public TaskListDetail getTaskById(@PathVariable("board_id") String boardId, @PathVariable("task_id") Integer taskId) {
-        return service.getTaskById(boardId, taskId);
+    @GetMapping("/{board_id}/tasks/{task_id}")
+    public ResponseEntity<Object> getTaskById(@PathVariable("board_id") String boardId,
+                                      @RequestHeader("Authorization") String token,
+                                      @PathVariable("task_id") Integer taskId) {
+        // ดึง userId จาก JWT token
+        String jwtToken = token.substring(7);
+        String userId = jwtTokenUtil.getUserIdFromToken(jwtToken);
+
+        // ตรวจสอบบอร์ดและดึงข้อมูลบอร์ด
+        BoardDTO boardDTO = boardService.getBoardById(boardId);
+
+        // ถ้าไม่เจอบอร์ด ให้ส่ง response ว่าไม่พบข้อมูล
+        if (boardDTO == null) {
+            throw new ItemNotFoundException("Board not found !!!");
+        }
+
+        // ตรวจสอบว่าผู้ใช้เป็นเจ้าของบอร์ดหรือไม่
+        boolean isOwner = boardDTO.getOwner().getUserId().equals(userId);
+        boolean isPublic = "public".equalsIgnoreCase(boardDTO.getVisibility());
+
+        // ถ้าบอร์ดเป็น private และผู้ใช้ไม่ใช่เจ้าของ ให้ส่ง response ว่า access denied
+        if (!isOwner && !isPublic) {
+            throw new AccessDeniedException("Access denied!!");
+        }
+        // ดึง task ตาม boardId และ taskId
+        TaskListDetail task = service.getTaskById(boardId, taskId);
+
+        // ถ้าไม่เจอ task ให้โยนข้อผิดพลาดว่าไม่พบ task
+        if (task == null) {
+            throw new ItemNotFoundException("Task not found !!!");
+        }
+
+        return ResponseEntity.ok(task);
     }
 
-    @PutMapping("/{board_id}/task/{task_id}")
-    public ResponseEntity<TaskAndStatusObject> updateTask(@Valid @PathVariable("board_id") String boardId, @PathVariable Integer task_id, @RequestBody TaskAndStatusInt taskLists) {
-        try {
-            Integer status = taskLists.getStatus();
-            TaskAndStatusObject updatedTask = service.updateTaskListById(boardId, task_id, taskLists, status);
+    @PutMapping("/{board_id}/tasks/{task_id}")
+    public ResponseEntity<TaskAndStatusObject> updateTask(@Valid @PathVariable("board_id") String boardId,
+                                                          @PathVariable Integer task_id,
+                                                          @RequestBody TaskAndStatusInt taskLists,
+                                                          @RequestHeader("Authorization") String token) {
+
+        String jwtToken = token.substring(7);
+        String userId = jwtTokenUtil.getUserIdFromToken(jwtToken);
+        BoardDTO boardDTO = boardService.getBoardById(boardId);
+
+        if (boardDTO == null) {
+            throw new ItemNotFoundException("Board not found");
+        }
+
+        boolean isOwner = boardDTO.getOwner() != null && boardDTO.getOwner().getUserId().equals(userId);
+
+        if (!isOwner) {
+            // ถ้าผู้ใช้ไม่ใช่เจ้าของบอร์ด ขว้างข้อยกเว้น
+            throw new AccessDeniedException("You are not authorized to update this task");
+        }
+
+        Integer status = taskLists.getStatus();
+        TaskAndStatusObject updatedTask = service.updateTaskListById(boardId, task_id, taskLists, status);
+
+        if(updatedTask != null) {
             return ResponseEntity.ok(updatedTask);
-        } catch (ItemNotFoundException e) {
+        } else {
             throw new ItemNotFoundException("Task is not found");
         }
     }
 
-    @DeleteMapping("/{board_id}/task/{task_id}")
-    public ResponseEntity<TaskShortDetail> deletedTaskListById(@Valid @PathVariable("board_id") String boardId, @PathVariable Integer task_id) {
+    @DeleteMapping("/{board_id}/tasks/{task_id}")
+    public ResponseEntity<TaskShortDetail> deletedTaskListById(@Valid @PathVariable("board_id") String boardId,
+                                                               @PathVariable Integer task_id,
+                                                               @RequestHeader("Authorization") String token) {
+
+        String jwtToken = token.substring(7);
+        String userId = jwtTokenUtil.getUserIdFromToken(jwtToken);
+        BoardDTO boardDTO = boardService.getBoardById(boardId);
+
+        if (boardDTO == null) {
+            throw new ItemNotFoundException("Board not found");
+        }
+
+        boolean isOwner = boardDTO.getOwner() != null && boardDTO.getOwner().getUserId().equals(userId);
+
+        if (!isOwner) {
+            // ถ้าผู้ใช้ไม่ใช่เจ้าของบอร์ด ขว้างข้อยกเว้น
+            throw new AccessDeniedException("You are not authorized to update this task");
+        }
+
         TaskShortDetail deletedTaskListDto = service.removeTaskById(boardId, task_id);
         return ResponseEntity.ok().body(deletedTaskListDto);
     }

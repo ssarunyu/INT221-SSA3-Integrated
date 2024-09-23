@@ -11,5 +11,5 @@ import lombok.Setter;
 public class BoardShortDetail {
     private String boardId;
     private String boardName;
-    private UserList ownerUsername;
+    private String ownerUsername;
 }

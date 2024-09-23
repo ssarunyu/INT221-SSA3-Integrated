@@ -8,6 +8,8 @@ import int221.sit.taskboard.entities.itbkk_db.Boards;
 import int221.sit.taskboard.entities.itbkk_db.SharedBoard;
 import int221.sit.taskboard.entities.itbkk_db.StatusList;
 import int221.sit.taskboard.entities.itbkk_db.UserList;
+import int221.sit.taskboard.exceptions.BadRequestException;
+import int221.sit.taskboard.exceptions.ItemNotFoundException;
 import int221.sit.taskboard.repositories.auth.UserRepository;
 import int221.sit.taskboard.repositories.task.BoardRepository;
 import int221.sit.taskboard.repositories.task.SharedBoardRepository;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,6 +53,8 @@ public class BoardService {
     ModelMapper modelMapper;
 
     private final List<String> defaultStatuses = List.of("TODO", "DOING", "DONE", "NO STATUS");
+    private final String defaultDescription = "Default description";
+    private final String defaultStatusColor = "#FFFFFF";
 
     @Transactional("taskBoardTransactionManager")
     public BoardForCreated createBoard(BoardForCreated bfc, String token) {
@@ -63,9 +68,20 @@ public class BoardService {
 
         Boards newBoard = new Boards();
         newBoard.setBoardName(bfc.getName());
-        newBoard.setOwnerId(owner.getUserListId()); // Set the owner ID
-        newBoard.setCreatedOn(ZonedDateTime.now()); // Set created time
-        newBoard.setUpdatedOn(ZonedDateTime.now()); // Set updated time
+        newBoard.setOwnerId(owner.getUserListId());
+        newBoard.setCreatedOn(ZonedDateTime.now());
+        newBoard.setUpdatedOn(ZonedDateTime.now());
+
+        if (bfc.getVisibility() != null &&
+                ("private".equalsIgnoreCase(bfc.getVisibility()) || "public".equalsIgnoreCase(bfc.getVisibility()))) {
+            newBoard.setBoardVisibility(Boards.Visibility.valueOf(bfc.getVisibility().toUpperCase()));
+        } else if (bfc.getVisibility() == null) {
+            // ตั้งค่าเริ่มต้นให้ visibility เป็น private
+            newBoard.setBoardVisibility(Boards.Visibility.PRIVATE);
+        } else {
+            throw new IllegalArgumentException("Invalid visibility value, must be 'private' or 'public'");
+        }
+
         boardRepository.save(newBoard);
 
         SharedBoard sharedBoard = new SharedBoard();
@@ -77,6 +93,8 @@ public class BoardService {
             StatusList status = new StatusList();
             status.setName(statusName);
             status.setBoard(newBoard);
+            status.setDescription(defaultDescription);
+            status.setStatusColor(defaultStatusColor);
             status.setCreatedOn(ZonedDateTime.now());
             status.setUpdatedOn(ZonedDateTime.now());
             statusListRepository.save(status);
@@ -85,6 +103,7 @@ public class BoardService {
         BoardForCreated resultDTO = new BoardForCreated();
         resultDTO.setId(newBoard.getBoardId());
         resultDTO.setName(newBoard.getBoardName());
+        resultDTO.setVisibility(newBoard.getBoardVisibility().toString());
 
         UserListResponse ownerResponse = modelMapper.map(owner, UserListResponse.class);
         resultDTO.setOwner(ownerResponse);
@@ -100,16 +119,26 @@ public class BoardService {
     }
 
     private BoardDTO convertToDTO(Boards board) {
-        BoardDTO boardDTO = new BoardDTO();
-        boardDTO.setBoardId(board.getBoardId());
-        boardDTO.setBoardName(board.getBoardName());
-        UserListResponse owner = userService.getUserById(board.getOwnerId());
-        boardDTO.setOwner(owner);
+        BoardDTO boardDTO = modelMapper.map(board, BoardDTO.class);
+
+        SharedBoard sharedBoard = sharedBoardRepository.findByBoard(board);
+        if (sharedBoard != null && sharedBoard.getOwner() != null) {
+            UserList owner = sharedBoard.getOwner();
+            UserListResponse ownerResponse = new UserListResponse();
+            ownerResponse.setUserId(owner.getUserListId());
+            ownerResponse.setUsername(owner.getUsername());
+            ownerResponse.setName(owner.getName());
+            ownerResponse.setEmail(owner.getEmail());
+
+            boardDTO.setOwner(ownerResponse);
+        } else {
+            boardDTO.setOwner(null);
+        }
 
         return boardDTO;
     }
 
-    public BoardDTO getBoardById(String boardId, String userId) {
+    public BoardDTO getBoardByIdAndUser(String boardId, String userId) {
         // ค้นหา board ตาม boardId
         Boards board = boardRepository.findByBoardId(boardId);
         if (board == null) {
@@ -128,6 +157,40 @@ public class BoardService {
         UserListResponse ownerResponse = modelMapper.map(owner, UserListResponse.class);
         boardDTO.setOwner(ownerResponse);
         // คืนค่า BoardDTO
+        return boardDTO;
+    }
+
+    public BoardDTO getBoardById(String boardId) {
+        // ดึงข้อมูลบอร์ดจาก boardId โดยไม่ต้องกรอง userId
+        Optional<Boards> optionalBoard = boardRepository.findById(boardId);
+
+        // ถ้าไม่มีบอร์ดให้ throw ข้อผิดพลาด
+        if (!optionalBoard.isPresent()) {
+            throw new ItemNotFoundException("Board not found !!!");
+        }
+
+        Boards board = optionalBoard.get();
+
+        // แปลงข้อมูลจาก Boards ไปเป็น BoardDTO
+        BoardDTO boardDTO = modelMapper.map(board, BoardDTO.class);
+
+        // ดึงข้อมูล SharedBoard เพื่อนำข้อมูล owner มา
+        SharedBoard sharedBoard = sharedBoardRepository.findByBoard(board);
+        if (sharedBoard != null && sharedBoard.getOwner() != null) {
+            UserList owner = sharedBoard.getOwner();
+            UserListResponse ownerResponse = new UserListResponse();
+            ownerResponse.setUserId(owner.getUserListId()); // ตั้งค่า userId
+            ownerResponse.setUsername(owner.getUsername());
+            ownerResponse.setName(owner.getName());
+            ownerResponse.setEmail(owner.getEmail());
+
+            // ตั้งค่า owner ให้กับ BoardDTO
+            boardDTO.setOwner(ownerResponse);
+        } else {
+            // ถ้าไม่มี owner
+            throw new BadRequestException("Invalid board");
+        }
+
         return boardDTO;
     }
 

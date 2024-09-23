@@ -32,6 +32,14 @@ public class Boards {
     @Column(name = "owner_id")
     private String ownerId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "visibility")
+    private Visibility boardVisibility;
+
+    public enum Visibility {
+        PRIVATE, PUBLIC
+    }
+
     @OneToMany(mappedBy = "board")
     @JsonIgnore
     private List<SharedBoard> sharedBoards;

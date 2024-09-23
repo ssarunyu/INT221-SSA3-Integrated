@@ -1,5 +1,7 @@
 package int221.sit.taskboard.services;
 
+import int221.sit.taskboard.DTO.boards.BoardDTO;
+import int221.sit.taskboard.DTO.boards.BoardShortDetail;
 import int221.sit.taskboard.DTO.tasks.*;
 import int221.sit.taskboard.entities.itbkk_db.Boards;
 import int221.sit.taskboard.entities.itbkk_db.StatusList;
@@ -33,6 +35,9 @@ public class TaskServiceV3 {
 
     @Autowired
     public ModelMapper modelMapper;
+
+    @Autowired
+    private BoardService boardService;
 
     @Transactional("taskBoardTransactionManager")
     public TaskAndStatusObject createNewTask(TaskAndStatusInt newTaskListDto, String boardId, Integer statusId) {
@@ -106,6 +111,14 @@ public class TaskServiceV3 {
                 .orElseThrow(() -> new ItemNotFoundException("Task id " + taskId + " does not exist!"));
 
         TaskListDetail taskListDetail = modelMapper.map(taskList, TaskListDetail.class);
+
+        BoardShortDetail boardShortDetail = taskListDetail.getBoard();
+        BoardDTO boardDTO = boardService.getBoardById(boardId);
+        if (boardDTO != null && boardDTO.getOwner() != null) {
+            boardShortDetail.setOwnerUsername(boardDTO.getOwner().getUsername());
+        }
+        taskListDetail.setBoard(boardShortDetail);
+
         return taskListDetail;
     }
 

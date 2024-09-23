@@ -14,5 +14,6 @@ public class BoardDTO {
     private String boardId;
     @Size(max = 120)
     private String boardName;
+    private String visibility;
     private UserListResponse owner;
 }
