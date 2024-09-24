@@ -6,11 +6,13 @@ import int221.sit.taskboard.DTO.tasks.TaskAndStatusObject;
 import int221.sit.taskboard.DTO.tasks.TaskListDetail;
 import int221.sit.taskboard.DTO.tasks.TaskShortDetail;
 import int221.sit.taskboard.Jwt.JwtTokenUtil;
+import int221.sit.taskboard.entities.itbkk_db.StatusList;
 import int221.sit.taskboard.exceptions.AccessDeniedException;
 import int221.sit.taskboard.exceptions.BadRequestException;
 import int221.sit.taskboard.exceptions.ItemNotFoundException;
 import int221.sit.taskboard.services.BoardService;
 import int221.sit.taskboard.services.StatusListService;
+import int221.sit.taskboard.services.StatusServiceV3;
 import int221.sit.taskboard.services.TaskServiceV3;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -32,7 +34,7 @@ public class TaskControllerV3 {
     private BoardService boardService;
 
     @Autowired
-    private StatusListService statusService;
+    private StatusServiceV3 statusService;
 
     @Autowired
     private TaskServiceV3 service;
@@ -162,8 +164,19 @@ public class TaskControllerV3 {
             throw new AccessDeniedException("You are not authorized to update this task");
         }
 
-        Integer status = taskLists.getStatus();
-        TaskAndStatusObject updatedTask = service.updateTaskListById(boardId, task_id, taskLists, status);
+        Integer statusId = taskLists.getStatus();
+
+        // ตรวจสอบว่าค่า statusId เป็น null หรือไม่ และตั้งค่าเป็น "No Status" หากเป็น null หรือว่างเปล่า
+        if (statusId == null || statusId == 0) {
+            List<StatusList> noStatus = statusService.getStatusByNameAndBoardId(boardId, "No Status");
+            if (noStatus != null && !noStatus.isEmpty()) {
+                statusId = noStatus.get(0).getId();// ตั้งค่า statusId เป็น "No Status"
+            } else {
+                throw new ItemNotFoundException("No Status not found in the system");
+            }
+        }
+
+        TaskAndStatusObject updatedTask = service.updateTaskListById(boardId, task_id, taskLists, statusId);
 
         if(updatedTask != null) {
             return ResponseEntity.ok(updatedTask);

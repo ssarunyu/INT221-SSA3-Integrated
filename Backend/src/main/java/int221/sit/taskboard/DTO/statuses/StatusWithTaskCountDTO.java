@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class StatusWithTaskCountDTO {
     private Integer id;
-    private String statusName;
+    private String name;
     private String boardId;
     private String taskCount;
 }

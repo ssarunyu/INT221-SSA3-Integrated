@@ -119,7 +119,12 @@ public class BoardService {
     }
 
     private BoardDTO convertToDTO(Boards board) {
-        BoardDTO boardDTO = modelMapper.map(board, BoardDTO.class);
+        BoardDTO boardDTO = new BoardDTO();
+
+        // แมปฟิลด์ทีละฟิลด์จาก Boards ไปยัง BoardDTO
+        boardDTO.setId(board.getBoardId()); // map boardId
+        boardDTO.setBoardName(board.getBoardName()); // map boardName
+        boardDTO.setVisibility(board.getBoardVisibility().toString()); // map visibility
 
         SharedBoard sharedBoard = sharedBoardRepository.findByBoard(board);
         if (sharedBoard != null && sharedBoard.getOwner() != null) {
@@ -172,7 +177,10 @@ public class BoardService {
         Boards board = optionalBoard.get();
 
         // แปลงข้อมูลจาก Boards ไปเป็น BoardDTO
-        BoardDTO boardDTO = modelMapper.map(board, BoardDTO.class);
+        BoardDTO boardDTO = new BoardDTO();
+        boardDTO.setId(board.getBoardId()); // map boardId
+        boardDTO.setBoardName(board.getBoardName()); // map boardName
+        boardDTO.setVisibility(board.getBoardVisibility().toString()); // map visibility
 
         // ดึงข้อมูล SharedBoard เพื่อนำข้อมูล owner มา
         SharedBoard sharedBoard = sharedBoardRepository.findByBoard(board);

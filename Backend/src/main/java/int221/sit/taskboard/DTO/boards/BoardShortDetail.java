@@ -12,4 +12,5 @@ public class BoardShortDetail {
     private String boardId;
     private String boardName;
     private String ownerUsername;
+    private String visibility;
 }

@@ -134,7 +134,7 @@ public class StatusControllerV3 {
         }
 
         StatusList statusList = statusService.addNewStatus(boardId, newStatus);
-        return ResponseEntity.ok(statusList);
+        return ResponseEntity.status(HttpStatus.CREATED).body(statusList);
     }
 
     //แก้ไข status โดยรับ id ของ status นั้นมา

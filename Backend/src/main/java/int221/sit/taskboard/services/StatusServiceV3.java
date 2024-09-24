@@ -64,7 +64,6 @@ public class StatusServiceV3 {
         if (status == null || status.isEmpty()) {
             throw new ItemNotFoundException("Status " + statusName + "is not found!, please try again.");
         }
-        System.out.println(status);
         return status;
     }
 
@@ -74,7 +73,6 @@ public class StatusServiceV3 {
         if (status == null) {
             throw new ItemNotFoundException("Status " + statusId + "is not found!, please try again.");
         }
-        System.out.println(status);
         return status;
     }
 
@@ -89,6 +87,10 @@ public class StatusServiceV3 {
             newStatus.setBoard(board);
             newStatus.setCreatedOn(ZonedDateTime.now());
             newStatus.setUpdatedOn(ZonedDateTime.now());
+
+            if (newStatus.getStatusColor() == null || newStatus.getStatusColor().isEmpty()) {
+                newStatus.setStatusColor("#FFFFFF");
+            }
 
             return statusRepository.saveAndFlush(newStatus);
         } else {
@@ -112,6 +114,10 @@ public class StatusServiceV3 {
             existingStatus.setDescription(newStatus.getDescription());
             existingStatus.setStatusColor(newStatus.getStatusColor());
             existingStatus.setUpdatedOn(ZonedDateTime.now());
+
+            if (existingStatus.getStatusColor() == null || existingStatus.getStatusColor().isEmpty()) {
+                existingStatus.setStatusColor("#FFFFFF");
+            }
 
             return statusRepository.saveAndFlush(existingStatus);
         } else {

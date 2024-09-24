@@ -4,6 +4,7 @@ import int221.sit.taskboard.exceptions.NotCreatedException;
 import int221.sit.taskboard.services.JwtUserDetailsService;
 import int221.sit.taskboard.exceptions.BadRequestException;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -56,6 +57,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 return;
             }   catch (SignatureException ex) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT signature " + ex.getMessage());
+                return;
+            }   catch (MalformedJwtException ex) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Malformed JWT token");
                 return;
             }
         }

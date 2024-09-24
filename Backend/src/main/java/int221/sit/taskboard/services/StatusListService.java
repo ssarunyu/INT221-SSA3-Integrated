@@ -5,7 +5,6 @@ import int221.sit.taskboard.exceptions.BadRequestException;
 import int221.sit.taskboard.exceptions.ItemNotFoundException;
 import int221.sit.taskboard.repositories.task.StatusListRepository;
 import org.springframework.transaction.annotation.Transactional;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -16,6 +15,8 @@ import java.util.List;
 public class StatusListService {
     @Autowired
     private StatusListRepository repository;
+    @Autowired
+    private StatusListRepository statusListRepository;
 
     public List<StatusList> getALl() {
         return repository.findAll();
@@ -81,4 +82,5 @@ public class StatusListService {
 
         return ResponseEntity.ok(statusList);
     }
+
 }
