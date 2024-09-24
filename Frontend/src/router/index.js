@@ -21,7 +21,7 @@ const router = createRouter({
   routes: [
     { path: '/login',
       name: 'Login',
-      component: LoginView,
+      component: BoardView,
     },
     {
       path: '/',
@@ -29,7 +29,7 @@ const router = createRouter({
       redirect: { name: 'Login' }
     },
     {
-      path: '/board', name: 'Board', component: BoardView
+      path: '/board', name: 'Board', component: BoardView,
     },
     { path: '/task', name: 'Home', component: HomeView,
       children: [
