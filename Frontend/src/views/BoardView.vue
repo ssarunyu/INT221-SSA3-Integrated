@@ -1,23 +1,17 @@
 <script setup>
 import router from '@/router';
-
-// const addBoardPopup = ref(false)
-const openBoardPopup = () => {
-    addBoardPopup.value = true
-}
-const closeBoardPopup = () => {
-    addBoardPopup.value = false
-}
 </script>
 
 <template>
+    <!-- To show the popup -->
+    <router-view></router-view>
     <div class="w-full h-screen">
         <!-- TITLE -->
         <div class="title bg-slate-800 text-white">
             <h1 class="text-2xl font-bold p-5 text-center">ITBKK-SSA3 Board</h1>
         </div>
         <div class="w-full flex flex-col justify-between items-center space-y-5">
-            <div @click="openBoardPopup"
+            <div @click="router.push({ name: 'AddBoard' })"
                 class="itbkk-button-add rounded-md p-5 bg-slate-200 text-slate-500 cursor-pointer duration-300 hover:bg-slate-300 hover:text-slate-700 ">
                 + Add New Board
             </div>

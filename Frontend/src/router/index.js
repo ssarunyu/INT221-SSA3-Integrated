@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { jwtDecode } from "jwt-decode";
 
 import HomeView from '@/views/HomeView.vue'
 import TaskDetail from '@/components/TaskDetail.vue'
@@ -10,18 +11,19 @@ import EditStatusPopup from '@/components/EditStatusPopup.vue'
 
 import Notfound from '@/views/Notfound.vue'
 import StatusView from '@/views/StatusView.vue'
+
 import LoginView from '@/views/LoginView.vue'
+
 import BoardView from '@/views/BoardView.vue'
-
-
-import { jwtDecode } from "jwt-decode";
+import AddBoardPopup from '@/components/AddBoardPopup.vue'
+import BoardDetail from '@/views/BoardDetail.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     { path: '/login',
       name: 'Login',
-      component: BoardView,
+      component: LoginView,
     },
     {
       path: '/',
@@ -30,6 +32,10 @@ const router = createRouter({
     },
     {
       path: '/board', name: 'Board', component: BoardView,
+      children: [
+        { path: 'add', name: 'AddBoard', component: AddBoardPopup },
+        { path: ':boardId', name: 'BoardDetail', component: BoardDetail}
+      ]
     },
     { path: '/task', name: 'Home', component: HomeView,
       children: [
@@ -65,22 +71,22 @@ function isTokenExpired(payload) {
 
 // Navigation Guard
 // TODO: Not-Well form
-router.beforeEach((to, from, next) => {
-  const token = JSON.parse(localStorage.getItem('token'))
-  const payload = JSON.parse(localStorage.getItem('payload'))
+// router.beforeEach((to, from, next) => {
+//   const token = JSON.parse(localStorage.getItem('token'))
+//   const payload = JSON.parse(localStorage.getItem('payload'))
   
-  if(token && payload) {
-    if(isTokenExpired(payload)) {
-      // If token expired remove from localStorage
-      localStorage.removeItem('token')
-      localStorage.removeItem('payload')
-      next({ name: 'Login' })
-      return;
-    }
-  }
-  if (to.name !== 'Login' && !token) {
-    next({ name: 'Login' })
-  } else next()
-})
+//   if(token && payload) {
+//     if(isTokenExpired(payload)) {
+//       // If token expired remove from localStorage
+//       localStorage.removeItem('token')
+//       localStorage.removeItem('payload')
+//       next({ name: 'Login' })
+//       return;
+//     }
+//   }
+//   if (to.name !== 'Login' && !token) {
+//     next({ name: 'Login' })
+//   } else next()
+// })
 
 export default router

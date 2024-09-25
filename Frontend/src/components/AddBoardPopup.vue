@@ -1,41 +1,13 @@
 <script setup>
-import { onMounted } from 'vue';
-import { getData } from '@/lib/fetchMethod';
 import router from '@/router';
-import { add } from 'cypress/types/lodash';
-
-const addBoardName = ref('')
-
-const emit = defineEmits(['confirm', 'close'])
-
-onMounted(async () => {
-    await fetchStatus()
-})
-
-const disabled = ref(false)
-
-const fetchStatus = async () => {
-    const response = await getData(import.meta.env.VITE_STATUS_URL)
-    allStatus.value = await response
-}
-
-const confirmHandle = () => {
-    const newBoard = {
-        title: addBoardName.value ? addBoardName.trim() : null
-    }
-    emit('confirm', newBoard) 
-    addBoardName.value = ''
-}
-
+const payload = JSON.parse(localStorage.getItem('payload'))
+import { ref } from 'vue'
+const addTitle = ref(`${payload.name} personal board`)
 const closeHandle = () => {
     router.go(-1)
-    emit('close')
-    // Clear form when open again
-    addBoardName.value = ''
-    disabled.value = false
 }
 </script>
- 
+
 <template>
     <div class="fixed z-10 inset-0 overflow-y-auto">
         <div class="flex items-center justify-center h-screen">
@@ -46,7 +18,7 @@ const closeHandle = () => {
                 <!-- Popup content -->
                 <div class="flex flex-col p-5">
                     <form class="space-y-5" novalidate>
-                        <h2 class="text-2xl font-bold mb-4">Add Task</h2>
+                        <h2 class="text-2xl font-bold mb-4">Create new board</h2>
                         <hr>
                         <div class="flex flex-col">
                             <p class="font-semibold">Name</p>

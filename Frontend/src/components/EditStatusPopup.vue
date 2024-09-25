@@ -46,7 +46,7 @@ const closeHandle = () => {
         <!-- Popup content -->
         <div class="flex flex-col p-5">
           <form class="space-y-5">
-              <h2 class="text-2xl font-bold mb-4">Edit Task</h2>
+              <h2 class="text-2xl font-bold mb-4">Edit Status</h2>
               <hr>
               <div class="flex flex-col">
                   <p class="font-semibold">Name</p>
