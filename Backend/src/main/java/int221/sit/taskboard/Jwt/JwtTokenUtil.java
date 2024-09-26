@@ -24,6 +24,9 @@ public class JwtTokenUtil implements Serializable {
     @Value("#{${jwt.max-token-interval-hour}*60*60*1000}")
     private int JWT_TOKEN_VALIDITY;
 
+    @Value("#{${jwt.refresh-token-interval-hour}*60*60*1000}") // กำหนดอายุ refresh token เป็น 24 ชั่วโมง
+    private int JWT_REFRESH_TOKEN_VALIDITY;
+
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
@@ -73,6 +76,30 @@ public class JwtTokenUtil implements Serializable {
                 .setIssuer("https://intproj23.sit.kmutt.ac.th/ssa3/")
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
+                .signWith(signatureAlgorithm, SECRET_KEY)
+                .compact();
+    }
+
+    // Method เพื่อสร้าง refresh token โดยใช้ข้อมูลจาก token หลัก
+    public String generateRefreshTokenFromToken(String token) {
+        // ดึงข้อมูลจาก token หลัก
+        Claims claims = getAllClaimsFromToken(token);
+        // ตรวจสอบว่าหมดอายุหรือไม่ (ในที่นี้จะยังใช้ได้แม้หมดอายุ)
+        // ไม่จำเป็นต้องเช็คว่า token หลักหมดอายุแล้วหรือไม่ เนื่องจากเราต้องการใช้ข้อมูลภายใน
+        // ใช้ข้อมูลที่ดึงมาเพื่อสร้าง refresh token
+        Map<String, Object> refreshClaims = new HashMap<>(claims);
+
+        // ตั้งค่า expired ของ refresh token เป็น 24 ชั่วโมง
+        return doGenerateRefreshToken(refreshClaims, claims.getSubject());
+    }
+
+    private String doGenerateRefreshToken(Map<String, Object> claims, String name) {
+        return Jwts.builder()
+                .setHeaderParam("typ", "JWT")
+                .setClaims(claims)
+                .setIssuer("https://intproj23.sit.kmutt.ac.th/ssa3/")
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_REFRESH_TOKEN_VALIDITY))
                 .signWith(signatureAlgorithm, SECRET_KEY)
                 .compact();
     }

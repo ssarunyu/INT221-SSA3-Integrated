@@ -51,7 +51,8 @@ public class AuthController {
             }
 
             String token = jwtTokenUtil.generateToken(user);
-            ResponseToken responseToken = new ResponseToken(token);
+            String refreshToken = jwtTokenUtil.generateRefreshTokenFromToken(token);
+            ResponseToken responseToken = new ResponseToken(token, refreshToken);
 
             return ResponseEntity.ok(responseToken);
 

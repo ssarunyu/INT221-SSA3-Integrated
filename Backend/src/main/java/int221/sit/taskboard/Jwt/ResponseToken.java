@@ -9,6 +9,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ResponseToken {
     private final String access_token;
-
+    private final String refresh_token;
 }
 
