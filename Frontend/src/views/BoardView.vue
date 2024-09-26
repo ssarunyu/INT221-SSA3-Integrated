@@ -1,5 +1,12 @@
 <script setup>
+import { getData } from '@/lib/fetchMethod';
 import router from '@/router';
+import { onMounted } from 'vue';
+
+onMounted(async () => {
+    // Get all board of that user
+    const result = await getData('http://localhost:8080/v3/boards')
+})
 </script>
 
 <template>
@@ -29,76 +36,6 @@ import router from '@/router';
                     <div class="flex flex-col items-center rounded">
                         <h5 class="text-xs my-2">Total Tasks</h5>
                         <h5 class="font-bold text-xl">21</h5>
-                    </div>
-                </div>
-            </div>
-            <!-- Each Card -->
-            <div class="w-1/4 bg-white shadow-md rounded-lg cursor-pointer duration-300 hover:bg-slate-100">
-                <div class="p-5 flex justify-between items-center">
-                    <div>
-                        <a href="#">
-                            <h5 class="text-2xl font-bold tracking-tight text-gray-900">Board 2</h5>
-                        </a>
-                    </div>
-                    <div class="flex flex-col items-center rounded">
-                        <h5 class="text-xs my-2">Total Tasks</h5>
-                        <h5 class="font-bold text-xl">1</h5>
-                    </div>
-                </div>
-            </div>
-            <!-- Each Card -->
-            <div class="w-1/4 bg-white shadow-md rounded-lg cursor-pointer duration-300 hover:bg-slate-100">
-                <div class="p-5 flex justify-between items-center">
-                    <div>
-                        <a href="#">
-                            <h5 class="text-2xl font-bold tracking-tight text-gray-900">Board 3</h5>
-                        </a>
-                    </div>
-                    <div class="flex flex-col items-center rounded">
-                        <h5 class="text-xs my-2">Total Tasks</h5>
-                        <h5 class="font-bold text-xl">101</h5>
-                    </div>
-                </div>
-            </div>
-            <!-- Each Card -->
-            <div class="w-1/4 bg-white shadow-md rounded-lg cursor-pointer duration-300 hover:bg-slate-100">
-                <div class="p-5 flex justify-between items-center">
-                    <div>
-                        <a href="#">
-                            <h5 class="text-2xl font-bold tracking-tight text-gray-900">Board 4</h5>
-                        </a>
-                    </div>
-                    <div class="flex flex-col items-center rounded">
-                        <h5 class="text-xs my-2">Total Tasks</h5>
-                        <h5 class="font-bold text-xl">45</h5>
-                    </div>
-                </div>
-            </div>
-            <!-- Each Card -->
-            <div class="w-1/4 bg-white shadow-md rounded-lg cursor-pointer duration-300 hover:bg-slate-100">
-                <div class="p-5 flex justify-between items-center">
-                    <div>
-                        <a href="#">
-                            <h5 class="text-2xl font-bold tracking-tight text-gray-900">Board 5</h5>
-                        </a>
-                    </div>
-                    <div class="flex flex-col items-center rounded">
-                        <h5 class="text-xs my-2">Total Tasks</h5>
-                        <h5 class="font-bold text-xl">30</h5>
-                    </div>
-                </div>
-            </div>
-            <!-- Each Card -->
-            <div class="w-1/4 bg-white shadow-md rounded-lg cursor-pointer duration-300 hover:bg-slate-100">
-                <div class="p-5 flex justify-between items-center">
-                    <div>
-                        <a href="#">
-                            <h5 class="text-2xl font-bold tracking-tight text-gray-900">Board 6</h5>
-                        </a>
-                    </div>
-                    <div class="flex flex-col items-center rounded">
-                        <h5 class="text-xs my-2">Total Tasks</h5>
-                        <h5 class="font-bold text-xl">18</h5>
                     </div>
                 </div>
             </div>

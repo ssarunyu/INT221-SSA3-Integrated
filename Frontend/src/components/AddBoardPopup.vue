@@ -1,8 +1,20 @@
 <script setup>
 import router from '@/router';
-const payload = JSON.parse(localStorage.getItem('payload'))
+import { postBoard } from '@/lib/fetchMethod';
 import { ref } from 'vue'
-const addTitle = ref(`${payload.name} personal board`)
+
+const payload = JSON.parse(localStorage.getItem('payload'))
+const addTitle = ref(`asdsadsa`)
+const visibility = ref('PRIVATE')
+
+const createNewBoard = async () => {
+    const newBoard = { name: addTitle.value, visibility: visibility.value }
+    const result = await postBoard('http://localhost:8080/v3/boards')
+    if(result.status === 200) {
+        router.push({ name: 'Home', params: { boardId: result.id }})
+    }
+}
+
 const closeHandle = () => {
     router.go(-1)
 }
@@ -24,7 +36,7 @@ const closeHandle = () => {
                             <p class="font-semibold">Name</p>
                             <input v-model="addTitle"
                                 class="itbkk-board-name border border-black rounded p-2 peer invalid:border-red-500 focus:outline-none"
-                                type="text" required>
+                                type="text" required maxlength="120">
                             <p class="hidden peer-invalid:block text-red-600 text-sm">
                                 This field required
                             </p>
@@ -32,9 +44,9 @@ const closeHandle = () => {
                     </form>
                     <div class="mt-5 space-x-5">
                         <div class="mt-5 space-x-5">
-                            <button @click="confirmHandle()" :disabled="!disabled"
+                            <button @click="createNewBoard"
                                 class="itbkk-button-ok disabled bg-green-500 duration-200 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded disabled:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50">
-                                Save
+                                Create
                             </button>
                             <button @click="closeHandle()"
                                 class="itbkk-button-cancel disabled bg-red-500 duration-200 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded">

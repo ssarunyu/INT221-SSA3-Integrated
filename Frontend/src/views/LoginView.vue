@@ -17,14 +17,16 @@ const userLogin = async () => {
   }
   try {
     const res = await postLogin(import.meta.env.VITE_AUTH_URL, user.value)
+    console.log(res)
     if (res.ok) {
-      router.push({ name: 'Home' })
+      router.push({ name: 'Board' })
     } else {
       userIncorrect.value = "Username or Password is incorrect"
     }
   } catch (error) {
-    userIncorrect.value = "Username or Password is incorrect"
+    console.log(error)
   }
+  
 
 }
 </script>

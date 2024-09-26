@@ -34,22 +34,29 @@ const router = createRouter({
       path: '/board', name: 'Board', component: BoardView,
       children: [
         { path: 'add', name: 'AddBoard', component: AddBoardPopup },
-        { path: ':boardId', name: 'BoardDetail', component: BoardDetail}
+        { path: ':boardId', name: 'Home', component: HomeView,
+          children: [
+            // 1. First child is task
+            { path: 'task', name: 'Home', component: HomeView,
+              children: [
+                { path: 'add', name: 'AddTask', component: AddPopup },
+                { path: ':taskId/edit', name: 'EditTask', component: EditPopup }
+              ]
+            },
+            // 2. Second child is status
+            // TODO: More method of status
+            { path: 'status', name: 'StausView', component: StatusView }
+          ]
+
+        }
       ]
     },
-    { path: '/task', name: 'Home', component: HomeView,
-      children: [
-        { path: 'add', name: 'AddTask', component: AddPopup},
-        { path: ':detailId', name: 'TaskDetail', component: TaskDetail, },
-        { path: ':editId/edit', name: 'EditPopup', component: EditPopup, },
-      ]
-    },
-    { path: '/status', name: 'StatusView', component: StatusView,
-      children: [
-        { path: 'add', name: 'AddStatus', component: AddStatusPopup},
-        { path: ':editStatusId/edit', name: 'EditStatusPopup', component: EditStatusPopup },
-      ],
-    },
+    // { path: '/status', name: 'StatusView', component: StatusView,
+    //   children: [
+    //     { path: 'add', name: 'AddStatus', component: AddStatusPopup},
+    //     { path: ':editStatusId/edit', name: 'EditStatusPopup', component: EditStatusPopup },
+    //   ],
+    // },
     {
       path: '/404',
       name: 'Notfound',

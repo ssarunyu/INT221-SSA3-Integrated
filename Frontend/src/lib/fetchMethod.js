@@ -22,6 +22,25 @@ async function getData(url) {
     }
 }
 
+async function postBoard(url, newBoard) {
+    const token = JSON.parse(localStorage.getItem('token'))
+    console.log(token.access_token)
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token.access_token}`,
+                body: JSON.stringify(newBoard)
+            }
+        })
+        const result = await response.json()
+        console.log(result)
+        return result
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 async function getDataById(url, id) {
     const finalURL = `${url}/${id}`
     const token = JSON.parse(localStorage.getItem('token'))
@@ -133,10 +152,11 @@ async function postLogin(url, obj) {
             )
         })
         if(response.status === 200) {
-            const token = await response.text()
+            const token = await response.json()
+            console.log(token)
             // NOTE: Set to localstorage
-            localStorage.setItem('token', token)
-            localStorage.setItem('payload', JSON.stringify(jwtDecode(token)))
+            localStorage.setItem('token', JSON.stringify(token))
+            localStorage.setItem('payload', JSON.stringify(jwtDecode(token.access_token)))
         }
         return response
     } catch (error) {
@@ -144,4 +164,4 @@ async function postLogin(url, obj) {
     }
 }
 
-export { getData, getDataById, postData, updateData, deleteData, transferData, postLogin}
+export { getData, getDataById, postData, updateData, deleteData, transferData, postLogin, postBoard}

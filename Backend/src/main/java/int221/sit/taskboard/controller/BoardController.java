@@ -26,6 +26,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/v3")
+@CrossOrigin(origins = "http://localhost:5173")
 public class BoardController {
 
     @Autowired
@@ -79,7 +80,7 @@ public class BoardController {
     }
 
     @PostMapping("/boards")
-    public ResponseEntity<BoardForCreated> createBoard(@Valid @RequestBody(required = false) BoardForCreated bfc, HttpServletRequest request) {
+    public ResponseEntity<BoardForCreated> createBoard(@RequestBody(required = false) BoardForCreated bfc, HttpServletRequest request) {
         if (bfc == null) {
             throw new BadRequestException("Please fill in the board information completely!");
         }
