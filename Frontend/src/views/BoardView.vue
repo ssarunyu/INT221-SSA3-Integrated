@@ -3,6 +3,7 @@ import { getData } from '@/lib/fetchMethod';
 import router from '@/router';
 import { onMounted } from 'vue';
 
+
 onMounted(async () => {
     // Get all board of that user
     const result = await getData('http://localhost:8080/v3/boards')
