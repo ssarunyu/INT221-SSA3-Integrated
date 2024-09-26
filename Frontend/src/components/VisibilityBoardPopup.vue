@@ -44,11 +44,11 @@ const cancelBoard = () => {
                     to change the visibility to Public?
                 </p>
                 <div class="flex justify-end space-x-3">
-                    <button @click="cancelChange()"
+                    <button @click="confirmBoard()"
                         class="itbkk-button-cancel bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
                         Cancel
                     </button>
-                    <button @click="confirmChange()" :disabled="!disabled"
+                    <button @click="cancelBoard()"
                         class="itbkk-button-confirm bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
                         Confirm
                     </button>
