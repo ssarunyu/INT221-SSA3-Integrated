@@ -14,6 +14,8 @@ import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
 
@@ -58,5 +60,9 @@ public class UserService {
 
     public Users getUserByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    public Optional<Users> findById(String userId) {
+        return userRepository.findById(userId);
     }
 }

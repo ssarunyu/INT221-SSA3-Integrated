@@ -65,10 +65,10 @@ public class JwtTokenUtil implements Serializable {
         claims.put("oid", userInfo.getUserId());
         claims.put("email", userInfo.getEmail());
         claims.put("role", userInfo.getRole());
-        return doGenerateToken(claims, userInfo.getName());
+        return doGenerateToken(claims);
     }
 
-    private String doGenerateToken(Map<String, Object> claims, String subject) {
+    private String doGenerateToken(Map<String, Object> claims) {
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT")
                 .setClaims(claims)
@@ -102,6 +102,15 @@ public class JwtTokenUtil implements Serializable {
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_REFRESH_TOKEN_VALIDITY))
                 .signWith(signatureAlgorithm, SECRET_KEY)
                 .compact();
+    }
+
+    public String generateTokenWithClaims(Claims claims) {
+        Map<String, Object> tokenClaims = new HashMap<>();
+        tokenClaims.put("sub", claims.getSubject());
+        tokenClaims.put("oid", claims.get("oid"));
+        tokenClaims.put("iss", claims.getIssuer());
+        tokenClaims.put("email", claims.get("email"));
+        return doGenerateToken(tokenClaims);
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {

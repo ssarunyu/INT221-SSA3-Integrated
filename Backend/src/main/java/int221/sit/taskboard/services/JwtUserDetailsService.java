@@ -3,12 +3,12 @@ package int221.sit.taskboard.services;
 import int221.sit.taskboard.Jwt.AuthUser;
 import int221.sit.taskboard.entities.itbkk_db.UserList;
 import int221.sit.taskboard.entities.itbkk_shared.Users;
+import int221.sit.taskboard.exceptions.UsernameNotFoundException;
 import int221.sit.taskboard.repositories.auth.UserRepository;
 import int221.sit.taskboard.repositories.task.UserListRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
@@ -26,7 +26,7 @@ public class JwtUserDetailsService implements UserDetailsService {
         Users user = userRepository.findByUsername(userName);
 
         if (user == null) {
-            throw new UsernameNotFoundException("The Username or Password is incorrect");
+            throw new UsernameNotFoundException("The Username or Password is incorrect !!!");
         }
 
         UserList userList = new UserList();
@@ -40,4 +40,6 @@ public class JwtUserDetailsService implements UserDetailsService {
 
         return new AuthUser(user.getUsername(), user.getPassword());
     }
+
+
 }

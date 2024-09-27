@@ -34,7 +34,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(csrf -> csrf.disable())
                 .authorizeRequests(authorize -> authorize
-                        .requestMatchers("/login", "/decode-token").permitAll()
+                        .requestMatchers("/login", "/decode-token", "/token").permitAll()
                         .requestMatchers("/v2/**").authenticated()
                         .requestMatchers("/v3/**").authenticated())
                         .exceptionHandling(exception -> exception
