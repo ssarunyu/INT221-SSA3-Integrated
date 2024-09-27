@@ -1,5 +1,6 @@
 package int221.sit.taskboard.Jwt;
 
+import int221.sit.taskboard.exceptions.CustomUsernameNotFoundException;
 import int221.sit.taskboard.exceptions.NotCreatedException;
 import int221.sit.taskboard.services.JwtUserDetailsService;
 import int221.sit.taskboard.exceptions.BadRequestException;
@@ -60,6 +61,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 return;
             }   catch (MalformedJwtException ex) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Malformed JWT token");
+                return;
+            } catch (CustomUsernameNotFoundException ex) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
                 return;
             }
         }

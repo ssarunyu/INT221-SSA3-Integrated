@@ -82,8 +82,6 @@ public class AuthController {
             responseBody.put("access_token", accessToken);
 
             return ResponseEntity.ok(responseBody);
-        }catch (UsernameNotFoundException e) {
-            throw e;
         } catch (Exception e) {
             throw new NotCreatedException("Refresh token failed!");
         }

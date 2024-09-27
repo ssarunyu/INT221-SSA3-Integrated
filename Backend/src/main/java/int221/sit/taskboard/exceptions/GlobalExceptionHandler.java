@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
+@ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpServletRequest request) {
@@ -165,9 +166,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(UsernameNotFoundException.class)
+    @ExceptionHandler(CustomUsernameNotFoundException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(UsernameNotFoundException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(CustomUsernameNotFoundException ex, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 ZonedDateTime.now(),
                 HttpStatus.UNAUTHORIZED.value(),
