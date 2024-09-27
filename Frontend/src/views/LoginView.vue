@@ -33,7 +33,7 @@ const userLogin = async () => {
 
 <template>
   <div class="grid grid-cols-2 h-screen">
-    <div class="flex items-center justify-center bg-white backdrop-blur-md">
+    <div class="flex flex-col justify-center items-center bg-white backdrop-blur-md h-full">
       <div class="p-8 max-w-md w-full">
         <div class="mb-6">
           <!-- title -->
@@ -69,7 +69,7 @@ const userLogin = async () => {
     </div>
     <div class="md:block">
       <!-- <p class="bg-black h-full w-full object-cover"></p> -->
-      <img src="../assets/abyan-athif-K0U0eSAjFGU-unsplash.jpg" alt="sky" class="h-full w-full object-cover">
+      <img src="../assets/abyan-athif-K0U0eSAjFGU-unsplash.jpg" alt="sky" class="h-screen w-full object-cover">
     </div>
   </div>
 </template>

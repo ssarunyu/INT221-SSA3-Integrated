@@ -30,14 +30,15 @@ async function postBoard(url, newBoard) {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token.access_token}`,
-                body: JSON.stringify(newBoard)
-            }
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newBoard)
         })
-        const result = await response.json()
-        console.log(result)
-        return result
+        const result = await response.json();
+        return { status: response.status, data: result };
     } catch (error) {
-        console.log(error)
+        console.error('Error in postBoard:', error);
+        throw error;
     }
 }
 
