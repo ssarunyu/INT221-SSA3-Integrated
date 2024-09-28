@@ -1,17 +1,20 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import { getData } from "@/lib/fetchMethod";
-import router from "@/router";
-import AddBoardPopup from "@/components/AddBoardPopup.vue"; // Import the popup
+import { ref, onMounted } from 'vue';
+import { getData } from '@/lib/fetchMethod';
+import AddBoardPopup from '@/components/AddBoardPopup.vue';
+import UserInfoPopup from '@/components/UserInfoPopup.vue';
+
+const userAuthItem = JSON.parse(localStorage.getItem('payload'));
 
 const boards = ref([]);
 const showAddBoardPopup = ref(false);
+const showUserInfoPopup = ref(false);
 
 const fetchBoards = async () => {
   try {
-    boards.value = await getData("http://localhost:8080/v3/boards");
+    boards.value = await getData('http://localhost:8080/v3/boards');
   } catch (error) {
-    console.error("Error fetching boards:", error);
+    console.error('Error fetching boards:', error);
   }
 };
 
@@ -30,15 +33,43 @@ const closeAddBoardPopup = () => {
 const refreshBoards = async () => {
   await fetchBoards();
 };
+
+const openUserInfoPopup = () => {
+  showUserInfoPopup.value = true;
+};
+
+
+const closeUserInfoPopup = () => {
+  showUserInfoPopup.value = false;
+};
+
+const handleLogout = () => {
+  localStorage.removeItem('payload');
+  router.push('/login');
+};
 </script>
 
 <template>
   <router-view></router-view>
   <div class="w-full h-screen bg-gray-100">
     <!-- TITLE -->
-    <div class="title bg-slate-800 text-white shadow-md">
-      <h1 class="text-2xl font-bold p-5 text-center">ITBKK-SSA3 Board</h1>
+    <div
+      class="title bg-slate-800 text-white shadow-md flex justify-between items-center px-5"
+    >
+      <h1 class="text-2xl font-bold py-5">ITBKK-SSA3 Board</h1>
+
+      <!-- User Profile Section -->
+      <div class="flex items-center space-x-4">
+        <span class="text-white font-medium">{{ userAuthItem.name }}</span>
+        <img
+          src="@/assets/user-circle-1.svg"
+          alt="User Profile"
+          class="w-10 h-10 rounded-full object-cover cursor-pointer"
+          @click="openUserInfoPopup">
+      </div>
     </div>
+
+    <!-- Main Content -->
     <div class="w-full flex flex-col justify-between items-center space-y-5">
       <div
         @click="openAddBoardPopup"
@@ -47,6 +78,7 @@ const refreshBoards = async () => {
         + Add New Board
       </div>
     </div>
+
     <!-- CARDS SECTION -->
     <div class="flex flex-wrap justify-center mt-5 items-center gap-5">
       <template v-for="board in boards" :key="board.id">
@@ -74,10 +106,19 @@ const refreshBoards = async () => {
         </div>
       </template>
     </div>
+
+    <!-- Add Board Popup -->
     <AddBoardPopup
       v-if="showAddBoardPopup"
       @close="closeAddBoardPopup"
       @createNewBoard="refreshBoards"
+    />
+
+    <!-- User Info Popup -->
+    <UserInfoPopup
+      v-if="showUserInfoPopup"
+      @close="closeUserInfoPopup"
+      @logout="handleLogout"
     />
   </div>
 </template>
