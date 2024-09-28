@@ -3,12 +3,15 @@ import router from "@/router";
 import { postBoard } from "@/lib/fetchMethod";
 import { ref } from "vue";
 
+// Get payload from localstorage
+const payload = JSON.parse(localStorage.getItem('payload'))
+
 const emit = defineEmits(["createNewBoard", "close", "toastItem"]);
 const closeHandle = () => {
   emit("close");
 };
 
-const addName = ref(``);
+const addName = ref(`${payload.name} personal board`);
 const isPrivate = ref(true);
 
 const createNewBoard = async () => {
@@ -42,7 +45,6 @@ const createNewBoard = async () => {
             <form class="space-y-5" novalidate @submit.prevent="createNewBoard">
               <div class="flex justify-start items-center">
                 <h2 class="text-2xl font-bold mb-0">Create new board</h2>
-                <p class="ml-4">({{ isPrivate ? 'Private' : 'Public' }})</p>
               </div>
               <hr>
               <div class="flex flex-col">
@@ -56,15 +58,17 @@ const createNewBoard = async () => {
               </div>
               <div class="flex items-center mt-4">
                 <label class="mr-2 font-semibold">Visibility:</label>
-                <div class="relative">
+                <!-- Toggle visibility button -->
+                <div class="relative flex">
                   <input type="checkbox" v-model="isPrivate" class="absolute opacity-0" />
                   <div
                     class="w-12 h-6 bg-gray-300 rounded-full cursor-pointer transition duration-200"
-                    :class="{'bg-blue-500': !isPrivate}"
+                    :class="{'bg-green-500': !isPrivate}"
                     @click="isPrivate = !isPrivate"
                   >
-                    <div class="w-6 h-6 bg-white rounded-full shadow-md transform transition duration-200" :style="isPrivate ? 'transform: translateX(0)' : 'transform: translateX(100%)'"></div>
+                    <div class="w-6 h-6 bg-white rounded-full shadow-md transform transition duration-200" :style="isPrivate ? 'transform: translateX(0)' : 'transform: translateX(100%);'"></div>
                   </div>
+                  <p class="ml-3">{{ isPrivate ? 'Private' : 'Public' }} Board</p>
                 </div>
               </div>
             </form>

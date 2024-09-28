@@ -31,8 +31,10 @@ const router = createRouter({
       redirect: { name: 'Login' }
     },
     {
-      path: '/board', name: 'Board', component: BoardView,
+      path: '/board',
       children: [
+        // Initial page of board (that show all board)
+        { path: '', name: 'Board', component: BoardView },
         { path: 'add', name: 'AddBoard', component: AddBoardPopup },
         { path: ':boardId', name: 'Home', component: HomeView,
           children: [

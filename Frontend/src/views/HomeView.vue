@@ -224,7 +224,7 @@ const removeFilter = async (r) => {
         <div class="flex flex-col">
             <!-- Status Page button -->
             <div class="flex justify-end">
-                <router-link class="itbkk-manage-status text-white p-3 bg-slate-700 rounded w-[150px] text-center" :to="{ name: 'StatusView' }">Manage Status</router-link>
+                <!-- <router-link class="itbkk-manage-status text-white p-3 bg-slate-700 rounded w-[150px] text-center" :to="{ name: 'StatusView' }">Manage Status</router-link> -->
             </div>
             <!-- Head of table -->
             <div class="flex w-full items-center justify-between font-xl font-bold text-white p-3 bg-slate-600">

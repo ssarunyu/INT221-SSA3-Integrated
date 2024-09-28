@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import router from '@/router';
 import { getData } from '@/lib/fetchMethod';
 import AddBoardPopup from '@/components/AddBoardPopup.vue';
 import UserInfoPopup from '@/components/UserInfoPopup.vue';
@@ -85,7 +86,7 @@ const handleLogout = () => {
         <div
           class="w-1/4 bg-white shadow-lg rounded-lg cursor-pointer duration-300 hover:bg-slate-50"
         >
-          <div class="p-6 flex justify-between items-center">
+          <div @click="router.push({name: 'Home', params: { boardId: board.id }})" class="p-6 flex justify-between items-center">
             <div>
               <a href="#">
                 <h5 class="text-xl font-semibold tracking-tight text-gray-800">

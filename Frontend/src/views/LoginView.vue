@@ -128,7 +128,7 @@ function togglePasswordVisibility() {
           :disabled="!username || !password"
           class="w-full py-2 bg-sky-600 text-white font-bold rounded-md hover:bg-sky-700 disabled:bg-sky-200"
         >
-          Login Now
+          Login
         </button>
       </div>
 
