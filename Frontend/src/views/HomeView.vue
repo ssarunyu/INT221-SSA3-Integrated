@@ -6,15 +6,14 @@ import { useRoute } from 'vue-router';
 import Toast from '@/components/Toast.vue'
 import { styleStatus } from '@/lib/styleStatus';
 
+
 const route = useRoute()
 // Store
 import { useTaskStore } from '@/stores/TaskStore.js'
 import { useStatusStore } from '@/stores/StatusStore.js'
-import DeletePopup from '@/components/DeletePopup.vue';
 // NOTE: Will change to use store
 const userAuthItem = JSON.parse(localStorage.getItem('payload'))
 
-// State variables
 const allTasks = ref([])
 const allStatuses = ref([])
 const fetch = async() => {
@@ -25,12 +24,6 @@ const fetch = async() => {
     // Fetch status
     const allStatus = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`)
     allStatuses.value.push(...allStatus)
-}
-
-// Add Task
-const handleTaskAdded = (newTask) => {
-    allTasks.value.push(newTask)
-    // NOTE: Status not show because it's send id not name
 }
 
 const items = allTasks.value
@@ -56,94 +49,84 @@ watch(items, (newItems) => {
 })
 
 onMounted(async () => {
-  await fetch()
+    await fetch()
 })
+
+// Toast
+const toastHandle = ref()
+
+// Edit
+const options = {
+    timeZoneName: "short",
+    hour12: false,
+}
+
+const tasks = ref(allTasks.value)
+const sortStage = ref(0);
+const changeSortStage = () => {
+    sortStage.value = (sortStage.value + 1) % 3;
+};
 
 const sortTask = computed(() => {
-  const copyTask = [...allTasks.value]
-  const sortFunctions = {
-    0: tasks => tasks,
-    1: tasks => tasks.sort((a, b) => a.status.name.localeCompare(b.status.name)),
-    2: tasks => tasks.sort((a, b) => b.status.name.localeCompare(a.status.name)),
-  }
-  return sortFunctions[sortStage.value](copyTask)
-})
+    const copyTask = [...tasks.value];
+
+    const sortFunctions = {
+        0: tasks => tasks,
+        1: tasks => tasks.sort((a, b) => a.status.name.localeCompare(b.status.name)),
+        2: tasks => tasks.sort((a, b) => b.status.name.localeCompare(a.status.name))
+    };
+
+    return sortFunctions[sortStage.value](copyTask);
+});
 
 const sortIcon = computed(() => {
-  const icons = {
-    0: "fa-solid fa-sort",
-    1: "fa-solid fa-sort-down",
-    2: "fa-solid fa-sort-up",
-  }
-  return icons[sortStage.value]
-})
+    const icons = {
+        0: 'fa-solid fa-sort',
+        1: 'fa-solid fa-sort-down',
+        2: 'fa-solid fa-sort-up'
+    };
 
-const submitFilter = async userClick => {
-  const findExist = filterSelect.value.indexOf(userClick)
-  if (findExist !== -1) {
-    filterSelect.value.splice(findExist, 1)
-  } else {
-    filterSelect.value.push(userClick)
-  }
-  await updateTasks()
+    return icons[sortStage.value];
+});
+
+const allStatusArr = allStatuses.value
+const filterSelect = ref([])
+const submitFilter = async (userClick) => {
+    const findExist = filterSelect.value.indexOf(userClick)
+    if (findExist !== -1) {
+        filterSelect.value.splice(findExist, 1)
+    } else {
+        filterSelect.value.push(userClick)
+    }
+    await updateTasks()
 }
 
 const updateTasks = async () => {
-  let userFilter = ""
-  if (filterSelect.value.length) {
-    userFilter = filterSelect.value.map(a => `filterStatuses=${a}`).join("&")
-  }
-  try {
-    const response = await getData(
-      `${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks?${userFilter}`
-    )
-    allTasks.value = response // ใช้ allTasks แทน tasks
-  } catch (error) {
-    console.error("Error updating tasks:", error)
-  }
+    let userFilter = ''
+    if (filterSelect.value.length) {
+        userFilter = filterSelect.value.map(a => `filterStatuses=${a}`).join('&')
+    }
+    const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/tasks?${userFilter}`)
+    tasks.value = response
 }
 
 const clearFilter = async () => {
-  filterSelect.value = []
-  await fetch() // Re-fetch all tasks without filters
+    filterSelect.value = []
+    const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/tasks`)
+    tasks.value = response
 }
 
-const removeFilter = async r => {
-  const findExist = filterSelect.value.indexOf(r)
-  if (findExist !== -1) {
-    filterSelect.value.splice(findExist, 1)
-    await updateTasks()
-  }
-}
-
-// Delete
-const deletePopupStatus = ref(false)
-const deleteTarget = ref()
-const openDeletePopup = async (id) => {
-    deletePopupStatus.value = true
-    const result = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks/${id}`)
-    deleteTarget.value = result
-}
-const deleteConfirm = async () => {
-    // Back-end
-    const response = await deleteData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks`, deleteTarget.value.id)
-    // Check Status
-    if(response.ok) {
-        toastHandle.value = {type: 'success', status: true, message: `The task has been deleted`}
-        // Front-end
-        const indexToDelete = allTasks.value.findIndex(a => a.id === deleteTarget.value.id)
-        allTasks.value.splice(indexToDelete, 1)
-        deletePopupStatus.value = false
-    } else {
-        toastHandle.value = {type: 'error', status: true, message: `Task doesn't exist`}
-        deletePopupStatus.value = false
+const removeFilter = async (r) => {
+    const findExist = filterSelect.value.indexOf(r)
+    if (findExist !== -1) {
+        filterSelect.value.splice(findExist, 1)
+        await updateTasks()
     }
 }
 </script>
 
 <template>
-    <router-view @taskAdded="handleTaskAdded"></router-view>
-    <DeletePopup v-show="deletePopupStatus" v-if="deleteTarget" :deleteItem="deleteTarget" @close="deletePopupStatus = false" @confirm="deleteConfirm()"/>
+    <router-view></router-view>
     <div class="w-full min-h-screen">
         <!-- Nav -->
         <div class="flex justify-between items-center bg-slate-800 p-5">
@@ -214,14 +197,16 @@ const deleteConfirm = async () => {
                                 </a>
                             </li>
                             <li>
-                                        <a class="itbkk-button-delete"
-                                        @click="openDeletePopup(item.id)">
+                                        <a class="itbkk-button-delete">
                                         Delete
                                         </a>
                                     </li>
                                 </ul>
                             </div>
                         </div>
+                        <p class="text-xl font-bold">
+                            {{ item.id }}
+                        </p>
                         <div class="w-full">
                             <p @click="router.push({ name: 'TaskDetail', params: { detailId: item.id}})" class="itbkk-title break-all font-bold text-xl duration-200 cursor-pointer hover:text-gray-700">
                                 {{ item.title }}

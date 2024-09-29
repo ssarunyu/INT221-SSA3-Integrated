@@ -1,7 +1,6 @@
 <script setup>
 import { onMounted, ref, defineEmits, watch } from 'vue';
 import { getData, postData } from '@/lib/fetchMethod';
-import { ref } from 'vue'
 import router from '@/router';
 import { useRoute } from 'vue-router';
 
@@ -56,14 +55,8 @@ const resetForm = () => {
 
 const closeHandle = () => {
   resetForm();
-  taskStore.fetchTasks(route.params.boardId); // Fetch tasks to ensure the latest data
   router.push({ name: 'Home', params: { boardId: route.params.boardId } });
 };
-
-// Optional: watch for changes to tasks in the store
-watch(() => taskStore.state.allTasks, (newTasks) => {
-  console.log("Updated Tasks:", newTasks);
-});
 </script>
 
 <template>
