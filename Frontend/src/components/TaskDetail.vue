@@ -13,7 +13,7 @@ const options = {
 }
 const item = ref()
 onMounted(async () => {
-  const fetch = await getDataById(import.meta.env.VITE_TASK_URL, route.params.detailId)
+  const fetch = await getDataById(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks`, route.params.detailId)
   fetch.createdOn = new Date(fetch.createdOn).toLocaleString('en-AU', options)
   fetch.updatedOn = new Date(fetch.updatedOn).toLocaleString('en-AU', options)
   item.value = await fetch
@@ -44,7 +44,7 @@ onMounted(async () => {
           </div>
           <div>
             <p class="text-lg font-bold">Status</p>
-            <p :class="styleStatus(item.status.name)" class="px-5 py-1 w-[7rem] rounded text-center">{{ item.status.name }}</p>
+            <p :class="styleStatus(item.status.name)" class="itbkk-status px-5 py-1 w-[7rem] rounded text-center">{{ item.status.name }}</p>
           </div>
         </div>
         <hr class="h-px my-5 bg-gray-200 border-0">

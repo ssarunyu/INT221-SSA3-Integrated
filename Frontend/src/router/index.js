@@ -33,6 +33,7 @@ const router = createRouter({
     { path: '/board', name: 'Board', component: BoardView },
     { path: '/board/add', name: 'AddBoard', component: AddBoardPopup },
     { path: '/board/:boardId', name: 'Home', component: HomeView },
+    { path: '/board/:boardId/:detailId', name: 'TaskDetail', component: TaskDetail },
     { path: '/board/:boardId/task/add', name: 'AddTask', component: AddPopup },
     { path: '/board/:boardId/:taskId/edit', name: 'EditTask', component: EditPopup },
     { path: '/board/:boardId/status', name: 'StatusView', component: StatusView },

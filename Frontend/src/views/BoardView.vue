@@ -13,7 +13,11 @@ const showUserInfoPopup = ref(false);
 
 const fetchBoards = async () => {
   try {
-    boards.value = await getData('http://localhost:8080/v3/boards');
+    boards.value = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards`);
+    // If user already have board redirect to that board
+    if(boards.value.length > 0) {
+      router.push({ name: 'Home', params: { boardId: boards.value[0].id}})
+    }
   } catch (error) {
     console.error('Error fetching boards:', error);
   }
@@ -52,6 +56,7 @@ const handleLogout = () => {
 
 <template>
   <div class="w-full h-screen bg-gray-100">
+    <p>Software Development Kanban Board for the course INT222 Integrated Project II at School of Information Technology in 202</p>
     <!-- TITLE -->
     <div
       class="title bg-slate-800 text-white shadow-md flex justify-between items-center px-5"
@@ -73,7 +78,7 @@ const handleLogout = () => {
     <div class="w-full flex flex-col justify-between items-center space-y-5">
       <div
         @click="openAddBoardPopup"
-        class="itbkk-button-add rounded-md p-5 bg-slate-200 text-slate-500 cursor-pointer duration-300 hover:bg-slate-300 hover:text-slate-700"
+        class="itbkk-button-create rounded-md p-5 bg-slate-200 text-slate-500 cursor-pointer duration-300 hover:bg-slate-300 hover:text-slate-700"
       >
         + Add New Board
       </div>

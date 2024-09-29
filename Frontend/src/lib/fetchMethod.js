@@ -3,45 +3,52 @@ import { jwtDecode } from "jwt-decode";
 
 async function getData(url) {
     const token = JSON.parse(localStorage.getItem('token'))
-    try {
-        const response = await fetch(url, {
-            method: "GET",
-            headers: {
-                'Authorization': `Bearer ${token.access_token}`
+    if(token) {
+        try {
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    'Authorization': `Bearer ${token.access_token}`
+                }
+            })
+            if(response.status === 401) {
+                localStorage.removeItem('token')
+                localStorage.removeItem('payload')
+                router.push({ name: 'Login' })
             }
-        })
-        if(response.status === 401) {
-            localStorage.removeItem('token')
-            localStorage.removeItem('payload')
-            router.push({ name: 'Login' })
+            const result = await response.json()
+            return result
+        } catch (error) {
+            console.log(error)
         }
-        const result = await response.json()
-        return result
-    } catch (error) {
-        console.log(error)
+    } else {
+        router.push({ name: 'Login' })
     }
 }
 
 async function postBoard(url, newBoard) {
     const token = JSON.parse(localStorage.getItem('token'))
-    console.log(token.access_token)
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token.access_token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(newBoard)
-        })
-        const result = await response.json();
-        return { status: response.status, data: result };
-    } catch (error) {
-        console.error('Error in postBoard:', error);
-        throw error;
+    if(token) {
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token.access_token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newBoard)
+            })
+            const result = await response.json();
+            return { status: response.status, data: result };
+        } catch (error) {
+            console.error('Error in postBoard:', error);
+            throw error;
+        }
+    } else {
+        router.push({ name: 'Login' })
     }
 }
-// check ถึง row 125
+
 async function postBoardId(url,boardId,id){
     const finalURL = `${url}/${id}`
      const token = JSON.parse(localStorage.getItem('token'))
@@ -157,6 +164,7 @@ async function postData(url, task) {
             },
             body: JSON.stringify(task)
         })
+        console.log(response)
         if(response.status === 401) {
             localStorage.removeItem('token')
             localStorage.removeItem('payload')
@@ -171,24 +179,28 @@ async function postData(url, task) {
 async function updateData(url, task, id) {
     const token = JSON.parse(localStorage.getItem('token'))
     const finalURL = `${url}/${id}`
-    try {
-        const response = await fetch(finalURL, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                'Authorization': `Bearer ${token.access_token}`
-            },
-            body: JSON.stringify(task)
-        })
-        if(response.status === 401) {
-            localStorage.removeItem('token')
-            localStorage.removeItem('payload')
-            router.push({ name: 'Login' })
-        }
-        return response
-    } catch (error) {
-        console.log(error)
-    }  
+    if(token) {
+        try {
+            const response = await fetch(finalURL, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    'Authorization': `Bearer ${token.access_token}`
+                },
+                body: JSON.stringify(task)
+            })
+            if(response.status === 401) {
+                localStorage.removeItem('token')
+                localStorage.removeItem('payload')
+                router.push({ name: 'Login' })
+            }
+            return response
+        } catch (error) {
+            console.log(error)
+        }  
+    } else {
+        router.push({ name: 'Login' })
+    }
 }
 
 async function deleteData(url, id) {
@@ -213,20 +225,28 @@ async function deleteData(url, id) {
 }
 
 async function transferData(url, oldId, newId) {
+    const token = JSON.parse(localStorage.getItem('token'))
     const finalURL = `${url}/${oldId}/${newId}`
-    try {
-        const response = await fetch(finalURL, {
-            method: "DELETE",
-        })
-        if(response.status === 401) {
-            localStorage.removeItem('token')
-            localStorage.removeItem('payload')
-            router.push({ name: 'Login' })
-        }
-        return response
-    } catch (error) {
-        console.log(error)
-    }  
+    if(token) {
+        try {
+            const response = await fetch(finalURL, {
+                method: "DELETE",
+                headers: {
+                    'Authorization': `Bearer ${token.access_token}`
+                }
+            })
+            if(response.status === 401) {
+                localStorage.removeItem('token')
+                localStorage.removeItem('payload')
+                router.push({ name: 'Login' })
+            }
+            return response
+        } catch (error) {
+            console.log(error)
+        }  
+    } else {
+        router.push({ name: 'Login' })
+    }
 }
 
 // NOTE: Change to use user stores

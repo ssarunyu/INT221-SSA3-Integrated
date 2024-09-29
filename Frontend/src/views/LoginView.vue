@@ -67,7 +67,7 @@ function togglePasswordVisibility() {
               v-model="username"
               id="username"
               type="text"
-              class="flex-1 bg-transparent outline-none"
+              class="itbkk-username flex-1 bg-transparent outline-none"
               placeholder="Username"
               required
               maxlength="50"
@@ -79,7 +79,7 @@ function togglePasswordVisibility() {
         <div class="w-full mb-4 relative">
           <label
             for="password"
-            class="flex items-center bg-gray-100 rounded-md p-2 mb-2"
+            class="itbkk-password flex items-center bg-gray-100 rounded-md p-2 mb-2"
           >
             <!-- Key Icon -->
             <img
@@ -125,7 +125,7 @@ function togglePasswordVisibility() {
         <button
           @click="userLogin"
           :disabled="!username || !password"
-          class="w-full py-2 bg-sky-600 text-white font-bold rounded-md hover:bg-sky-700 disabled:bg-sky-200"
+          class="itbkk-button-signin w-full py-2 bg-sky-600 text-white font-bold rounded-md hover:bg-sky-700 disabled:bg-sky-200"
         >
           Login
         </button>

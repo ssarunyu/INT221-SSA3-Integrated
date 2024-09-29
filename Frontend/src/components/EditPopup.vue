@@ -54,7 +54,7 @@ const closeHandle = () => {
       <!-- Popup -->
       <div class="relative bg-white rounded-lg shadow-xl w-[70%]">
         <!-- Popup content -->
-        <div class="flex flex-col p-5">
+        <div class="itbkk-modal-task flex flex-col p-5">
           <form class="space-y-5">
               <h2 class="text-2xl font-bold mb-4">Edit Task</h2>
               <hr>

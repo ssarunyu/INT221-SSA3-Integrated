@@ -27,9 +27,14 @@ const createNewBoard = async () => {
     if (result && result.status === 201) {
       closeHandle();
       router.push({ name: "Home", params: { boardId: result.data.id } });
-    } else {
+    }
+    else {
       console.error("Error creating board:", result);
     }
+    if(result.status === 401) {
+      router.push({ name: 'Login' })
+    }
+    console.log(result)
   } catch (error) {
     console.error("Error in creating new board:", error);
   }
@@ -40,7 +45,7 @@ const createNewBoard = async () => {
     <div class="fixed z-10 inset-0 overflow-y-auto">
       <div class="flex items-center justify-center h-screen">
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 backdrop-blur"></div>
-        <div class="itbkk-modal-task relative bg-white rounded-lg shadow-xl w-[70%]">
+        <div class="itbkk-modal-new relative bg-white rounded-lg shadow-xl w-[70%]">
           <div class="flex flex-col p-5">
             <form class="space-y-5" novalidate @submit.prevent="createNewBoard">
               <div class="flex justify-start items-center">

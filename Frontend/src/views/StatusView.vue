@@ -4,6 +4,10 @@ import { useRoute } from 'vue-router';
 import router from '@/router';
 import { ref, onMounted } from 'vue'
 
+// Components
+import DeleteStatusPopup from '@/components/DeleteStatusPopup.vue';
+import TransferDeleteStatusPopup from '@/components/TransferDeleteStatusPopup.vue';
+
 const route = useRoute()
 
 const statusInBoard = ref({})
@@ -15,12 +19,55 @@ const fetch = async () => {
         console.log('error')
     }
 }
+// Delete
+const statuses = ref(statusInBoard.value);
+const normalDeleteStatusShow = ref(false);
+const transferDeleteStatusShow = ref(false);
+const deleteTarget = ref();
+
+const controlToast = (newToast) => {
+  toastHandle.value = newToast;
+};
+const sendDeleteStatus = async (obj) => {
+  // Get all task already use that status
+  const getAllTask = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks`);
+  const filterRepeatTask = getAllTask.filter((a) => a.status.id === obj.id);
+  if (filterRepeatTask.length > 0) {
+    transferDeleteStatusShow.value = true;
+    // NOTE: Transfer
+    deleteTarget.value = obj;
+  } else {
+    // NOTE: Normal delete
+    normalDeleteStatusShow.value = true;
+    deleteTarget.value = obj;
+  }
+};
+
+// Update FE when status deleted
+const controlDelete = async (statusId) => {
+    const findStatusIndex = statusInBoard.value.findIndex(a => a.id === statusId.id)
+    statusInBoard.value.splice(findStatusIndex, 1)
+};
 
 onMounted(() => fetch())
 </script>
 
 <template>
     <router-view></router-view>
+    <DeleteStatusPopup
+        v-if="normalDeleteStatusShow"
+        :deleteItem="deleteTarget"
+        @confirmDeleteStatus="controlDelete"
+        @close="normalDeleteStatusShow = false"
+        @toastItem="controlToast"
+    />
+    <TransferDeleteStatusPopup
+        v-if="transferDeleteStatusShow"
+        :deleteItem="deleteTarget"
+        @confirmDeleteStatus="controlDelete"
+        @close="transferDeleteStatusShow = false"
+        @toastItem="controlToast"
+    />
     <div class="w-full min-h-screen">
         <!-- Nav -->
         <div class="flex justify-between items-center bg-slate-800 p-5">
@@ -47,8 +94,11 @@ onMounted(() => fetch())
                     + Add New Status
             </div>
             <!-- Card below head of table -->
-            <div v-for="status in statusInBoard" class="w-full flex items-center justify-between p-3 bg-white rounded-lg shadow-md border">
-                <p @click="router.push({ name: 'EditStatusPopup', params: { editStatusId: status.id }})">Edit</p>
+            <div v-for="status in statusInBoard" class="itbkk-item w-full flex items-center justify-between p-3 bg-white rounded-lg shadow-md border">
+                <div>
+                    <p @click="router.push({ name: 'EditStatusPopup', params: { editStatusId: status.id }})">Edit</p>
+                    <p @click="sendDeleteStatus(status)">Delete</p>
+                </div>
                 <p class="font-bold text-lg">{{ status.name }}</p>
                 <p>{{ status.description }}</p>
                 <p class="px-3 py-1 text-black rounded-lg" :style="{ backgroundColor: status.color }">{{ status.name }}</p>

@@ -1,6 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getData, getDataById, deleteData, transferData } from '@/lib/fetchMethod'
+import { useRoute } from 'vue-router';
+
+const route = useRoute()
 
 const toastHandle = ref()
 
@@ -14,15 +17,19 @@ const closeHandle = () => {
 }
 
 const confirmHandle = async () => {
-    const response = await deleteData(import.meta.env.VITE_STATUS_URL, props.deleteItem.id)
+    const response = await deleteData(
+        `${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`,
+        props.deleteItem.id
+    )
+    console.log(response)
     if(response.ok) {
         emit('confirmDeleteStatus', await response.json())
-        toastHandle.value = { type: 'success', status: true, message: `The status has been deleted` }
-        emit('toastItem', toastHandle.value)
+        // toastHandle.value = { type: 'success', status: true, message: `The status has been deleted` }
+        // emit('toastItem', toastHandle.value)
         emit('close')
     } else {
-        toastHandle.value = { type: 'error', status: true, message: `An error has occurred, the status does not exist` }
-        emit('toastItem', toastHandle.value)
+        // toastHandle.value = { type: 'error', status: true, message: `An error has occurred, the status does not exist` }
+        // emit('toastItem', toastHandle.value)
         emit('close')
     }
 }

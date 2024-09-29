@@ -5,13 +5,11 @@ import router from '@/router';
 import { useRoute } from 'vue-router';
 import Toast from '@/components/Toast.vue'
 import { styleStatus } from '@/lib/styleStatus';
+import DeletePopup from '@/components/DeletePopup.vue';
 
 
 const route = useRoute()
-// Store
-import { useTaskStore } from '@/stores/TaskStore.js'
-import { useStatusStore } from '@/stores/StatusStore.js'
-// NOTE: Will change to use store
+
 const userAuthItem = JSON.parse(localStorage.getItem('payload'))
 
 const allTasks = ref([])
@@ -19,11 +17,15 @@ const allStatuses = ref([])
 const fetch = async() => {
     // Fetch task
     const allTask = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks`)
-    allTasks.value.push(...allTask)
+    if(allTask !== undefined) {
+        allTasks.value.push(...allTask)
+    }
 
     // Fetch status
     const allStatus = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`)
-    allStatuses.value.push(...allStatus)
+    if(allStatus !== undefined) {
+        allStatuses.value.push(...allStatus)
+    }
 }
 
 const items = allTasks.value
@@ -123,16 +125,41 @@ const removeFilter = async (r) => {
         await updateTasks()
     }
 }
+
+// Delete
+const deletePopupStatus = ref(false)
+const deleteTarget = ref()
+const openDeletePopup = async (id) => {
+    deletePopupStatus.value = true
+    const result = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks/${id}`)
+    deleteTarget.value = result
+}
+const deleteConfirm = async () => {
+    // Back-end
+    const response = await deleteData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks`, deleteTarget.value.id)
+    // Check Status
+    if(response.ok) {
+        toastHandle.value = {type: 'success', status: true, message: `The task has been deleted`}
+        // Front-end
+        const indexToDelete = allTasks.value.findIndex(a => a.id === deleteTarget.value.id)
+        allTasks.value.splice(indexToDelete, 1)
+        deletePopupStatus.value = false
+    } else {
+        toastHandle.value = {type: 'error', status: true, message: `Task doesn't exist`}
+        deletePopupStatus.value = false
+    }
+}
 </script>
 
 <template>
     <router-view></router-view>
+    <DeletePopup v-show="deletePopupStatus" v-if="deleteTarget" :deleteItem="deleteTarget" @close="deletePopupStatus = false" @confirm="deleteConfirm()"/>
     <div class="w-full min-h-screen">
         <!-- Nav -->
         <div class="flex justify-between items-center bg-slate-800 p-5">
             <h1 class="font-bold text-2xl text-white">ITBKK SSA3 Taskboard</h1>
             <!-- NOTE: Need fix -->
-            <div class="text-right text-white">
+            <div v-if="userAuthItem" class="text-right text-white">
                 <h1 class="font-semibold">{{ userAuthItem.name }}</h1>
                 <h1 class="text-xs">{{ userAuthItem.email }}</h1>
             </div>
@@ -140,7 +167,7 @@ const removeFilter = async (r) => {
         <div class="flex flex-col">
             <!-- Status Page button -->
             <div class="flex justify-end">
-                <div class="cursor-pointer" @click="router.push({name: 'StatusView'})">Status Page</div>
+                <div class="itbkk-manage-status cursor-pointer" @click="router.push({name: 'StatusView'})">Status Page</div>
             </div>
             <!-- Head of table -->
             <div class="flex w-full items-center justify-between font-xl font-bold text-white p-3 bg-slate-600">
@@ -197,7 +224,8 @@ const removeFilter = async (r) => {
                                 </a>
                             </li>
                             <li>
-                                        <a class="itbkk-button-delete">
+                                        <a class="itbkk-button-delete"
+                                        @click="openDeletePopup(item.id)">
                                         Delete
                                         </a>
                                     </li>
@@ -217,7 +245,7 @@ const removeFilter = async (r) => {
                         </div>
                     </div>
                     <div>
-                        <p class="itbkk-status px-4 py-2 rounded" :class="`bg-[${item.status.statusColor}]`">{{ item.status.name }}</p>
+                        <p class="itbkk-status px-4 py-2 rounded" :style="{ backgroundColor: item.status.statusColor }">{{ item.status.name }}</p>
                     </div>
                 </div>
             </div>

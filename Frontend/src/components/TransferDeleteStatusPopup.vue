@@ -1,6 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getData, getDataById, deleteData, transferData } from '@/lib/fetchMethod'
+import { useRoute } from 'vue-router';
+
+const route = useRoute()
 
 const toastHandle = ref()
 const props = defineProps({
@@ -17,7 +20,7 @@ const allStatusExist = ref()
 const userTransferSelect = ref()
 onMounted(async () => {
     // Get all status that can select
-    const getAllStatus = await getData(import.meta.env.VITE_STATUS_URL)
+    const getAllStatus = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`)
     const filterStatus = getAllStatus.filter((a) => a.id !== props.deleteItem.id)
     allStatusExist.value = filterStatus
 
@@ -29,15 +32,19 @@ onMounted(async () => {
 })
 
 const confirmHandle = async () => {
-    const response = await transferData(import.meta.env.VITE_STATUS_URL, props.deleteItem.id, userTransferSelect.value)
+    const response = await transferData(
+        `${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`,
+        props.deleteItem.id,
+        userTransferSelect.value
+    )
     if(response.ok) {
         emit('confirmDeleteStatus', props.deleteItem)
-        toastHandle.value = { type: 'success', status: true, message: `${repeatItem.value.length} task have been transferred and the status has been deleted` }
-        emit('toastItem', toastHandle.value)
+        // toastHandle.value = { type: 'success', status: true, message: `${repeatItem.value.length} task have been transferred and the status has been deleted` }
+        // emit('toastItem', toastHandle.value)
         emit('close')
     } else {
-        toastHandle.value = { type: 'error', status: true, message: `An error has occurred, the status does not exist` }
-        emit('toastItem', toastHandle.value)
+        // toastHandle.value = { type: 'error', status: true, message: `An error has occurred, the status does not exist` }
+        // emit('toastItem', toastHandle.value)
         emit('close')
     }
 }

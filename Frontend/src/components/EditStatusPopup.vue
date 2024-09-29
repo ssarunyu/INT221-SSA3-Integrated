@@ -49,14 +49,14 @@ const closeHandle = () => {
               <hr>
               <div class="flex flex-col">
                   <p class="font-semibold">Name</p>
-                  <input v-model="itemData[0].name"  @input="disabled = false" class="itbkk-status-name border border-black rounded p-2 peer invalid:border-red-500 focus:outline-none" type="text" required>
+                  <input v-model="itemData.name"  @input="disabled = false" class="itbkk-status-name border border-black rounded p-2 peer invalid:border-red-500 focus:outline-none" type="text" required>
                   <p class="hidden peer-invalid:block text-red-600 text-sm">
                     This field required
                   </p>
               </div>
               <div class="flex flex-col">
                   <p class="font-semibold">Description</p>
-                  <input v-model="itemData[0].description" @input="disabled = false" class="itbkk-status-description border border-black rounded p-2 focus:outline-none" type="text" :placeholder="itemData.description === null ? 'No Description Provided' : ''">
+                  <input v-model="itemData.description" @input="disabled = false" class="itbkk-status-description border border-black rounded p-2 focus:outline-none" type="text" :placeholder="itemData.description === null ? 'No Description Provided' : ''">
               </div>
             </form>
             <div class="itbkk-button-action mt-5 space-x-5">
