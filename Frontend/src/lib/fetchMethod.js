@@ -41,6 +41,88 @@ async function postBoard(url, newBoard) {
         throw error;
     }
 }
+// check ถึง row 125
+async function postBoardId(url,boardId,id){
+    const finalURL = `${url}/${id}`
+     const token = JSON.parse(localStorage.getItem('token'))
+    try {
+        const response = await fetch(finalURL, {
+            method: "GET",
+            headers: {
+                'Authorization': `Bearer ${token.access_token}`
+            }
+        })
+        if(response.status === 401) {
+            localStorage.removeItem('token')
+            localStorage.removeItem('payload')
+            router.push({ name: 'Login' })
+        }
+        const result = await response.json()
+        return result
+    } catch (error) {
+        console.log(error)
+    }  
+}
+
+async function getBoardId(url, id) {
+    const finalURL = `${url}/${id}`
+    const token = JSON.parse(localStorage.getItem('token'))
+    try {
+        const response = await fetch(finalURL, {
+            method: "GET",
+            headers: {
+                'Authorization': `Bearer ${token.access_token}`
+            }
+        })
+        if(response.status === 401) {
+            localStorage.removeItem('token')
+            localStorage.removeItem('payload')
+            router.push({ name: 'Login' })
+        }
+        const result = await response.json()
+        return result
+    } catch (error) {
+        console.log(error)
+    }  
+}
+
+async function deleteBoardId(url, id) {
+    const finalURL = `${url}/${id}`
+    try {
+        const response = await fetch(finalURL, {
+            method: "DELETE",
+        })
+        if(response.status === 401) {
+            localStorage.removeItem('token')
+            localStorage.removeItem('payload')
+            router.push({ name: 'Login' })
+        }
+        return response
+    } catch (error) {
+        console.log(error)
+    }  
+}
+
+async function updateBoardId(url, task, id) {
+    const finalURL = `${url}/${id}`
+    try {
+        const response = await fetch(finalURL, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(task)
+        })
+        if(response.status === 401) {
+            localStorage.removeItem('token')
+            localStorage.removeItem('payload')
+            router.push({ name: 'Login' })
+        }
+        return response
+    } catch (error) {
+        console.log(error)
+    }  
+}
 
 async function getDataById(url, id) {
     const finalURL = `${url}/${id}`
@@ -167,4 +249,4 @@ async function postLogin(url, obj) {
     }
 }
 
-export { getData, getDataById, postData, updateData, deleteData, transferData, postLogin, postBoard}
+export { getData, getDataById, postData, updateData, deleteData, transferData, postLogin, postBoard ,postBoardId ,getBoardId ,deleteBoardId }
