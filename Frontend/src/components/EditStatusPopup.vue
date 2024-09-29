@@ -1,5 +1,5 @@
 <script setup>
-import { getDataById, updateData } from "@/lib/fetchMethod";
+import { getData, getDataById, updateData } from "@/lib/fetchMethod";
 import { onMounted, ref } from "vue"
 import router from '@/router';
 import { useRoute } from 'vue-router';
@@ -10,10 +10,9 @@ const toastHandle = ref()
 const emit = defineEmits(['updateStatus', 'toastItem'])
 
 onMounted(async () => {
-  const response = await getDataById(import.meta.env.VITE_STATUS_URL, route.params.editStatusId)
-  if(response.status === 404) {
-    // NOTE: Give data to variables cause need to show the popup
-    itemData.value = await response
+  const response = await getDataById(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`, route.params.editStatusId)
+  console.log(response)
+  if(!response) {
     toastHandle.value = { type: 'error', status: true, message: `An error has occurred, the status does not exist` }
     emit('toastItem', toastHandle.value)
   } else {
@@ -22,9 +21,9 @@ onMounted(async () => {
 })
 
 const updateHandle = async () => {
-  itemData.value.name = itemData.value.name ? itemData.value.name.trim() : itemData.value.name
+  itemData.value.title = itemData.value.title ? itemData.value.title.trim() : itemData.value.title
   itemData.value.description = itemData.value.description ? itemData.value.description.trim() : null
-  const response = await updateData(import.meta.env.VITE_STATUS_URL, itemData.value, route.params.editStatusId)
+  const response = await updateData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`, itemData.value, route.params.editStatusId)
   if(response.ok) {
     emit('updateStatus', itemData.value)
     router.push({ name : 'StatusView' })
@@ -50,14 +49,14 @@ const closeHandle = () => {
               <hr>
               <div class="flex flex-col">
                   <p class="font-semibold">Name</p>
-                  <input v-model="itemData.name"  @input="disabled = false" class="itbkk-status-name border border-black rounded p-2 peer invalid:border-red-500 focus:outline-none" type="text" required>
+                  <input v-model="itemData[0].name"  @input="disabled = false" class="itbkk-status-name border border-black rounded p-2 peer invalid:border-red-500 focus:outline-none" type="text" required>
                   <p class="hidden peer-invalid:block text-red-600 text-sm">
                     This field required
                   </p>
               </div>
               <div class="flex flex-col">
                   <p class="font-semibold">Description</p>
-                  <input v-model="itemData.description" @input="disabled = false" class="itbkk-status-description border border-black rounded p-2 focus:outline-none" type="text" :placeholder="itemData.description === null ? 'No Description Provided' : ''">
+                  <input v-model="itemData[0].description" @input="disabled = false" class="itbkk-status-description border border-black rounded p-2 focus:outline-none" type="text" :placeholder="itemData.description === null ? 'No Description Provided' : ''">
               </div>
             </form>
             <div class="itbkk-button-action mt-5 space-x-5">

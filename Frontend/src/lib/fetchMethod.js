@@ -169,12 +169,14 @@ async function postData(url, task) {
 }
 
 async function updateData(url, task, id) {
+    const token = JSON.parse(localStorage.getItem('token'))
     const finalURL = `${url}/${id}`
     try {
         const response = await fetch(finalURL, {
             method: "PUT",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                'Authorization': `Bearer ${token.access_token}`
             },
             body: JSON.stringify(task)
         })
@@ -190,10 +192,14 @@ async function updateData(url, task, id) {
 }
 
 async function deleteData(url, id) {
+    const token = JSON.parse(localStorage.getItem('token'))
     const finalURL = `${url}/${id}`
     try {
         const response = await fetch(finalURL, {
             method: "DELETE",
+            headers: {
+                'Authorization': `Bearer ${token.access_token}`
+            }
         })
         if(response.status === 401) {
             localStorage.removeItem('token')
@@ -238,7 +244,6 @@ async function postLogin(url, obj) {
         })
         if(response.status === 200) {
             const token = await response.json()
-            console.log(token)
             // NOTE: Set to localstorage
             localStorage.setItem('token', JSON.stringify(token))
             localStorage.setItem('payload', JSON.stringify(jwtDecode(token.access_token)))

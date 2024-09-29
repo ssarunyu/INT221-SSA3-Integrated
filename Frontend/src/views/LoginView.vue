@@ -17,7 +17,6 @@ const userLogin = async () => {
   };
   try {
     const res = await postLogin(import.meta.env.VITE_AUTH_URL, user.value);
-    console.log(res);
     if (res.ok) {
       router.push({ name: "Board" });
     } else {

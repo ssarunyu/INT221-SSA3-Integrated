@@ -1,12 +1,14 @@
 <script setup>
 import { onMounted, ref, defineEmits, watch } from 'vue';
 import { getData, postData } from '@/lib/fetchMethod';
-import { useRoute, useRouter } from 'vue-router';
-import { useTaskStore } from '@/stores/TaskStore';
+import { ref } from 'vue'
+import router from '@/router';
+import { useRoute } from 'vue-router';
 
-const route = useRoute();
-const router = useRouter();
-const taskStore = useTaskStore();
+// For send data back to parent
+const emit = defineEmits(['taskAdded'])
+
+const route = useRoute()
 
 const addTitle = ref('');
 const addDescription = ref('');
@@ -14,8 +16,6 @@ const addAssignees = ref('');
 const addStatus = ref('');
 
 const allStatus = ref([]);
-
-const emit = defineEmits(['task-added']);
 
 const fetchStatus = async () => {
   const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`);
@@ -35,22 +35,11 @@ const confirmHandle = async () => {
   };
 
   try {
-    const result = await postData(`http://localhost:8080/v3/boards/${route.params.boardId}/tasks`, newTask);
-    console.log("API Response:", result);
-
-    if (result && result.status === 201) {
-      // Check if result.data has the id property
-      const taskId = result.data?.id; // Use optional chaining
-      if (taskId) {
-        taskStore.addTask({ ...newTask, id: taskId }); // Add task with ID
-      } else {
-        console.error("No ID found in the response:", result.data);
-        console.log("Response body:", result);
-      }
-      closeHandle();
-    } else {
-      console.error("Error creating task:", result);
-    }
+    const addNewTask = await postData(`http://localhost:8080/v3/boards/${route.params.boardId}/tasks`, newTask)
+    // Send task that just add to parent to resolve ref update
+    emit('taskAdded', newTask)
+    // Redirect when complete
+    router.push({name: 'Home'})
   } catch (error) {
     console.error(error);
   }

@@ -30,34 +30,14 @@ const router = createRouter({
       name: 'RootPath',
       redirect: { name: 'Login' }
     },
-    {
-      path: '/board',
-      children: [
-        // Initial page of board (that show all board)
-        { path: '', name: 'Board', component: BoardView },
-        { path: 'add', name: 'AddBoard', component: AddBoardPopup },
-        { path: ':boardId', name: 'Home', component: HomeView,
-          children: [
-            // 1. First child is task
-            { path: 'task',
-              children: [
-                { path: 'add', name: 'AddTask', component: AddPopup },
-                { path: ':taskId/edit', name: 'EditTask', component: EditPopup }
-              ]
-            },
-            // 2. Second child is status
-            // TODO: More method of status
-            { path: 'status', name: 'StatusView', component: StatusView }
-          ]
-        }
-      ]
-    },
-    // { path: '/status', name: 'StatusView', component: StatusView,
-    //   children: [
-    //     { path: 'add', name: 'AddStatus', component: AddStatusPopup},
-    //     { path: ':editStatusId/edit', name: 'EditStatusPopup', component: EditStatusPopup },
-    //   ],
-    // },
+    { path: '/board', name: 'Board', component: BoardView },
+    { path: '/board/add', name: 'AddBoard', component: AddBoardPopup },
+    { path: '/board/:boardId', name: 'Home', component: HomeView },
+    { path: '/board/:boardId/task/add', name: 'AddTask', component: AddPopup },
+    { path: '/board/:boardId/:taskId/edit', name: 'EditTask', component: EditPopup },
+    { path: '/board/:boardId/status', name: 'StatusView', component: StatusView },
+    { path: '/board/:boardId/status/add', name: 'AddStatus', component: AddStatusPopup },
+    { path: '/board/:boardId/status/:editStatusId/edit', name: 'EditStatusPopup', component: EditStatusPopup },
     {
       path: '/404',
       name: 'Notfound',

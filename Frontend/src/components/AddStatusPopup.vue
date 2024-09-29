@@ -1,10 +1,14 @@
 <script setup>
 import { ref, watch } from "vue";
 import { postData } from "@/lib/fetchMethod";
+import router from "@/router";
+import { useRoute } from "vue-router";
+
+const route = useRoute()
 
 const emit = defineEmits(["confirmAddStatus", "close", "toastItem"]);
 const closeHandle = () => {
-  emit("close");
+  router.go(-1)
 };
 
 const disabled = ref(false);
@@ -12,10 +16,10 @@ const uniqueAlert = ref(false);
 const toastHandle = ref();
 const addName = ref("");
 const addDescription = ref(null);
-const newStatus = ref({});
-const statusColor = ref("#000000");//ตรงนี้ด้วย
+const statusColor = ref('#000000')
 
 watch(addName, (valName) => {
+  console.log(statusColor.value)
   if (valName.length > 50 || valName === "") {
     disabled.value = false;
   } else {
@@ -34,32 +38,27 @@ const confirmHandle = async () => {
   const statusToCreate = {
     name: addName.value ? addName.value.trim() : null,
     description: addDescription.value ? addDescription.value.trim() : null,
-    color: statusColor.value,//ตรงนี้ด้วย
-  };
-
-    //กูเพิ่มสีเอง ถ้าผิดฝากแก้ด้วย
-    localStorage.setItem(`statusColor${statusToCreate.name}`, statusToCreate.color);
+    statusColor: statusColor.value
+  }
+  console.log(statusToCreate)
 
   const response = await postData(
-    import.meta.env.VITE_STATUS_URL,
+    `${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`,
     statusToCreate
   );
+  console.log(response)
   if (response.ok) {
-    const createdStatus = await response.json();
-    newStatus.value = {
-      // Extract ID from the response
-      id: createdStatus.id,
-      name: createdStatus.name,
-      description: createdStatus.description,
-    };
-    emit("confirmAddStatus", newStatus.value);
+    // Send to parent
+    emit("confirmAddStatus", statusToCreate);
+    // Toast
     toastHandle.value = {
       type: "success",
       status: true,
       message: `The status has been added`,
     };
     emit("toastItem", toastHandle.value);
-    emit("close"); // Close modal after adding status
+    // Redirect
+    router.go(-1)
   } else if (!response.ok) {
     uniqueAlert.value = true;
   } else {

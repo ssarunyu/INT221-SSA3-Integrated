@@ -9,9 +9,13 @@ const itemData = ref()
 const toastHandle = ref()
 const emit = defineEmits(['updateTask', 'toastItem'])
 
+const statusData = ref([])
 onMounted(async () => {
+  // Get task data first
   const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks/${route.params.taskId}`)
-  console.log(response)
+  const statusResponse = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`)
+  statusData.value = statusResponse
+
   if(response.status === 404) {
     // NOTE: Give data to variables cause need to show the popup
     itemData.value = await response
@@ -23,13 +27,17 @@ onMounted(async () => {
 })
 
 const updateHandle = async () => {
-  itemData.value.name = itemData.value.name ? itemData.value.name.trim() : itemData.value.name
+  itemData.value.title = itemData.value.title ? itemData.value.title.trim() : itemData.value.title
   itemData.value.description = itemData.value.description ? itemData.value.description.trim() : null
+  console.log('task', itemData.value)
   // Fetch to Backend
-  const response = await updateData(import.meta.env.VITE_STATUS_URL, itemData.value, route.params.editStatusId)
+  const response = await updateData(
+    `${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks`,
+    itemData.value,
+    route.params.taskId
+  )
   if(response.ok) {
-    emit('updateTask', itemData.value)
-    router.push({ name : 'HomeView' })
+    router.go(-1)
   }
 }
 
@@ -69,7 +77,7 @@ const closeHandle = () => {
                   <p>Status</p>
                   <select @change="disabled = false" class="itbkk-status rounded px-3 py-1 border border-gray-300" v-model="itemData.status" name="" id="">
                     <!-- TODO: Fetch all status that can change to -->
-                    <option>{{ itemData.status.name }}</option>
+                    <option v-for="status in statusData" :value="status.id">{{ status.name }}</option>
                   </select>
               </div>
               <div class="flex flex-col">
