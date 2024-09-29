@@ -3,7 +3,6 @@ package int221.sit.taskboard.services;
 import int221.sit.taskboard.DTO.statuses.StatusWithTaskCountDTO;
 import int221.sit.taskboard.entities.itbkk_db.Boards;
 import int221.sit.taskboard.entities.itbkk_db.StatusList;
-import int221.sit.taskboard.entities.itbkk_db.TaskList;
 import int221.sit.taskboard.exceptions.BadRequestException;
 import int221.sit.taskboard.exceptions.ItemNotFoundException;
 import int221.sit.taskboard.repositories.task.BoardRepository;
@@ -70,8 +69,8 @@ public class StatusServiceV3 {
     }
 
     @Transactional("taskBoardTransactionManager")
-    public List<StatusList> getStatusByIdAndBoardId(String boardId, Integer statusId) {
-        List<StatusList> status = statusRepository.findStatusByIdAndBoard(statusId, boardId);
+    public StatusList getStatusByIdAndBoardId(String boardId, Integer statusId) {
+        StatusList status = statusRepository.findStatusByIdAndBoard(statusId, boardId);
         if (status == null) {
             throw new ItemNotFoundException("Status " + statusId + "is not found!, please try again.");
         }

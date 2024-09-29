@@ -20,7 +20,7 @@ public interface StatusListRepository extends JpaRepository<StatusList, Integer>
     Optional<StatusList> findByIdAndBoard(Integer statusId, String boardId);
 
     @Query("SELECT s FROM StatusList s WHERE s.id = :statusId AND s.board.boardId = :boardId")
-    List<StatusList> findStatusByIdAndBoard(Integer statusId, String boardId);
+    StatusList findStatusByIdAndBoard(Integer statusId, String boardId);
 
     @Modifying
     @Transactional

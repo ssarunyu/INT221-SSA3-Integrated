@@ -103,7 +103,7 @@ public class StatusControllerV3 {
             throw new AccessDeniedException("Access denied!!!");
         }
 
-        List<StatusList> statusList = statusService.getStatusByIdAndBoardId(boardId, statusId);
+        StatusList statusList = statusService.getStatusByIdAndBoardId(boardId, statusId);
         return ResponseEntity.ok(statusList);
     }
 
