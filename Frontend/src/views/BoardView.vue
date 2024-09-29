@@ -51,7 +51,6 @@ const handleLogout = () => {
 </script>
 
 <template>
-  <router-view></router-view>
   <div class="w-full h-screen bg-gray-100">
     <!-- TITLE -->
     <div

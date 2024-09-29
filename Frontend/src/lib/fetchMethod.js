@@ -65,10 +65,12 @@ async function getDataById(url, id) {
 }
 
 async function postData(url, task) {
+    const token = JSON.parse(localStorage.getItem('token'))
     try {
         const response = await fetch(url, {
             method: "POST",
             headers: {
+                'Authorization': `Bearer ${token.access_token}`,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(task)

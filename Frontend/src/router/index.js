@@ -39,7 +39,7 @@ const router = createRouter({
         { path: ':boardId', name: 'Home', component: HomeView,
           children: [
             // 1. First child is task
-            { path: 'task', name: 'Home', component: HomeView,
+            { path: 'task',
               children: [
                 { path: 'add', name: 'AddTask', component: AddPopup },
                 { path: ':taskId/edit', name: 'EditTask', component: EditPopup }
@@ -47,9 +47,8 @@ const router = createRouter({
             },
             // 2. Second child is status
             // TODO: More method of status
-            { path: 'status', name: 'StausView', component: StatusView }
+            { path: 'status', name: 'StatusView', component: StatusView }
           ]
-
         }
       ]
     },

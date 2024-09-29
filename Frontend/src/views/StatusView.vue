@@ -1,203 +1,51 @@
 <script setup>
-import { onMounted, ref } from "vue";
-import router from "@/router";
-import { styleStatus } from "@/lib/styleStatus";
-import { getData, deleteData } from "@/lib/fetchMethod.js";
-import AddStatusPopup from "@/components/AddStatusPopup.vue";
-import Toast from "@/components/Toast.vue";
-import DeleteStatusPopup from "@/components/DeleteStatusPopup.vue";
-import TransferDeleteStatusPopup from "@/components/TransferDeleteStatusPopup.vue";
+import { getData } from '@/lib/fetchMethod';
+import { useRoute } from 'vue-router';
+import { ref, onMounted } from 'vue'
 
-// Store
-import { useStatusStore } from "@/stores/StatusStore.js";
-const statusManagement = useStatusStore();
-// NOTE: Will change to use store
-const userAuthItem = JSON.parse(localStorage.getItem('payload'))
+const route = useRoute()
 
+const statusInBoard = ref({})
 const fetch = async () => {
-  // Fetch data
-  const response = await getData(import.meta.env.VITE_STATUS_URL);
-  // Front-end
-  statusManagement.addAllStatus(response);
-};
-
-onMounted(async () => {
-  await fetch();
-});
-
-// Toast
-const toastHandle = ref();
-
-const statuses = ref(statusManagement.getAllStatus());
-const addStatusShow = ref(false);
-const normalDeleteStatusShow = ref(false);
-const transferDeleteStatusShow = ref(false);
-const deleteTarget = ref();
-
-const controlAddStatus = (newStatus) => {
-  statusManagement.addStatus(newStatus);
-};
-const controlUpdateStatus = (updateNewStatus) => {
-  statusManagement.updateStatus(updateNewStatus, updateNewStatus.id);
-};
-const controlToast = (newToast) => {
-  toastHandle.value = newToast;
-};
-const sendDeleteStatus = async (obj) => {
-  // Get all task already use that status
-  const getAllTask = await getData(import.meta.env.VITE_TASK_URL);
-  const filterRepeatTask = getAllTask.filter((a) => a.status.id === obj.id);
-  if (filterRepeatTask.length > 0) {
-    transferDeleteStatusShow.value = true;
-    // NOTE: Transfer
-    deleteTarget.value = obj;
+  const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`)
+  if(response) {
+    statusInBoard.value = response
   } else {
-    // NOTE: Normal delete
-    normalDeleteStatusShow.value = true;
-    deleteTarget.value = obj;
+    console.log('error')
   }
-};
-const controlDelete = async (statusId) => {
-  statusManagement.deleteStatus(statusId.id);
-};
+}
+
+onMounted(() => fetch())
 </script>
 
 <template>
-  <AddStatusPopup
-    v-if="addStatusShow"
-    @confirmAddStatus="controlAddStatus"
-    @close="addStatusShow = false"
-    @toastItem="controlToast"
-  />
-  <DeleteStatusPopup
-    v-if="normalDeleteStatusShow"
-    :deleteItem="deleteTarget"
-    @confirmDeleteStatus="controlDelete"
-    @close="normalDeleteStatusShow = false"
-    @toastItem="controlToast"
-  />
-  <TransferDeleteStatusPopup
-    v-if="transferDeleteStatusShow"
-    :deleteItem="deleteTarget"
-    @confirmDeleteStatus="controlDelete"
-    @close="transferDeleteStatusShow = false"
-    @toastItem="controlToast"
-  />
-  <router-view
-    @updateStatus="controlUpdateStatus"
-    @toastItem="controlToast"
-  ></router-view>
-  <div class="w-full min-h-screen p-5">
-    <div class="p-5 flex justify-between">
-      <div>
-        <h1 class="text-2xl font-bold mb-5">ITBKK-SSA3 Taskboard</h1>
-      </div>
-      <div class="flex items-center border-solid border-gray-100 border-2 rounded-lg p-2">
-        <h1 class="mr-3 ml-2 font-semibold">{{ userAuthItem.name }}</h1>
-        <img src="../assets/profile-icon.png" alt="profile_pic" width="40" height="40">
-      </div>
-    </div>
-    <div class="flex justify-center items-center">
-      <div>
-        <h3>Hi, <span class="font-bold">{{ userAuthItem.name }}</span> Here are all your statuses.</h3>
-      </div>
-    </div>
-    <!-- <div class="flex w-full justify-between">
-      <div class="flex p-3">
-        <router-link
-          :to="{ name: 'Home' }"
-          class="itbkk-button-home hover:text-blue-500 hover:scale-105 ml-1"
-          >Home</router-link
-        >
-        <p class="font-bold text-gray-400 ml-1">></p>
-        <router-link
-          :to="{ name: 'StatusView' }"
-          class="font-bold ml-1 hover:scale-105"
-          >Task Status</router-link
-        >
-      </div>
-      <div
-        @click="addStatusShow = true"
-        class="itbkk-button-add p-2 w-35 m-1 rounded cursor-pointer duration-300 bg-gray-300 hover:bg-gray-400 hover:scale-105"
-      >
-        + Add Status
-      </div>
-    </div> -->
-    <div class="mt-5 flex justify-center">
-    <div
-      class="grid grid-cols-4 font-xl font-bold text-black p-3 rounded w-full max-w-screen-xl text-center"
-    >
-      <p>ID</p>
-      <p>Name</p>
-      <p>Description</p>
-      <p>Action</p>
-    </div>
-  </div>
-    <Toast :toastObject="toastHandle" @close="toastHandle.status = false" />
-    <div class="mt-5 flex justify-center">
-      <div class="w-full max-w-screen-xl space-y-5 ">
-      <div
-        v-for="item in statuses"
-        class="itbkk-item relative p-2"
-      >
-        <div class="grid grid-cols-4 items-center">
-          <!-- Vertical line -->
-          <div
-            class="absolute left-0 w-2 h-full rounded-l-lg"
-            :class="styleStatus(item.name)"
-          ></div>
-          <div class="text-lg font-bold text-center">
-            {{ item.id }}
-          </div>
-          <div
-            class="itbkk-status-name font-medium text-lg px-5 ml-4 mr-6 py-2 rounded-full break-all"
-            :class="styleStatus(item.name)"
-          >
-            {{ item.name }}
-          </div>
-          <div
-            class="itbkk-status-description text-lg m-2 break-all"
-            :class="item.description === null ? 'italic text-gray-500' : ''"
-          >
-            {{
-              item.description === null
-                ? "No description is provided"
-                : item.description
-            }}
-          </div>
-          <div
-            class="itbkk-status-action flex justify-center"
-            v-if="item.name !== 'No Status' && item.name !== 'Done'"
-          >
-            <div
-              @click="
-                router.push({
-                  name: 'EditStatusPopup',
-                  params: { editStatusId: item.id },
-                })
-              "
-              class="itbkk-button-edit p-2 px-5 w-35 text-center m-1 rounded-lg cursor-pointer duration-300 bg-gray-300 hover:bg-gray-400 hover:scale-105"
-            >
-              Edit
-            </div>
-            <div
-              @click="sendDeleteStatus(item)"
-              class="itbkk-button-delete p-2 px-3 w-35 m-1 rounded-lg cursor-pointer text-center duration-300 bg-red-300 hover:bg-red-500 hover:scale-105"
-            >
-              Delete
-            </div>
-          </div>
+<div class="w-full min-h-screen">
+    <!-- Nav -->
+    <div class="flex justify-between items-center bg-slate-800 p-5">
+        <h1 class="font-bold text-2xl text-white">ITBKK SSA3 Taskboard</h1>
+        <!-- User Info -->
+        <div class="text-right text-white">
+            <h1 class="font-semibold">John Doe</h1>
+            <h1 class="text-xs">john.doe@example.com</h1>
         </div>
-      </div>
     </div>
+
+    <div class="flex flex-col space-y-4 p-5">
+
+        <!-- Head of table -->
+        <div class="flex w-full items-center justify-between font-bold text-white p-3 bg-slate-600">
+            <p>Title</p>
+            <div class="flex items-center space-x-1">
+                <p>Status</p>
+            </div>
+        </div>
+        <!-- Card below head of table -->
+        <div v-for="status in statusInBoard" class="w-full flex items-center justify-between p-3 bg-white rounded-lg shadow-md border">
+            <p class="font-bold text-lg">{{ status.name }}</p>
+            <p>{{ status }}</p>
+            <p class="px-3 py-1 bg-blue-500 text-white rounded-lg">{{ status.name }}</p>
+        </div>
     </div>
-    <div class="flex justify-center mt-5">
-    <div
-        @click="router.push({name: 'AddStatus'})"
-        class="itbkk-button-add p-2 w-35 m-1 rounded-full cursor-pointer duration-300 bg-gray-200 hover:bg-gray-300 hover:scale-105 w-full max-w-screen-md text-center"
-      >
-        Add Status
-      </div>
-    </div>
-  </div>
+</div>
+
 </template>

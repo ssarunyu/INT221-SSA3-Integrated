@@ -2,33 +2,31 @@
 import { ref, watch, onMounted, computed } from 'vue';
 import { getData, getDataById, deleteData, postData, updateData } from '@/lib/fetchMethod.js';
 import router from '@/router';
+import { useRoute } from 'vue-router';
 import Toast from '@/components/Toast.vue'
-import AddPopup from '@/components/AddPopup.vue';
-import EditPopup from '@/components/EditPopup.vue'
-import DeletePopup from '@/components/DeletePopup.vue'
 import { styleStatus } from '@/lib/styleStatus';
 
+
+const route = useRoute()
 // Store
 import { useTaskStore } from '@/stores/TaskStore.js'
 import { useStatusStore } from '@/stores/StatusStore.js'
 // NOTE: Will change to use store
 const userAuthItem = JSON.parse(localStorage.getItem('payload'))
 
-
-const taskManagement = useTaskStore()
-const statusManagement = useStatusStore()
-
+const allTasks = ref([])
+const allStatuses = ref([])
 const fetch = async() => {
     // Fetch task
-    const allTask = await getData(import.meta.env.VITE_TASK_URL)
-    taskManagement.addAllTask(allTask)
+    const allTask = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks`)
+    allTasks.value.push(...allTask)
 
     // Fetch status
-    const allStatus = await getData(import.meta.env.VITE_STATUS_URL)
-    statusManagement.addAllStatus(allStatus)
+    const allStatus = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`)
+    allStatuses.value.push(...allStatus)
 }
 
-const items = taskManagement.getAllTask()
+const items = allTasks.value
 watch(items, (newItems) => {
     newItems.forEach(item => {
         switch(item.status) {
@@ -62,86 +60,8 @@ const options = {
     timeZoneName: "short",
     hour12: false,
 }
-const editTaskTarget = ref()
-const editPopupStatus = ref(false)
-const openEditPopup = async (componentId) => {
-    const result = await getDataById(import.meta.env.VITE_TASK_URL, componentId)
-    if(result) {
-        editPopupStatus.value = true
-        router.push({ name: 'EditPopup', params: { editId: componentId }})
-        result.createdOn = new Date(result.createdOn).toLocaleString('en-AU', options)
-        result.updatedOn = new Date(result.updatedOn).toLocaleString('en-AU', options)
-        editTaskTarget.value = result
-    }
-}
-const closeEditPopup = () => {
-    editTaskTarget.value = ''
-    editPopupStatus.value = false
-    router.push({ name: 'Home' })
-}
-const updateEdit = async (newEdit) => {
-    const response = await updateData(import.meta.env.VITE_TASK_URL,
-    {
-        title: newEdit.title,
-        description: newEdit.description,
-        assignees: newEdit.assignees,
-        status: newEdit.status.id
-    }, newEdit.id)
-    if(response.ok) {
-        // Toast
-        toastHandle.value = {type: 'success', status: true, message: `Task successfully edited to ${newEdit.title} !`}
-        // Front-end
-        taskManagement.updateTask(newEdit, newEdit.id)
-        editPopupStatus.value = false
-        router.push({ name: 'Home' })
-    }
-}
 
-// Add
-const addPopupStatus = ref(false)
-const openAddPopup = () => {
-    addPopupStatus.value = true
-}
-const closeAddPopup = () => {
-    addPopupStatus.value = false
-}
-const confirmAdd = async (newTask) => {
-    // Back-end
-    const response = await postData(import.meta.env.VITE_TASK_URL, newTask)
-    if(response.ok) {
-        // Add Toast
-        toastHandle.value = {type: 'success', status: true, message: `${newTask.title} task added successfully!`}
-        // Front-end
-        taskManagement.addTask(await response.json())
-        addPopupStatus.value = false
-    }
-}
-
-// Delete
-const deletePopupStatus = ref(false)
-const deleteTarget = ref()
-const openDeletePopup = async (id) => {
-    deletePopupStatus.value = true
-    const result = await getDataById(import.meta.env.VITE_TASK_URL, id)
-    deleteTarget.value = result
-}
-const deleteConfirm = async () => {
-    // Back-end
-    const response = await deleteData(import.meta.env.VITE_TASK_URL, deleteTarget.value.id)
-    // Check Status
-    if(response.ok) {
-        toastHandle.value = {type: 'success', status: true, message: `The task has been deleted`}
-        // Front-end
-        taskManagement.deleteTask(deleteTarget.value.id)
-        deletePopupStatus.value = false
-    } else {
-        toastHandle.value = {type: 'error', status: true, message: `Task doesn't exist`}
-        taskManagement.deleteTask(deleteTarget.value.id)
-        deletePopupStatus.value = false
-    }
-}
-
-const tasks = ref(taskManagement.getAllTask())
+const tasks = ref(allTasks.value)
 const sortStage = ref(0);
 const changeSortStage = () => {
     sortStage.value = (sortStage.value + 1) % 3;
@@ -169,7 +89,7 @@ const sortIcon = computed(() => {
     return icons[sortStage.value];
 });
 
-const allStatusArr = statusManagement.getAllStatus()
+const allStatusArr = allStatuses.value
 const filterSelect = ref([])
 const submitFilter = async (userClick) => {
     const findExist = filterSelect.value.indexOf(userClick)
@@ -186,13 +106,13 @@ const updateTasks = async () => {
     if (filterSelect.value.length) {
         userFilter = filterSelect.value.map(a => `filterStatuses=${a}`).join('&')
     }
-    const response = await getData(`${import.meta.env.VITE_TASK_URL}?${userFilter}`)
+    const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/tasks?${userFilter}`)
     tasks.value = response
 }
 
 const clearFilter = async () => {
     filterSelect.value = []
-    const response = await getData(import.meta.env.VITE_TASK_URL)
+    const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/tasks`)
     tasks.value = response
 }
 
@@ -206,11 +126,7 @@ const removeFilter = async (r) => {
 </script>
 
 <template>
-    <!-- For details -->
     <router-view></router-view>
-    <!-- Components -->
-    <DeletePopup v-show="deletePopupStatus" v-if="deleteTarget" :deleteItem="deleteTarget" @close="deletePopupStatus = false" @confirm="deleteConfirm()"/>
-    <EditPopup v-show="editPopupStatus" v-if="editTaskTarget" :itemData="editTaskTarget" :statusData="taskManagement.getAllStatus()" @update="updateEdit" @close="closeEditPopup()"/>
     <div class="w-full min-h-screen">
         <!-- Nav -->
         <div class="flex justify-between items-center bg-slate-800 p-5">
@@ -224,7 +140,7 @@ const removeFilter = async (r) => {
         <div class="flex flex-col">
             <!-- Status Page button -->
             <div class="flex justify-end">
-                <!-- <router-link class="itbkk-manage-status text-white p-3 bg-slate-700 rounded w-[150px] text-center" :to="{ name: 'StatusView' }">Manage Status</router-link> -->
+                <div class="cursor-pointer" @click="router.push({name: 'StatusView'})">Status Page</div>
             </div>
             <!-- Head of table -->
             <div class="flex w-full items-center justify-between font-xl font-bold text-white p-3 bg-slate-600">
@@ -265,7 +181,7 @@ const removeFilter = async (r) => {
             </div>
             <Toast :toastObject="toastHandle" @close="toastHandle.status = false"/>
             <div v-for="item in sortTask" :key="item.id" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded border">
-                <div class="absolute left-0 w-1 h-10" :class="styleStatus(item.status.name)"></div>
+                <div class="absolute left-0 w-1 h-10" :class="`bg-[${item.status.statusColor}]`"></div>
                 <div class="flex items-center space-x-3">
                     <div>
                         <div class="dropdown itbkk-button-action">
@@ -276,13 +192,12 @@ const removeFilter = async (r) => {
                                 <!-- NOTE: Edit must send params -->
                                 <li>
                                     <a class="itbkk-button-edit"
-                                    @click="router.push({name: 'EditPopup', params: { editId: item.id }})">
+                                    @click="router.push({name: 'EditTask', params: { taskId: item.id }})">
                                     Edit
                                 </a>
                             </li>
                             <li>
-                                        <a class="itbkk-button-delete"
-                                        @click="openDeletePopup(item.id)">
+                                        <a class="itbkk-button-delete">
                                         Delete
                                         </a>
                                     </li>
@@ -302,7 +217,7 @@ const removeFilter = async (r) => {
                         </div>
                     </div>
                     <div>
-                        <p class="itbkk-status px-4 py-2 rounded" :class="styleStatus(item.status.name)">{{ item.status.name }}</p>
+                        <p class="itbkk-status px-4 py-2 rounded" :class="`bg-[${item.status.statusColor}]`">{{ item.status.name }}</p>
                     </div>
                 </div>
             </div>

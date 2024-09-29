@@ -1,19 +1,20 @@
 <script setup>
 import { onMounted, computed, watch } from 'vue';
-import { getData } from '@/lib/fetchMethod';
+import { getData, postData } from '@/lib/fetchMethod';
 import { ref } from 'vue'
 import router from '@/router';
+import { useRoute } from 'vue-router';
+
+const route = useRoute()
 
 const addTitle = ref('')
 const addDescription = ref(null)
 const addAssignees = ref(null)
 const addStatus = ref(null)
 
-const emit = defineEmits(['confirm', 'close'])
-
 const allStatus = ref()
 const fetchStatus = async () => {
-  const response = await getData(import.meta.env.VITE_STATUS_URL)
+  const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`)
   allStatus.value = await response
 }
 
@@ -21,31 +22,8 @@ onMounted(async() => {
   await fetchStatus()
 })
 
-const disabled = ref(false)
-watch(addTitle, (valTitle) => {
-  if(valTitle.length > 100 || valTitle === '') {
-    disabled.value = false
-  } else {
-    disabled.value = true
-  }
-})
-watch(addDescription, (valDesc) => {
-  if(valDesc.length > 500 || valDesc === '') {
-    disabled.value = false
-  } else {
-    disabled.value = true
-  }
-})
-watch(addAssignees, (valAssign) => {
-  console.log(valAssign.length)
-  if(valAssign.length > 30 || valAssign === '') {
-    disabled.value = false
-  } else {
-    disabled.value = true
-  }
-})
-
-const confirmHandle = () => {
+// Add new task
+const confirmHandle = async () => {
   const newTask = 
   {
     title: addTitle.value ? addTitle.value.trim() : null,
@@ -53,7 +31,15 @@ const confirmHandle = () => {
     assignees: addAssignees.value ? addAssignees.value.trim() : null,
     status: addStatus.value
   }
-  emit('confirm', newTask)
+  try {
+    const addNewTask = await postData(`http://localhost:8080/v3/boards/${route.params.boardId}/tasks`, newTask)
+    console.log(addNewTask)
+    // Redirect when complete
+    router.go(-1)
+  } catch (error) {
+    console.error(error)
+  }
+
   // Clear form when open again
   addTitle.value = ''
   addDescription.value = ''
@@ -62,14 +48,13 @@ const confirmHandle = () => {
 }
 
 const closeHandle = () => {
+  // Redirect
   router.go(-1)
-  emit('close')
   // Clear form when open again
   addTitle.value = ''
   addDescription.value = ''
   addAssignees.value = ''
   addStatus.value = ''
-  disabled.value = false
 }
 </script>
 
@@ -108,10 +93,10 @@ const closeHandle = () => {
               </div>
             </form>
             <div class="mt-5 space-x-5">
-              <button @click="confirmHandle()" :disabled="!disabled" class="itbkk-button-confirm disabled bg-green-500 duration-200 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded disabled:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50">
+              <button @click="confirmHandle()" class="itbkk-button-confirm bg-green-500 duration-200 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded disabled:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50">
                 Save
               </button>
-              <button @click="closeHandle()" class="itbkk-button-cancel disabled bg-red-500 duration-200 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded">
+              <button @click="closeHandle" class="itbkk-button-cancel bg-red-500 duration-200 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded">
                 Cancel
               </button>
             </div>

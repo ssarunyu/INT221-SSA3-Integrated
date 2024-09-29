@@ -1,5 +1,5 @@
 <script setup>
-import { getDataById, updateData } from "@/lib/fetchMethod";
+import { getData, getDataById, updateData } from "@/lib/fetchMethod";
 import { onMounted, ref } from "vue"
 import { useRoute } from 'vue-router'
 import router from '@/router';
@@ -10,7 +10,8 @@ const toastHandle = ref()
 const emit = defineEmits(['updateTask', 'toastItem'])
 
 onMounted(async () => {
-  const response = await getDataById(import.meta.env.VITE_TASK_URL, route.params.editId)
+  const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks/${route.params.taskId}`)
+  console.log(response)
   if(response.status === 404) {
     // NOTE: Give data to variables cause need to show the popup
     itemData.value = await response
@@ -24,6 +25,7 @@ onMounted(async () => {
 const updateHandle = async () => {
   itemData.value.name = itemData.value.name ? itemData.value.name.trim() : itemData.value.name
   itemData.value.description = itemData.value.description ? itemData.value.description.trim() : null
+  // Fetch to Backend
   const response = await updateData(import.meta.env.VITE_STATUS_URL, itemData.value, route.params.editStatusId)
   if(response.ok) {
     emit('updateTask', itemData.value)
@@ -66,7 +68,8 @@ const closeHandle = () => {
               <div class="flex items-center space-x-3 ">
                   <p>Status</p>
                   <select @change="disabled = false" class="itbkk-status rounded px-3 py-1 border border-gray-300" v-model="itemData.status" name="" id="">
-                    <option v-for="status in itemData" :value="status">{{ status.name }}</option>
+                    <!-- TODO: Fetch all status that can change to -->
+                    <option>{{ itemData.status.name }}</option>
                   </select>
               </div>
               <div class="flex flex-col">
