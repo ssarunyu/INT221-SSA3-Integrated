@@ -52,8 +52,8 @@ public class BoardService {
     @Autowired
     ModelMapper modelMapper;
 
-    private final List<String> defaultStatuses = List.of("TODO", "DOING", "DONE", "NO STATUS");
-    private final String defaultDescription = "Default description";
+    private final List<String> defaultStatuses = List.of("NO STATUS", "TODO", "DOING", "DONE");
+    private final String defaultDescription = "Default status description";
     private final String defaultStatusColor = "#FFFFFF";
 
     @Transactional("taskBoardTransactionManager")
