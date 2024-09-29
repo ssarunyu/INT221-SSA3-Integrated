@@ -12,6 +12,8 @@ import lombok.Setter;
 public class StatusWithTaskCountDTO {
     private Integer id;
     private String name;
+    private String description;
+    private String color;
     private String boardId;
     private String taskCount;
 }

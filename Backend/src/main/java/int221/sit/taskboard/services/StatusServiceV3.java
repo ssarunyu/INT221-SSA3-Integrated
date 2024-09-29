@@ -50,6 +50,8 @@ public class StatusServiceV3 {
             statusWithTaskCountList.add(new StatusWithTaskCountDTO(
                     status.getId(),
                     status.getName(),
+                    status.getDescription(),
+                    status.getStatusColor(),
                     status.getBoard().getBoardId(),
                     taskCount.toString()
             ));
