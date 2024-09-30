@@ -111,7 +111,7 @@ public class BoardService {
         return resultDTO;
     }
 
-    public List<BoardDTO> getAllBoardsForUser(String userId) {
+    public List<BoardDTO> getAllBoards(String userId) {
         List<Boards> ownedBoards = boardRepository.findAllBoardByUserId(userId);
         return ownedBoards.stream()
                 .map(this::convertToDTO)
@@ -202,5 +202,17 @@ public class BoardService {
         return boardDTO;
     }
 
+    @Transactional("taskBoardTransactionManager")
+    public Boards updateBoard(BoardDTO boardDTO) {
+        // แปลงจาก BoardDTO เป็น Boards entity
+        Boards boardEntity = boardRepository.findById(boardDTO.getId())
+                .orElseThrow(() -> new ItemNotFoundException("Board not found"));
+
+        boardEntity.setBoardName(boardDTO.getBoardName());
+        boardEntity.setBoardVisibility(Boards.Visibility.valueOf(boardDTO.getVisibility().toUpperCase()));
+
+        // บันทึก entity หลังจากทำการอัปเดต
+        return boardRepository.save(boardEntity);
+    }
 
 }

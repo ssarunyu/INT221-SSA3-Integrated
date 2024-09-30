@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
@@ -39,7 +40,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 ZonedDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                "Validation Failed",
+                "Validation Failed FROM [MethodArgumentNotValidException]",
                 errorMessages,
                 request.getRequestURI()
         );
@@ -51,7 +52,7 @@ public class GlobalExceptionHandler {
             ErrorResponse errorResponse = new ErrorResponse(
                     ZonedDateTime.now(),
                     HttpStatus.UNAUTHORIZED.value(),
-                    "Not Created Exception",
+                    "Not Created Exception FROM [NotCreatedException]",
                     ex.getMessage(),
                     request.getRequestURI()
             );
@@ -63,7 +64,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 ZonedDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
+                "Bad Request FROM [BadRequestException]",
                 ex.getMessage(),
                 request.getRequestURI()
         );
@@ -75,7 +76,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 ZonedDateTime.now(),
                 HttpStatus.UNAUTHORIZED.value(),
-                "Authentication Failed",
+                "Authentication Failed FROM [BadCredentialsException]",
                 ex.getMessage(),
                 request.getRequestURI()
         );
@@ -87,7 +88,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 ZonedDateTime.now(),
                 HttpStatus.UNAUTHORIZED.value(),
-                "Authentication Failed",
+                "Authentication Failed FROM [SignatureException]",
                 ex.getMessage(),
                 request.getRequestURI()
         );
@@ -99,7 +100,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 ZonedDateTime.now(),
                 HttpStatus.UNAUTHORIZED.value(),
-                "Authentication Failed",
+                "Authentication Failed FROM [ExpiredJwtException]",
                 ex.getMessage(),
                 request.getRequestURI()
         );
@@ -111,7 +112,7 @@ public class GlobalExceptionHandler {
                 ErrorResponse errorResponse = new ErrorResponse(
                         ZonedDateTime.now(),
                         HttpStatus.UNAUTHORIZED.value(),
-                        "Missing Header",
+                        "Missing Header FROM [MissingRequestHeaderException]",
                         "Required header '" + ex.getHeaderName() + "' is not present.",
                         request.getRequestURI()
                 );
@@ -123,7 +124,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 ZonedDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                "Missing Body",
+                "Missing Body FROM [MissingRequestValueException]",
                 "Required body '" + ex.getBody() + "' is not present.",
                 request.getRequestURI()
         );
@@ -135,7 +136,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 ZonedDateTime.now(),
                 HttpStatus.FORBIDDEN.value(),
-                "Forbidden",
+                "Forbidden FROM [AccessDeniedException]",
                 ex.getMessage(),
                 request.getRequestURI()
         );
@@ -147,7 +148,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 ZonedDateTime.now(),
                 HttpStatus.UNAUTHORIZED.value(),
-                "Unauthorized",
+                "Unauthorized FROM [UnauthorizedException]",
                 ex.getMessage(),
                 request.getRequestURI()
         );
@@ -159,7 +160,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 ZonedDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
+                "Bad Request FROM [JwtException]",
                 ex.getMessage(),
                 request.getRequestURI()
         );
@@ -172,11 +173,23 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 ZonedDateTime.now(),
                 HttpStatus.UNAUTHORIZED.value(),
-                "UsernameNotFoundException",
+                "UsernameNotFoundException FROM [CustomUsernameNotFoundException]",
                 ex.getMessage(),
                 request.getContextPath()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ZonedDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "BAD REQUEST FROM [HttpMessageNotReadableException]",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
 }

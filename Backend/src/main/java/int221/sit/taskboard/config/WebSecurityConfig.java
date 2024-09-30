@@ -1,11 +1,13 @@
 package int221.sit.taskboard.config;
 
 import int221.sit.taskboard.Jwt.JwtAuthFilter;
+import int221.sit.taskboard.exceptions.CustomAccessDeniedHandler;
 import int221.sit.taskboard.services.JwtUserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -30,17 +32,18 @@ public class WebSecurityConfig {
     @Autowired
     JwtUserDetailsService jwtUserDetailsService;
 
+    @Autowired
+    CustomAccessDeniedHandler customAccessDeniedHandler;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(csrf -> csrf.disable())
                 .authorizeRequests(authorize -> authorize
                         .requestMatchers("/login", "/decode-token", "/token").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v3/**").permitAll()
                         .requestMatchers("/v2/**").authenticated()
                         .requestMatchers("/v3/**").authenticated())
-                        .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint((request, response, authException) ->
-                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized access !!!")))
-                .httpBasic(withDefaults());
+                        .httpBasic(withDefaults());
         httpSecurity.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }

@@ -1,5 +1,6 @@
 package int221.sit.taskboard.Jwt;
 
+import int221.sit.taskboard.exceptions.AccessDeniedException;
 import int221.sit.taskboard.exceptions.CustomUsernameNotFoundException;
 import int221.sit.taskboard.exceptions.NotCreatedException;
 import int221.sit.taskboard.services.JwtUserDetailsService;
@@ -66,7 +67,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
                 return;
             }
+
         }
+        // ตรวจสอบเฉพาะ URL ที่ไม่ใช่ /login
+//        else if (request.getServletPath().startsWith("/v3/")) {
+//                if (requestTokenHeader == null || !requestTokenHeader.startsWith("Bearer ")) {
+//                    if ("GET".equalsIgnoreCase(request.getMethod())) {
+//                        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Authorization header is missing for GET requests!");
+//                    } else {
+//                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization header is missing or invalid!");
+//                    }
+//                    return;
+//                }
+//            }
+
         filterChain.doFilter(request, response);
     }
 

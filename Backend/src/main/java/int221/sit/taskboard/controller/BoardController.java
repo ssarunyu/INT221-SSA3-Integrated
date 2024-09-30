@@ -14,7 +14,6 @@ import int221.sit.taskboard.repositories.task.BoardRepository;
 import int221.sit.taskboard.repositories.task.UserListRepository;
 import int221.sit.taskboard.services.BoardService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,11 +44,12 @@ public class BoardController {
     private BoardRepository boardRepository;
 
     @GetMapping("/boards")
-    public ResponseEntity<List<BoardDTO>> getAllBoardsForUser(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<List<BoardDTO>> getAllBoards(@RequestHeader(value = "Authorization", required = false) String token) {
+
         if (token != null && token.startsWith("Bearer ")) {
             String jwtToken = token.substring(7);
             String userId = jwtTokenUtil.getUserIdFromToken(jwtToken);
-            List<BoardDTO> boards = boardService.getAllBoardsForUser(userId);
+            List<BoardDTO> boards = boardService.getAllBoards(userId);
 
             return ResponseEntity.ok(boards);
         } else {
@@ -59,9 +59,7 @@ public class BoardController {
 
 
     @GetMapping("/boards/{board_id}")
-    public ResponseEntity<Object> getBoardById(@PathVariable("board_id") String boardId, @RequestHeader("Authorization") String token) {
-        String jwtToken = token.substring(7);
-        String userId = jwtTokenUtil.getUserIdFromToken(jwtToken);
+    public ResponseEntity<Object> getBoardById(@PathVariable("board_id") String boardId, @RequestHeader(value = "Authorization", required = false) String token) {
 
         BoardDTO boardDTO = boardService.getBoardById(boardId);
 
@@ -69,14 +67,31 @@ public class BoardController {
             throw new ItemNotFoundException("Board not found !!!");
         }
 
-        boolean isOwner = boardDTO.getOwner() != null && boardDTO.getOwner().getUserId().equals(userId);
+        // ตรวจสอบว่าบอร์ดเป็น public หรือ private
         boolean isPublic = "public".equalsIgnoreCase(boardDTO.getVisibility());
 
-        if (isOwner || isPublic) {
+        // ถ้าเป็น public สามารถเข้าถึงได้โดยไม่ต้องใช้ token
+        if (isPublic) {
+            return ResponseEntity.ok(boardDTO);
+        }
+
+        // ถ้าไม่มี token หรือ token ไม่ถูกต้อง ให้ return 403 Forbidden
+        if (token == null || !token.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied! Private board requires authentication.");
+        }
+
+        String jwtToken = token.substring(7);
+        String userId = jwtTokenUtil.getUserIdFromToken(jwtToken);
+
+        // ตรวจสอบว่าผู้ใช้เป็นเจ้าของบอร์ดหรือไม่
+        boolean isOwner = boardDTO.getOwner() != null && boardDTO.getOwner().getUserId().equals(userId);
+
+        if (isOwner) {
             return ResponseEntity.ok(boardDTO); // ส่งข้อมูลบอร์ดกลับไป
         } else {
             throw new AccessDeniedException("Access denied");
         }
+
     }
 
     @PostMapping("/boards")
@@ -102,39 +117,67 @@ public class BoardController {
     @PatchMapping("/boards/{board_id}")
     public ResponseEntity<Object> updateBoardVisibility(
             @PathVariable("board_id") String boardId,
-            @RequestBody Map<String, String> requestBody,
-            @RequestHeader("Authorization") String token) {
+            @RequestBody(required = false) Map<String, String> requestBody,
+            @RequestHeader(value = "Authorization", required = false) String token) {
 
-        String visibility = requestBody.get("visibility");
+        // ตรวจสอบว่าเจอบอร์ดหรือไม่
+        BoardDTO boardEntity = boardService.getBoardById(boardId);
 
-        // ตรวจสอบว่า visibility มีค่าเป็น public หรือ private หรือไม่
-        if (!"private".equalsIgnoreCase(visibility) && !"public".equalsIgnoreCase(visibility)) {
-            throw new BadRequestException("Invalid visibility value");
+        // ถ้าไม่เจอบอร์ด ให้ส่ง response ว่าไม่พบข้อมูล
+        if (boardEntity == null) {
+            throw new ItemNotFoundException("Board not found !!!");
         }
 
-        // ดึง userId จาก JWT token
-        String jwtToken = token.substring(7);
-        String userId = jwtTokenUtil.getUserIdFromToken(jwtToken);
+        // ถ้าไม่มี token และบอร์ดเป็น private ให้ return 403
+        boolean isPrivateBoard = "private".equalsIgnoreCase(boardEntity.getVisibility());
+        if (token == null && isPrivateBoard) {
+            throw new AccessDeniedException("Access denied! Private board requires authentication.");
+        }
 
-        // ดึงข้อมูลบอร์ดจาก repository
-        Boards boardEntity = boardRepository.findById(boardId)
-                .orElseThrow(() -> new ItemNotFoundException("Board not found"));
+        // ตรวจสอบว่าถ้ามี token ให้ทำการดึง userId
+        String userId = null;
+        boolean isOwner = false;
+        if (token != null) {
+            String jwtToken = token.substring(7); // ตัดคำว่า "Bearer " ออก
+            userId = jwtTokenUtil.getUserIdFromToken(jwtToken);
 
-        // ตรวจสอบว่าผู้ใช้เป็นเจ้าของบอร์ดหรือไม่
-        if (!boardEntity.getOwnerId().equals(userId)) {
-            throw new AccessDeniedException("You are not the owner of this board !!! ");
+            // ตรวจสอบว่าผู้ใช้เป็นเจ้าของบอร์ดหรือไม่
+            isOwner = boardEntity.getOwner() != null && boardEntity.getOwner().getUserId().equals(userId);
+        }
+
+        // กรณีที่บอร์ดเป็น public และผู้ใช้ไม่ใช่เจ้าของ ให้ return 403 Forbidden
+        if (!isPrivateBoard && !isOwner) {
+            throw new AccessDeniedException("Access denied! You are not authorized to update the visibility of this public board.");
+        }
+
+        // กรณีที่บอร์ดเป็น private และ user ไม่ใช่ owner ให้ return 403
+        if (isPrivateBoard && !isOwner) {
+            throw new AccessDeniedException("Access denied! You are not the owner of this private board.");
+        }
+
+        // กรณีที่เป็น owner และไม่ได้ส่ง body หรือ requestBody ไม่มีค่า visibility ให้ return 400
+        if (isOwner && (requestBody == null || !requestBody.containsKey("visibility"))) {
+            throw new BadRequestException("Visibility cannot be null or missing.");
+        }
+
+        // ตรวจสอบว่า visibility มีค่าเป็น public หรือ private หรือไม่
+        String visibility = requestBody.get("visibility");
+        if (visibility == null || (!"private".equalsIgnoreCase(visibility) && !"public".equalsIgnoreCase(visibility))) {
+            throw new BadRequestException("Invalid visibility value.");
         }
 
         // อัปเดตสถานะการมองเห็นใน entity
         Boards.Visibility boardVisibility = Boards.Visibility.valueOf(visibility.toUpperCase());
-        boardEntity.setBoardVisibility(boardVisibility);
-        boardRepository.save(boardEntity);
+        boardEntity.setVisibility(String.valueOf(boardVisibility));
+
+        // บันทึกการเปลี่ยนแปลงลงฐานข้อมูล
+        boardService.updateBoard(boardEntity);  // เรียก method เพื่อบันทึกการเปลี่ยนแปลง
 
         // สร้าง response object
         BoardUpdateResponse response = new BoardUpdateResponse(
-                boardEntity.getBoardId(),
+                boardEntity.getId(),
                 "Board visibility updated successfully",
-                boardEntity.getBoardVisibility().name()
+                boardEntity.getVisibility()
         );
 
         return ResponseEntity.ok(response);
