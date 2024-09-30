@@ -76,7 +76,6 @@ const closeHandle = () => {
               <div class="flex items-center space-x-3 ">
                   <p>Status</p>
                   <select @change="disabled = false" class="itbkk-status rounded px-3 py-1 border border-gray-300" v-model="itemData.status" name="" id="">
-                    <!-- TODO: Fetch all status that can change to -->
                     <option v-for="status in statusData" :value="status.id">{{ status.name }}</option>
                   </select>
               </div>

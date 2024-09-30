@@ -164,7 +164,6 @@ async function postData(url, task) {
             },
             body: JSON.stringify(task)
         })
-        console.log(response)
         if(response.status === 401) {
             localStorage.removeItem('token')
             localStorage.removeItem('payload')

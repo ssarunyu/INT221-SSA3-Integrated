@@ -15,10 +15,25 @@ const fetch = async () => {
     const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`)
     if(response) {
         statusInBoard.value = response
+        if(statusInBoard.value) {
+            if(statusInBoard.value[0].name === 'NO STATUS') {
+                statusInBoard.value[0].name = 'No Status'
+            }
+            if(statusInBoard.value[1].name === 'TODO') {
+                statusInBoard.value[1].name = 'To Do'
+            }
+            if(statusInBoard.value[2].name === 'DOING') {
+                statusInBoard.value[2].name = 'Doing'
+            }
+            if(statusInBoard.value[3].name === 'DONE') {
+                statusInBoard.value[3].name = 'Done'
+            }
+        }
     } else {
         console.log('error')
     }
 }
+
 // Delete
 const statuses = ref(statusInBoard.value);
 const normalDeleteStatusShow = ref(false);
@@ -49,7 +64,9 @@ const controlDelete = async (statusId) => {
     statusInBoard.value.splice(findStatusIndex, 1)
 };
 
-onMounted(() => fetch())
+onMounted(() => {
+    fetch()
+})
 </script>
 
 <template>
@@ -90,18 +107,17 @@ onMounted(() => fetch())
             </div>
             <!-- Add Status -->
             <div @click="router.push({ name: 'AddStatus' })"
-                    class="itbkk-button-add w-2/3 rounded-md p-5 bg-slate-200 text-slate-500 cursor-pointer duration-300 hover:bg-slate-300 hover:text-slate-700">
+                    class="itbkk-button-add rounded-md p-5 bg-slate-200 text-slate-500 cursor-pointer duration-300 hover:bg-slate-300 hover:text-slate-700">
                     + Add New Status
             </div>
             <!-- Card below head of table -->
             <div v-for="status in statusInBoard" class="itbkk-item w-full flex items-center justify-between p-3 bg-white rounded-lg shadow-md border">
                 <div>
-                    <p @click="router.push({ name: 'EditStatusPopup', params: { editStatusId: status.id }})">Edit</p>
+                    <p class="itbkk-button-edit" @click="router.push({ name: 'EditStatusPopup', params: { editStatusId: status.id }})">Edit</p>
                     <p @click="sendDeleteStatus(status)">Delete</p>
                 </div>
-                <p class="font-bold text-lg">{{ status.name }}</p>
+                <p class="itbkk-status-name font-bold text-lg px-5 rounded" :style="{ backgroundColor: status.color }">{{ status.name }}</p>
                 <p>{{ status.description }}</p>
-                <p class="px-3 py-1 text-black rounded-lg" :style="{ backgroundColor: status.color }">{{ status.name }}</p>
             </div>
         </div>
     </div>

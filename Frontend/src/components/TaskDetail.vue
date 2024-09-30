@@ -1,7 +1,7 @@
 <script setup>
 import { styleStatus } from '@/lib/styleStatus';
 import { getDataById } from '@/lib/fetchMethod';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import router from '@/router';
 import { useRoute } from 'vue-router';
 
@@ -17,6 +17,21 @@ onMounted(async () => {
   fetch.createdOn = new Date(fetch.createdOn).toLocaleString('en-AU', options)
   fetch.updatedOn = new Date(fetch.updatedOn).toLocaleString('en-AU', options)
   item.value = await fetch
+
+  if(item.value) {
+    if(item.value.status.name === 'NO STATUS') {
+      item.value.status.name = 'No Status'
+    }
+    if(item.value.status.name === 'TO DO') {
+      item.value.status.name = 'To Do'
+    }
+    if(item.value.status.name === 'DOING') {
+      item.value.status.name = 'Doing'
+    }
+    if(item.value.status.name === 'DONE') {
+      item.value.status.name = 'Done'
+    }
+  }
 })
 </script>
 
@@ -44,7 +59,10 @@ onMounted(async () => {
           </div>
           <div>
             <p class="text-lg font-bold">Status</p>
-            <p :class="styleStatus(item.status.name)" class="itbkk-status px-5 py-1 w-[7rem] rounded text-center">{{ item.status.name }}</p>
+            <p class="itbkk-status px-5 py-1 w-[7rem] rounded text-center shadow-md"
+            :style="{ backgroundColor: item.status.statusColor }">
+              {{ item.status.name }}
+            </p>
           </div>
         </div>
         <hr class="h-px my-5 bg-gray-200 border-0">

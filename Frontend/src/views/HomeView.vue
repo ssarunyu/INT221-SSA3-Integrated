@@ -28,27 +28,27 @@ const fetch = async() => {
     }
 }
 
-const items = allTasks.value
-watch(items, (newItems) => {
+watch(allTasks.value, (newItems) => {
     newItems.forEach(item => {
-        switch(item.status) {
-            case 'TO_DO':
-                item.status = 'To Do'
+        switch(item.status.name) {
+            case 'TODO':
+                item.status.name = 'To Do';
                 break;
-            case 'NO_STATUS':
-                item.status = 'No Status'
+            case 'NO STATUS':
+                item.status.name = 'No Status';
                 break;
             case 'DOING':
-                item.status = 'Doing'
+                item.status.name = 'Doing';
                 break;
             case 'DONE':
-                item.status = 'Done'
+                item.status.name = 'Done';
                 break;
             default:
                 break;
         }
     })
-})
+});
+
 
 onMounted(async () => {
     await fetch()
@@ -63,68 +63,68 @@ const options = {
     hour12: false,
 }
 
-const tasks = ref(allTasks.value)
-const sortStage = ref(0);
-const changeSortStage = () => {
-    sortStage.value = (sortStage.value + 1) % 3;
-};
+// const tasks = ref(allTasks.value)
+// const sortStage = ref(0);
+// const changeSortStage = () => {
+//     sortStage.value = (sortStage.value + 1) % 3;
+// };
 
-const sortTask = computed(() => {
-    const copyTask = [...tasks.value];
+// const sortTask = computed(() => {
+//     const copyTask = [...tasks.value];
 
-    const sortFunctions = {
-        0: tasks => tasks,
-        1: tasks => tasks.sort((a, b) => a.status.name.localeCompare(b.status.name)),
-        2: tasks => tasks.sort((a, b) => b.status.name.localeCompare(a.status.name))
-    };
+//     const sortFunctions = {
+//         0: tasks => tasks,
+//         1: tasks => tasks.sort((a, b) => a.status.name.localeCompare(b.status.name)),
+//         2: tasks => tasks.sort((a, b) => b.status.name.localeCompare(a.status.name))
+//     };
 
-    return sortFunctions[sortStage.value](copyTask);
-});
+//     return sortFunctions[sortStage.value](copyTask);
+// });
 
-const sortIcon = computed(() => {
-    const icons = {
-        0: 'fa-solid fa-sort',
-        1: 'fa-solid fa-sort-down',
-        2: 'fa-solid fa-sort-up'
-    };
+// const sortIcon = computed(() => {
+//     const icons = {
+//         0: 'fa-solid fa-sort',
+//         1: 'fa-solid fa-sort-down',
+//         2: 'fa-solid fa-sort-up'
+//     };
 
-    return icons[sortStage.value];
-});
+//     return icons[sortStage.value];
+// });
 
-const allStatusArr = allStatuses.value
-const filterSelect = ref([])
-const submitFilter = async (userClick) => {
-    const findExist = filterSelect.value.indexOf(userClick)
-    if (findExist !== -1) {
-        filterSelect.value.splice(findExist, 1)
-    } else {
-        filterSelect.value.push(userClick)
-    }
-    await updateTasks()
-}
+// const allStatusArr = allStatuses.value
+// const filterSelect = ref([])
+// const submitFilter = async (userClick) => {
+//     const findExist = filterSelect.value.indexOf(userClick)
+//     if (findExist !== -1) {
+//         filterSelect.value.splice(findExist, 1)
+//     } else {
+//         filterSelect.value.push(userClick)
+//     }
+//     await updateTasks()
+// }
 
-const updateTasks = async () => {
-    let userFilter = ''
-    if (filterSelect.value.length) {
-        userFilter = filterSelect.value.map(a => `filterStatuses=${a}`).join('&')
-    }
-    const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/tasks?${userFilter}`)
-    tasks.value = response
-}
+// const updateTasks = async () => {
+//     let userFilter = ''
+//     if (filterSelect.value.length) {
+//         userFilter = filterSelect.value.map(a => `filterStatuses=${a}`).join('&')
+//     }
+//     const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/tasks?${userFilter}`)
+//     tasks.value = response
+// }
 
-const clearFilter = async () => {
-    filterSelect.value = []
-    const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/tasks`)
-    tasks.value = response
-}
+// const clearFilter = async () => {
+//     filterSelect.value = []
+//     const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/tasks`)
+//     tasks.value = response
+// }
 
-const removeFilter = async (r) => {
-    const findExist = filterSelect.value.indexOf(r)
-    if (findExist !== -1) {
-        filterSelect.value.splice(findExist, 1)
-        await updateTasks()
-    }
-}
+// const removeFilter = async (r) => {
+//     const findExist = filterSelect.value.indexOf(r)
+//     if (findExist !== -1) {
+//         filterSelect.value.splice(findExist, 1)
+//         await updateTasks()
+//     }
+// }
 
 // Delete
 const deletePopupStatus = ref(false)
@@ -164,24 +164,9 @@ const deleteConfirm = async () => {
                 <h1 class="text-xs">{{ userAuthItem.email }}</h1>
             </div>
         </div>
-        <div class="flex flex-col">
-            <!-- Status Page button -->
-            <div class="flex justify-end">
-                <div class="itbkk-manage-status cursor-pointer" @click="router.push({name: 'StatusView'})">Status Page</div>
-            </div>
-            <!-- Head of table -->
-            <div class="flex w-full items-center justify-between font-xl font-bold text-white p-3 bg-slate-600">
-                <p>Title</p>
-                <p>Assignees</p>
-                <div class="flex items-center space-x-1">
-                    <p>Status</p>
-                    <div @click="changeSortStage()" class="p-2 cursor-pointer transition duration-300">
-                        <font-awesome-icon class="itbkk-status-sort" v-if="sortIcon" :icon="sortIcon" />
-                    </div>
-                </div>
-            </div>
+        <div class="flex flex-col space-y-4 p-5">
             <!-- Filter -->
-            <div class="flex">
+            <!-- <div class="flex">
                 <div class="itbkk-status-filter dropdown dropdown-bottom">
                     <div tabindex="0" role="button" class="btn m-1">Filter Tasks</div>
                     <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-white rounded-box w-52">
@@ -193,21 +178,37 @@ const deleteConfirm = async () => {
                         </div>
                     </ul>
                 </div>
-                <!-- Show already filter -->
                 <div class="flex items-center space-x-3 ml-4">
                     <div v-for="status in filterSelect" class="px-5 py-2 rounded bg-blue-200">
                         {{ status }}
                         <font-awesome-icon class="cursor-pointer" @click="removeFilter(status)" icon="fa-solid fa-xmark" />
                     </div>
                 </div>
+            </div> -->
+            <!-- Status Page button -->
+            <div class="flex justify-end">
+                <div class="itbkk-manage-status cursor-pointer" @click="router.push({name: 'StatusView'})">Status Page</div>
             </div>
+            <!-- Head of table -->
+            <div class="flex w-full items-center justify-between font-xl font-bold text-white p-3 bg-slate-600">
+                <p>Title</p>
+                <p>Assignees</p>
+                <div class="flex items-center space-x-1">
+                    <p>Status</p>
+                    <!-- <div @click="changeSortStage()" class="p-2 cursor-pointer transition duration-300"> -->
+                        <!-- <font-awesome-icon class="itbkk-status-sort" v-if="sortIcon" :icon="sortIcon" /> -->
+                    <!-- </div> -->
+                </div>
+            </div>
+            <!-- Add task button -->
             <div class="w-full flex flex-col justify-center items-center space-y-5">
                 <div @click="router.push({ name: 'AddTask' })"
-                class="itbkk-button-add w-2/3 rounded-md p-5 bg-slate-200 text-slate-500 cursor-pointer duration-300 hover:bg-slate-300 hover:text-slate-700">
-                + Add New Task
-            </div>
+                class="itbkk-button-add w-full rounded-md p-5 bg-slate-200 text-slate-500 cursor-pointer duration-300 hover:bg-slate-300 hover:text-slate-700">
+                    + Add New Task
+                </div>
             <Toast :toastObject="toastHandle" @close="toastHandle.status = false"/>
-            <div v-for="item in sortTask" :key="item.id" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded border">
+            <!-- Each element -->
+            <div v-for="item in allTasks" :key="item.id" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded border">
                 <div class="absolute left-0 w-1 h-10" :class="`bg-[${item.status.statusColor}]`"></div>
                 <div class="flex items-center space-x-3">
                     <div>
@@ -220,23 +221,23 @@ const deleteConfirm = async () => {
                                 <li>
                                     <a class="itbkk-button-edit"
                                     @click="router.push({name: 'EditTask', params: { taskId: item.id }})">
-                                    Edit
-                                </a>
-                            </li>
-                            <li>
-                                        <a class="itbkk-button-delete"
-                                        @click="openDeletePopup(item.id)">
+                                        Edit
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="itbkk-button-delete"
+                                    @click="openDeletePopup(item.id)">
                                         Delete
-                                        </a>
-                                    </li>
-                                </ul>
+                                    </a>
+                                </li>
+                            </ul>
                             </div>
                         </div>
                         <p class="text-xl font-bold">
                             {{ item.id }}
                         </p>
                         <div class="w-full">
-                            <p @click="router.push({ name: 'TaskDetail', params: { detailId: item.id}})" class="itbkk-title break-all font-bold text-xl duration-200 cursor-pointer hover:text-gray-700">
+                            <p @click="router.push({ name: 'TaskDetail', params: { detailId: item.id }})" class="itbkk-title break-all font-bold text-xl duration-200 cursor-pointer hover:text-gray-700">
                                 {{ item.title }}
                             </p>
                             <p class="itbkk-assignees" :class="item.assignees === null ? 'italic text-gray-500' : ''">
@@ -245,7 +246,9 @@ const deleteConfirm = async () => {
                         </div>
                     </div>
                     <div>
-                        <p class="itbkk-status px-4 py-2 rounded" :style="{ backgroundColor: item.status.statusColor }">{{ item.status.name }}</p>
+                        <p class="itbkk-status px-4 py-2 rounded shadow-md" :style="{ backgroundColor: item.status.statusColor }">
+                            {{ item.status.name }}
+                        </p>
                     </div>
                 </div>
             </div>

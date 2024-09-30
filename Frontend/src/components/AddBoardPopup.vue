@@ -18,27 +18,26 @@ const createNewBoard = async () => {
   const newBoard = {
     name: addName.value.trim(),
     visibility: isPrivate.value ? 'PRIVATE' : 'PUBLIC'
-  };
+  }
 
   try {
     const result = await postBoard("http://localhost:8080/v3/boards", newBoard);
-    console.log("Server Response:", result);
-
-    if (result && result.status === 201) {
-      closeHandle();
-      router.push({ name: "Home", params: { boardId: result.data.id } });
-    }
-    else {
-      console.error("Error creating board:", result);
-    }
+    
     if(result.status === 401) {
       router.push({ name: 'Login' })
     }
+    if (result && result.status === 201) {
+      closeHandle();
+      router.push({ name: "Home", params: { boardId: result.data.id } });
+    } else {
+      console.error("Error creating board:", result);
+    }
+
     console.log(result)
   } catch (error) {
     console.error("Error in creating new board:", error);
   }
-};
+}
 </script>
 
 <template>
@@ -78,7 +77,7 @@ const createNewBoard = async () => {
               </div>
             </form>
             <div class="mt-5 space-x-5">
-              <button @click="createNewBoard"
+              <button @click="createNewBoard()"
                 class="itbkk-button-ok bg-green-500 duration-200 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded">
                 Create
               </button>

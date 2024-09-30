@@ -19,6 +19,20 @@ const allStatus = ref([]);
 const fetchStatus = async () => {
   const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`);
   allStatus.value = await response;
+  if(allStatus.value) {
+    if(allStatus.value[0].name === 'NO STATUS') {
+      allStatus.value[0].name = 'No Status'
+    }
+    if(allStatus.value[1].name === 'TODO') {
+      allStatus.value[1].name = 'To Do'
+    }
+    if(allStatus.value[2].name === 'DOING') {
+      allStatus.value[2].name = 'Doing'
+    }
+    if(allStatus.value[3].name === 'DONE') {
+      allStatus.value[3].name = 'Done'
+    }
+  }
 };
 
 onMounted(async () => {
@@ -38,7 +52,7 @@ const confirmHandle = async () => {
     // Send task that just add to parent to resolve ref update
     emit('taskAdded', newTask)
     // Redirect when complete
-    router.push({name: 'Home'})
+    router.push({ name: 'Home', params: { boardId: route.params.boardId }})
   } catch (error) {
     console.error(error);
   }
@@ -55,7 +69,7 @@ const resetForm = () => {
 
 const closeHandle = () => {
   resetForm();
-  router.push({ name: 'Home', params: { boardId: route.params.boardId } });
+  router.push({ name: 'Home', params: { boardId: route.params.boardId }})
 };
 </script>
 
@@ -86,7 +100,9 @@ const closeHandle = () => {
             <div class="flex items-center space-x-3">
               <p class="font-semibold">Status</p>
               <select v-model="addStatus" class="itbkk-status rounded px-3 py-1 border border-gray-300">
-                <option v-for="status in allStatus" :key="status.id" :value="status.id">{{ status.name }}</option>
+                <option v-for="status in allStatus" :key="status.id" :value="status.id">
+                  {{ status.name }}
+                </option>
               </select>
             </div>
           </form>
