@@ -30,6 +30,9 @@ const createNewBoard = async () => {
       closeHandle();
       router.push({ name: "Home", params: { boardId: result.data.id } });
     } else {
+      if(result.status === 401) {
+        router.push({ name: 'Login' })
+      }
       console.error("Error creating board:", result);
     }
 

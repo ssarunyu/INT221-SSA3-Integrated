@@ -56,7 +56,6 @@ const handleLogout = () => {
 
 <template>
   <div class="w-full h-screen bg-gray-100">
-    <p>Software Development Kanban Board for the course INT222 Integrated Project II at School of Information Technology in 202</p>
     <!-- TITLE -->
     <div
       class="title bg-slate-800 text-white shadow-md flex justify-between items-center px-5"

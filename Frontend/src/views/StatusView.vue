@@ -8,6 +8,9 @@ import { ref, onMounted } from 'vue'
 import DeleteStatusPopup from '@/components/DeleteStatusPopup.vue';
 import TransferDeleteStatusPopup from '@/components/TransferDeleteStatusPopup.vue';
 
+// Payload
+const userAuthItem = JSON.parse(localStorage.getItem('payload'))
+
 const route = useRoute()
 
 const statusInBoard = ref({})
@@ -91,13 +94,15 @@ onMounted(() => {
             <h1 class="font-bold text-2xl text-white">ITBKK SSA3 Taskboard</h1>
             <!-- User Info -->
             <div class="text-right text-white">
-                <h1 class="font-semibold">John Doe</h1>
-                <h1 class="text-xs">john.doe@example.com</h1>
+                <h1 class="font-semibold">{{ userAuthItem.name }}</h1>
+                <h1 class="text-xs">{{ userAuthItem.email }}</h1>
             </div>
         </div>
 
         <div class="flex flex-col space-y-4 p-5">
-
+            <div class="flex justify-end">
+                <div class="cursor-pointer px-5 py-3 bg-slate-300 rounded" @click="router.push({name: 'Home'})">Main Page</div>
+            </div>
             <!-- Head of table -->
             <div class="flex w-full items-center justify-between font-bold text-white p-3 bg-slate-600">
                 <p>Title</p>

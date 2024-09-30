@@ -14,6 +14,7 @@ const userAuthItem = JSON.parse(localStorage.getItem('payload'))
 
 const allTasks = ref([])
 const allStatuses = ref([])
+const boardDetail = ref()
 const fetch = async() => {
     // Fetch task
     const allTask = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks`)
@@ -26,6 +27,10 @@ const fetch = async() => {
     if(allStatus !== undefined) {
         allStatuses.value.push(...allStatus)
     }
+
+    // Fetch that board detail
+    const responseBoardDetail = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}`)
+    boardDetail.value = responseBoardDetail
 }
 
 watch(allTasks.value, (newItems) => {
@@ -52,6 +57,7 @@ watch(allTasks.value, (newItems) => {
 
 onMounted(async () => {
     await fetch()
+    console.log(boardDetail.value)
 })
 
 // Toast
@@ -187,7 +193,10 @@ const deleteConfirm = async () => {
             </div> -->
             <!-- Status Page button -->
             <div class="flex justify-end">
-                <div class="itbkk-manage-status cursor-pointer" @click="router.push({name: 'StatusView'})">Status Page</div>
+                <div class="itbkk-manage-status cursor-pointer px-5 py-3 bg-slate-300 rounded" @click="router.push({name: 'StatusView'})">Status Page</div>
+            </div>
+            <div v-if="boardDetail">
+                <p class="text-center text-2xl font-bold">{{ boardDetail.boardName }}</p>
             </div>
             <!-- Head of table -->
             <div class="flex w-full items-center justify-between font-xl font-bold text-white p-3 bg-slate-600">

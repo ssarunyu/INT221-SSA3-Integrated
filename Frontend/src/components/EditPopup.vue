@@ -15,6 +15,20 @@ onMounted(async () => {
   const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks/${route.params.taskId}`)
   const statusResponse = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`)
   statusData.value = statusResponse
+  if(statusData.value) {
+    if(statusData.value[0].name === 'NO STATUS') {
+      statusData.value[0].name = 'No Status'
+    }
+    if(statusData.value[1].name === 'TODO') {
+      statusData.value[1].name = 'To Do'
+    }
+    if(statusData.value[2].name === 'DOING') {
+      statusData.value[2].name = 'Doing'
+    }
+    if(statusData.value[3].name === 'DONE') {
+      statusData.value[3].name = 'Done'
+    }
+  }
 
   if(response.status === 404) {
     // NOTE: Give data to variables cause need to show the popup
@@ -86,7 +100,7 @@ const closeHandle = () => {
               </div>
             </form>
             <div class="itbkk-button-action mt-5 space-x-5">
-                <button :disabled="disabled" class="itbkk-button-edit bg-green-500 duration-200 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded disabled:cursor-not-allowed disabled:opacity-50"
+                <button :disabled="disabled" class="itbkk-button-confirm bg-green-500 duration-200 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded disabled:cursor-not-allowed disabled:opacity-50"
                 @click="updateHandle()">
                   Save
                 </button>
