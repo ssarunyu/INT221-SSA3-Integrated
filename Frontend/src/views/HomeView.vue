@@ -1,11 +1,14 @@
 <script setup>
 import { ref, watch, onMounted, computed } from 'vue';
-import { getData, getDataById, deleteData, postData, updateData } from '@/lib/fetchMethod.js';
+import { getData, getDataById, deleteData, postData, updateData, patchVisi } from '@/lib/fetchMethod.js';
 import router from '@/router';
 import { useRoute } from 'vue-router';
 import Toast from '@/components/Toast.vue'
 import { styleStatus } from '@/lib/styleStatus';
+
+// Components
 import DeletePopup from '@/components/DeletePopup.vue';
+import VisibilityBoardPopup from '@/components/VisibilityBoardPopup.vue';
 
 
 const route = useRoute()
@@ -31,6 +34,8 @@ const fetch = async() => {
     // Fetch that board detail
     const responseBoardDetail = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}`)
     boardDetail.value = responseBoardDetail
+
+    
 }
 
 watch(allTasks.value, (newItems) => {
@@ -54,10 +59,12 @@ watch(allTasks.value, (newItems) => {
     })
 });
 
-
+// Set the initial value for isPrivate base on boardDetail bisibility after fetch
+const isPrivate = ref()
 onMounted(async () => {
     await fetch()
     console.log(boardDetail.value)
+    isPrivate.value = boardDetail.value.visibility === 'PRIVATE' ? true : false
 })
 
 // Toast
@@ -155,9 +162,45 @@ const deleteConfirm = async () => {
         deletePopupStatus.value = false
     }
 }
+
+// Visibility and modal
+// NOTE: True = private, False = public
+const showVisi = ref(false)
+// Open popup
+const changeVisi = () => {
+    showVisi.value = true
+}
+// Handle confirm
+const confirmVisibilityChange = async (confirmation) => {
+    console.log('confirm', confirmation)
+    isPrivate.value = confirmation
+    try {
+        // Should couter with base because it's change opposite
+        const response = await patchVisi(import.meta.env.VITE_BASE_URL, route.params.boardId, confirmation ? 'PRIVATE' : 'PUBLIC')
+        if(response.status === 500) {
+            window.alert('There is a problem. Please try again later.')
+        }
+        if(response.status === 403) {
+            window.alert('you do not have permission')
+        }
+        showVisi.value = false
+    } catch (error) {
+        console.error(error)
+    }
+}
+// Handle cancel
+const cancelVisibilityChange = () => {
+    showVisi.value = false
+}
 </script>
 
 <template>
+    <VisibilityBoardPopup 
+        v-if="showVisi" 
+        :isPrivate="isPrivate" 
+        @confirm="confirmVisibilityChange" 
+        @cancel="cancelVisibilityChange" 
+    />
     <router-view></router-view>
     <DeletePopup v-show="deletePopupStatus" v-if="deleteTarget" :deleteItem="deleteTarget" @close="deletePopupStatus = false" @confirm="deleteConfirm()"/>
     <div class="w-full min-h-screen">
@@ -196,6 +239,18 @@ const deleteConfirm = async () => {
                 <div class="itbkk-manage-status cursor-pointer px-5 py-3 bg-slate-300 rounded" @click="router.push({name: 'StatusView'})">Status Page</div>
             </div>
             <div v-if="boardDetail">
+                <!-- Toggle visibility button -->
+                <div class="relative flex">
+                    <input type="checkbox" class="absolute opacity-0" />
+                    <div
+                        class="itbkk-board-visibility w-12 h-6 bg-gray-300 rounded-full cursor-pointer transition duration-200"
+                        :class="{'bg-green-500': !isPrivate}"
+                        @click="changeVisi"
+                    >
+                        <div class="w-6 h-6 bg-white rounded-full shadow-md transform transition duration-200" :style="isPrivate ? 'transform: translateX(0)' : 'transform: translateX(100%);'"></div>
+                    </div>
+                    <p class="ml-3">{{ isPrivate ? 'Private' : 'Public' }} Board</p>
+                </div>
                 <p class="text-center text-2xl font-bold">{{ boardDetail.boardName }}</p>
             </div>
             <!-- Head of table -->

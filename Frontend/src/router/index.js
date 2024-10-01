@@ -60,22 +60,24 @@ function isTokenExpired(payload) {
 
 // Navigation Guard
 // TODO: Not-Well form
-// router.beforeEach((to, from, next) => {
-//   const token = JSON.parse(localStorage.getItem('token'))
-//   const payload = JSON.parse(localStorage.getItem('payload'))
+router.beforeEach((to, from, next) => {
+  const token = JSON.parse(localStorage.getItem('token'))
+  const payload = JSON.parse(localStorage.getItem('payload'))
   
-//   if(token && payload) {
-//     if(isTokenExpired(payload)) {
-//       // If token expired remove from localStorage
-//       localStorage.removeItem('token')
-//       localStorage.removeItem('payload')
-//       next({ name: 'Login' })
-//       return;
-//     }
-//   }
-//   if (to.name !== 'Login' && !token) {
-//     next({ name: 'Login' })
-//   } else next()
-// })
+  if(token && payload) {
+    if(isTokenExpired(payload)) {
+      // If token expired remove from localStorage
+      localStorage.removeItem('token')
+      localStorage.removeItem('payload')
+      next({ name: 'Login' })
+      return;
+    }
+  } else {
+    window.alert('Access denied, you do not have permission to view this page.')
+  }
+  if (to.name !== 'Login' && !token) {
+    next({ name: 'Login' })
+  } else next()
+})
 
 export default router

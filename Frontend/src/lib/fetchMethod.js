@@ -51,7 +51,7 @@ async function postBoard(url, newBoard) {
 
 async function postBoardId(url,boardId,id){
     const finalURL = `${url}/${id}`
-     const token = JSON.parse(localStorage.getItem('token'))
+    const token = JSON.parse(localStorage.getItem('token'))
     try {
         const response = await fetch(finalURL, {
             method: "GET",
@@ -248,6 +248,35 @@ async function transferData(url, oldId, newId) {
     }
 }
 
+async function patchVisi(url, boardId, type) {
+    const token = JSON.parse(localStorage.getItem('token'))
+    const finalURL = `${url}/v3/boards/${boardId}`
+    if(token) {
+        try {
+            const response = await fetch(finalURL, {
+                method: "PATCH",
+                headers: {
+                    'Authorization': `Bearer ${token.access_token}`,
+                    "Content-Type": "application/json"
+                },
+                // Type is plain text 'public' and 'private' control in child element
+                body: JSON.stringify({ visibility: type })
+            })
+            if(response.status === 401) {
+                localStorage.removeItem('token')
+                localStorage.removeItem('payload')
+                router.push({ name: 'Login' })
+            }
+            console.log(await response.json())
+            return response
+        } catch (error) {
+            console.log(error)
+        }  
+    } else {
+        router.push({ name: 'Login' })
+    }
+}
+
 // NOTE: Change to use user stores
 import { useUserStore } from "@/stores/UserStore"
 async function postLogin(url, obj) {
@@ -258,7 +287,7 @@ async function postLogin(url, obj) {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(
-                {userName: obj.username, password: obj.password}
+                { userName: obj.username, password: obj.password }
             )
         })
         if(response.status === 200) {
@@ -273,4 +302,4 @@ async function postLogin(url, obj) {
     }
 }
 
-export { getData, getDataById, postData, updateData, deleteData, transferData, postLogin, postBoard ,postBoardId ,getBoardId ,deleteBoardId }
+export { getData, getDataById, postData, updateData, deleteData, transferData, postLogin, postBoard ,postBoardId ,getBoardId ,deleteBoardId, patchVisi }

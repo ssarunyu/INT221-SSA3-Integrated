@@ -119,7 +119,7 @@ onMounted(() => {
             <div v-for="status in statusInBoard" class="itbkk-item w-full flex items-center justify-between p-3 bg-white rounded-lg shadow-md border">
                 <div>
                     <p class="itbkk-button-edit" @click="router.push({ name: 'EditStatusPopup', params: { editStatusId: status.id }})">Edit</p>
-                    <p @click="sendDeleteStatus(status)">Delete</p>
+                    <p class="itbkk-button-delete" @click="sendDeleteStatus(status)">Delete</p>
                 </div>
                 <p class="itbkk-status-name font-bold text-lg px-5 rounded" :style="{ backgroundColor: status.color }">{{ status.name }}</p>
                 <p>{{ status.description }}</p>

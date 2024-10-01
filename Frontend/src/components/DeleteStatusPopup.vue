@@ -51,7 +51,7 @@ const confirmHandle = async () => {
                 <div class="mt-4 md:mt-0 md:ml-6 text-center md:text-left">
                 <p class="font-bold">Warning!</p>
                 <p class="itbkk-message text-sm text-gray-700 mt-1">
-                    Do you want to delete <strong>{{ deleteItem.name }}</strong> status?
+                    Do you want to delete the <strong>{{ deleteItem.name }}</strong> status?
                 </p>
                 </div>
             </div>
