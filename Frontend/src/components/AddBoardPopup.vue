@@ -35,8 +35,6 @@ const createNewBoard = async () => {
       }
       console.error("Error creating board:", result);
     }
-
-    console.log(result)
   } catch (error) {
     console.error("Error in creating new board:", error);
   }

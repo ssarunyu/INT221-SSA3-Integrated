@@ -78,7 +78,7 @@ async function checkBoardAccess(to, from, next) {
 
     // Ensure responseBoardDetail is defined and has the expected structure
     if (!responseBoardDetail) {
-      window.alert('Error of fect board detail for un-auth user i dont know how to fix');
+      window.alert('Error of fetch board detail for un-auth user i dont know how to fix');
       return next({ name: 'Login' }); // Redirect to login if board is not found
     }
 

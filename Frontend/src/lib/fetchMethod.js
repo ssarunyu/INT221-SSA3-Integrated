@@ -38,6 +38,11 @@ async function postBoard(url, newBoard) {
                 },
                 body: JSON.stringify(newBoard)
             })
+            if(response.status === 401) {
+                localStorage.removeItem('token')
+                localStorage.removeItem('payload')
+                router.push({ name: 'Login' })
+            }
             const result = await response.json();
             return { status: response.status, data: result };
         } catch (error) {
