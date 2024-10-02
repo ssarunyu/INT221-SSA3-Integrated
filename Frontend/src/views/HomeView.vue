@@ -235,8 +235,6 @@
 
   // User permission
   const isOwner = ref(route.meta.isOwner)
-  console.log(isOwner);
-  
 
   //User card
   const showUserInfoPopup = ref(false)
@@ -316,7 +314,7 @@
           class="px-4 py-2 mb-4 text-white bg-blue-500 rounded hover:bg-blue-600"
           @click="router.push({ name: 'Board' })"
         >
-          ← Go Back to All Boards
+          ← Go Back to Boards
         </button>
         <!-- Status Page button -->
         <button

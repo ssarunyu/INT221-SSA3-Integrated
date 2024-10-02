@@ -74,7 +74,7 @@ const closeHandle = () => {
 </script>
 
 <template>
-  <div class="fixed z-10 inset-0 overflow-y-auto">
+  <div class="fixed inset-0 z-10 overflow-y-auto">
     <div class="flex items-center justify-center h-screen">
       <!-- Overlay -->
       <div class="fixed inset-0 bg-gray-500 bg-opacity-75 backdrop-blur"></div>
@@ -82,24 +82,24 @@ const closeHandle = () => {
       <div class="itbkk-modal-task relative bg-white rounded-lg shadow-xl w-[70%]">
         <div class="flex flex-col p-5">
           <form class="space-y-5" novalidate>
-            <h2 class="text-2xl font-bold mb-4">Add Task</h2>
+            <h2 class="mb-4 text-2xl font-bold">Add Task</h2>
             <hr>
             <div class="flex flex-col">
               <p class="font-semibold">Title</p>
-              <input v-model="addTitle" class="itbkk-title border border-black rounded p-2 peer invalid:border-red-500 focus:outline-none" type="text" required>
-              <p class="hidden peer-invalid:block text-red-600 text-sm">This field is required</p>
+              <input v-model="addTitle" class="p-2 border border-black rounded itbkk-title peer invalid:border-red-500 focus:outline-none" type="text" required>
+              <p class="hidden text-sm text-red-600 peer-invalid:block">This field is required</p>
             </div>
             <div class="flex flex-col">
               <p class="font-semibold">Description</p>
-              <input v-model="addDescription" class="itbkk-description border border-black rounded p-2 focus:outline-none" type="text">
+              <input v-model="addDescription" class="p-2 border border-black rounded itbkk-description focus:outline-none" type="text">
             </div>
             <div class="flex flex-col">
               <p class="font-semibold">Assignees</p>
-              <input v-model="addAssignees" class="itbkk-assignees border border-black rounded p-2 focus:outline-none" type="text">
+              <input v-model="addAssignees" class="p-2 border border-black rounded itbkk-assignees focus:outline-none" type="text">
             </div>
             <div class="flex items-center space-x-3">
               <p class="font-semibold">Status</p>
-              <select v-model="addStatus" class="itbkk-status rounded px-3 py-1 border border-gray-300">
+              <select v-model="addStatus" class="px-3 py-1 border border-gray-300 rounded itbkk-status">
                 <option v-for="status in allStatus" :key="status.id" :value="status.id">
                   {{ status.name }}
                 </option>
@@ -107,10 +107,10 @@ const closeHandle = () => {
             </div>
           </form>
           <div class="mt-5 space-x-5">
-            <button @click="confirmHandle" class="itbkk-button-confirm bg-green-500 duration-200 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded disabled:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50">
+            <button @click="confirmHandle" class="px-4 py-2 font-semibold text-white duration-200 bg-green-500 rounded itbkk-button-confirm hover:bg-green-600 disabled:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50">
               Save
             </button>
-            <button @click="closeHandle" class="itbkk-button-cancel bg-red-500 duration-200 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded">
+            <button @click="closeHandle" class="px-4 py-2 font-semibold text-white duration-200 bg-red-500 rounded itbkk-button-cancel hover:bg-red-600">
               Cancel
             </button>
           </div>

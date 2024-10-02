@@ -65,46 +65,6 @@ const router = createRouter({
   ],
 });
 
-// Utility function to check board access 
-// async function checkBoardAccess(to, from, next) {
-//   try {
-//       // Always try to get board details without requiring auth
-//       const responseBoardDetail = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${to.params.boardId}`, false);
-
-//       // Ensure responseBoardDetail is valid and has the visibility property
-//       if (responseBoardDetail && responseBoardDetail.visibility) {
-//           // Check if the board is PUBLIC
-//           if (responseBoardDetail.visibility === 'PUBLIC') {
-//               to.meta.isOwner = false;
-//               next(); // Allow access if the board is public
-//           } else {
-//               // If not public, check if the user is authenticated
-//               const token = JSON.parse(localStorage.getItem('token'));
-              
-//               if (!token) {
-//                   next({ name: 'Login' }); // If no token, redirect to login
-//               } else {
-//                   // Check ownership if the user is authenticated
-//                   const payload = JSON.parse(localStorage.getItem('payload'));
-                  
-//                   if (payload && responseBoardDetail.owner.userId === payload.oid) {
-//                       to.meta.isOwner = true;
-//                       next(); // User is the owner, allow access
-//                   } else {
-//                       next({ name: 'Login' }); // Not authorized, redirect to login
-//                   }
-//               }
-//           }
-//       } else {
-//           console.log('Board not found or visibility is missing, redirecting to 404.');
-//           next({ name: 'Notfound' }); // Board not found or visibility is missing, redirect to 404
-//       }
-//   } catch (error) {
-//       console.error('Error fetching board details:', error);
-//       next({ name: 'Notfound' }); // Handle fetch error, redirect to 404
-//   }
-// }
-
 // Utility function to check board access
 async function checkBoardAccess(to, from, next) {
   try {

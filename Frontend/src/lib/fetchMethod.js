@@ -1,52 +1,34 @@
 import router from '@/router';
 import { jwtDecode } from "jwt-decode";
 
-async function getData(url, requireAuth = true, isPublicBoard = false) {
-    const token = JSON.parse(localStorage.getItem('token'));
-
-    // If authentication is required and it's not a public board, but no token is present, redirect to login
-    if (requireAuth && !isPublicBoard && !token) {
-        router.push({ name: 'Login' });
-        return;
-    }
-
-    try {
-        const headers = {};
-        if (token) {
-            headers['Authorization'] = `Bearer ${token.access_token}`;
+async function getData(url) {
+    const token = JSON.parse(localStorage.getItem('token'))
+    if(token) {
+        try {
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    'Authorization': `Bearer ${token.access_token}`
+                }
+            })
+            if(response.status === 401) {
+                localStorage.removeItem('token')
+                localStorage.removeItem('payload')
+                router.push({ name: 'Login' })
+            }
+            if(response.status === 403) {
+                window.alert('Access denied, you do not have permission to view this page.')
+                router.push({ name: 'Login' })
+            }
+            const result = await response.json()
+            return result
+        } catch (error) {
+            console.log(error)
         }
-
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-              ...headers,
-              'Content-Type': 'application/json',
-            },
-          });
-
-        if (!response.ok) {
-            console.error('Failed to fetch data:', response.status, response.statusText); // Log the status
-            throw new Error('Network response was not ok');
-          }
-
-        if (response.status === 401 && requireAuth) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('payload');
-            router.push({ name: 'Login' });
-        }
-
-        if (response.status === 403) {
-            window.alert('Access denied, you do not have permission to view this page.');
-            router.push({ name: 'Login' });
-        }
-
-        const result = await response.json();
-        return result;
-    } catch (error) {
-        console.log(error);
+    } else {
+        router.push({ name: 'Login' })
     }
 }
-
 
 async function postBoard(url, newBoard) {
     const token = JSON.parse(localStorage.getItem('token'))

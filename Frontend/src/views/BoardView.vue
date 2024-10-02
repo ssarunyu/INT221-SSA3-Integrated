@@ -10,28 +10,48 @@
   const boards = ref([])
   const showAddBoardPopup = ref(false)
   const showUserInfoPopup = ref(false)
+  const justLoggedIn = ref(false)
+  const isFetchingBoards = ref(false);
 
   const fetchBoards = async () => {
-
-    if (!userAuthItem) {
-      router.push({ name: "Login" })
-      return
-    }
-    
-    try {
-      boards.value = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards`)
-      // If user already have board redirect to that board
-      if (boards.value.length > 0) {
-        router.push({ name: "Home", params: { boardId: boards.value[0].id } })
-      }
-    } catch (error) {
-      console.error("Error fetching boards:", error)
-    }
+  if (!userAuthItem) {
+    router.push({ name: "Login" });
+    return;
   }
 
-  onMounted(async () => {
-    await fetchBoards()
-  })
+  isFetchingBoards.value = true; // Set fetching to true
+  try {
+    boards.value = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards`);
+
+    // Redirect only if just logged in and if we're not coming back from 'Home'
+    if (boards.value.length > 0 && justLoggedIn.value === true) {
+      const latestBoard = boards.value.sort(
+        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+      )[0];
+
+      router.replace({ name: "Home", params: { boardId: latestBoard.id } });
+      justLoggedIn.value = false;
+    }
+  } catch (error) {
+    console.error("Error fetching boards:", error);
+  } finally {
+    isFetchingBoards.value = false; // Set fetching to false regardless of success or failure
+  }
+};
+
+
+onMounted(async () => {
+  justLoggedIn.value = true;
+
+  // ตรวจสอบว่า route มาจากหน้าไหน
+  if (router.name !== "Home") {
+    try {
+      await fetchBoards();
+    } catch (error) {
+      console.error("Error during mounted hook:", error);
+    }
+  }
+});
 
   const openAddBoardPopup = () => {
     showAddBoardPopup.value = true
@@ -86,6 +106,11 @@
         class="p-5 duration-300 rounded-md cursor-pointer itbkk-button-create bg-slate-200 text-slate-500 hover:bg-slate-300 hover:text-slate-700"
       >
         + Add New Board
+      </div>
+
+            <!-- Show loading spinner or message -->
+            <div v-if="isFetchingBoards" class="text-gray-600">
+        Loading boards...
       </div>
     </div>
 
