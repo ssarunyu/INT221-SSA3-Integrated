@@ -14,6 +14,7 @@ import int221.sit.taskboard.repositories.task.BoardRepository;
 import int221.sit.taskboard.repositories.task.UserListRepository;
 import int221.sit.taskboard.services.BoardService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -95,7 +96,7 @@ public class BoardController {
     }
 
     @PostMapping("/boards")
-    public ResponseEntity<BoardForCreated> createBoard(@RequestBody(required = false) BoardForCreated bfc, HttpServletRequest request) {
+    public ResponseEntity<BoardForCreated> createBoard(@Valid @RequestBody(required = false) BoardForCreated bfc, HttpServletRequest request) {
         if (bfc == null) {
             throw new BadRequestException("Please fill in the board information completely!");
         }

@@ -68,26 +68,28 @@ const router = createRouter({
 });
 
 // Utility function to check board access
-// Utility function to check board access
 async function checkBoardAccess(to, from, next) {
-  const payload = JSON.parse(localStorage.getItem('payload'));
-
   try {
     const responseBoardDetail = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${to.params.boardId}`);
-
-    // Check if the user is the owner
-    if (payload && responseBoardDetail.owner.userId === payload.oid) {
-      to.meta.isOwner = true;
-      next(); // User is the owner, continue to the route
-    } else if (responseBoardDetail.visibility === 'PUBLIC') {
+    
+    // ตรวจสอบว่า Board เป็น Public หรือไม่
+    if (responseBoardDetail.visibility === 'PUBLIC') {
       to.meta.isOwner = false;
-      next(); // Public board access granted
+      next(); // ให้เข้าถึงได้ถ้า Board เป็น Public
+    } else {
+      // ถ้าไม่ใช่ Public ให้ตรวจสอบ token และ owner
+      const payload = JSON.parse(localStorage.getItem('payload'));
+
+      if (payload && responseBoardDetail.owner.userId === payload.oid) {
+        to.meta.isOwner = true;
+        next(); // User เป็นเจ้าของบอร์ด ให้เข้าถึงได้
+      } else {
+        next({ name: 'Login' }); // ไม่สามารถเข้าถึงได้ ให้ไปหน้า Login
+      }
     }
   } catch (error) {
-    next()
     console.error('Error fetching board details:', error);
-    // window.alert('Error fetching board details. Redirecting to login.');
-    // next({ name: 'Login' });
+    next({ name: 'Notfound' }); // ถ้ามีข้อผิดพลาด ให้ redirect ไปหน้า 404
   }
 }
 
@@ -102,15 +104,24 @@ function isTokenExpired(payload) {
 router.beforeEach((to, from, next) => {
   const token = JSON.parse(localStorage.getItem('token'));
   const payload = JSON.parse(localStorage.getItem('payload'));
+
+  // ถ้ามี token และ payload
   if (token && payload) {
+    // ตรวจสอบว่า token หมดอายุหรือไม่
     if (isTokenExpired(payload)) {
       localStorage.removeItem('token');
       localStorage.removeItem('payload');
-      next({ name: 'Login' });
+      next({ name: 'Login' }); // ถ้า token หมดอายุ ให้ไปหน้า login
       return;
     }
   }
-  next(); // Allow access to all routes for unauthenticated users
+
+  // ตรวจสอบว่าเส้นทางเป็น public หรือไม่ (เช่น '/login' หรือ 'public board')
+  if (to.name === 'Login' || to.name === 'Notfound' || to.meta.isPublic) {
+    next(); // ให้ผ่านได้ถ้าเป็นเส้นทางที่ไม่ต้องการ auth
+  } else {
+    next(); // ให้ผ่านสำหรับเส้นทางที่ต้องการ auth แต่ token ไม่หมดอายุ
+  }
 });
 
 export default router;

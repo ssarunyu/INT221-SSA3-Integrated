@@ -75,7 +75,7 @@ public class BoardService {
         if (bfc.getVisibility() != null &&
                 ("private".equalsIgnoreCase(bfc.getVisibility()) || "public".equalsIgnoreCase(bfc.getVisibility()))) {
             newBoard.setBoardVisibility(Boards.Visibility.valueOf(bfc.getVisibility().toUpperCase()));
-        } else if (bfc.getVisibility() == null) {
+        } else if (bfc.getVisibility() == null || bfc.getVisibility().isEmpty() || bfc.getVisibility().isBlank()) {
             // ตั้งค่าเริ่มต้นให้ visibility เป็น private
             newBoard.setBoardVisibility(Boards.Visibility.PRIVATE);
         } else {
