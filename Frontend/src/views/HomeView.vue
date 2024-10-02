@@ -34,8 +34,6 @@ const fetch = async() => {
     // Fetch that board detail
     const responseBoardDetail = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}`)
     boardDetail.value = responseBoardDetail
-
-    
 }
 
 watch(allTasks.value, (newItems) => {
@@ -63,7 +61,6 @@ watch(allTasks.value, (newItems) => {
 const isPrivate = ref()
 onMounted(async () => {
     await fetch()
-    console.log(boardDetail.value)
     isPrivate.value = boardDetail.value.visibility === 'PRIVATE' ? true : false
 })
 
@@ -192,6 +189,10 @@ const confirmVisibilityChange = async (confirmation) => {
 const cancelVisibilityChange = () => {
     showVisi.value = false
 }
+
+// User permission
+const isOwner = ref(route.meta.isOwner)
+
 </script>
 
 <template>
@@ -266,10 +267,12 @@ const cancelVisibilityChange = () => {
             </div>
             <!-- Add task button -->
             <div class="w-full flex flex-col justify-center items-center space-y-5">
-                <div @click="router.push({ name: 'AddTask' })"
-                class="itbkk-button-add w-full rounded-md p-5 bg-slate-200 text-slate-500 cursor-pointer duration-300 hover:bg-slate-300 hover:text-slate-700">
+                <button @click="router.push({ name: 'AddTask' })"
+                class="itbkk-button-add disabled:cursor-not-allowed w-full rounded-md p-5 bg-slate-200 text-slate-500 cursor-pointer duration-300 hover:bg-slate-300 hover:text-slate-700"
+                :disabled="!isOwner"
+                >
                     + Add New Task
-                </div>
+                </button>
             <Toast :toastObject="toastHandle" @close="toastHandle.status = false"/>
             <!-- Each element -->
             <div v-for="item in allTasks" :key="item.id" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded border">
@@ -283,16 +286,18 @@ const cancelVisibilityChange = () => {
                             <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-white rounded-box w-40">
                                 <!-- NOTE: Edit must send params -->
                                 <li>
-                                    <a class="itbkk-button-edit"
-                                    @click="router.push({name: 'EditTask', params: { taskId: item.id }})">
+                                    <button class="itbkk-button-edit disabled:cursor-not-allowed"
+                                    @click="router.push({name: 'EditTask', params: { taskId: item.id }})"
+                                    :disabled="!isOwner">
                                         Edit
-                                    </a>
+                                    </button>
                                 </li>
                                 <li>
-                                    <a class="itbkk-button-delete"
-                                    @click="openDeletePopup(item.id)">
+                                    <button class="itbkk-button-delete disabled:cursor-not-allowed"
+                                    @click="openDeletePopup(item.id)"
+                                    :disabled="!isOwner">
                                         Delete
-                                    </a>
+                                    </button>
                                 </li>
                             </ul>
                             </div>

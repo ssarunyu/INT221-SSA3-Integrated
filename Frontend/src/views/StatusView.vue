@@ -70,6 +70,9 @@ const controlDelete = async (statusId) => {
 onMounted(() => {
     fetch()
 })
+
+// User permission
+const isOwner = ref(route.meta.isOwner)
 </script>
 
 <template>
@@ -111,15 +114,16 @@ onMounted(() => {
                 </div>
             </div>
             <!-- Add Status -->
-            <div @click="router.push({ name: 'AddStatus' })"
-                    class="itbkk-button-add rounded-md p-5 bg-slate-200 text-slate-500 cursor-pointer duration-300 hover:bg-slate-300 hover:text-slate-700">
+            <button @click="router.push({ name: 'AddStatus' })"
+                    class="itbkk-button-add disabled:cursor-not-allowed rounded-md p-5 bg-slate-200 text-slate-500 cursor-pointer duration-300 hover:bg-slate-300 hover:text-slate-700"
+                    :disabled="!isOwner">
                     + Add New Status
-            </div>
+            </button>
             <!-- Card below head of table -->
             <div v-for="status in statusInBoard" class="itbkk-item w-full flex items-center justify-between p-3 bg-white rounded-lg shadow-md border">
-                <div>
-                    <p class="itbkk-button-edit" @click="router.push({ name: 'EditStatusPopup', params: { editStatusId: status.id }})">Edit</p>
-                    <p class="itbkk-button-delete" @click="sendDeleteStatus(status)">Delete</p>
+                <div class="flex flex-col">
+                    <button :disabled="!isOwner" class="itbkk-button-edit disabled:cursor-not-allowed" @click="router.push({ name: 'EditStatusPopup', params: { editStatusId: status.id }})">Edit</button>
+                    <button :disabled="!isOwner" class="itbkk-button-delete disabled:cursor-not-allowed" @click="sendDeleteStatus(status)">Delete</button>
                 </div>
                 <p class="itbkk-status-name font-bold text-lg px-5 rounded" :style="{ backgroundColor: status.color }">{{ status.name }}</p>
                 <p>{{ status.description }}</p>
