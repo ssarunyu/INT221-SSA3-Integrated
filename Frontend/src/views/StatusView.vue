@@ -13,29 +13,41 @@ const userAuthItem = JSON.parse(localStorage.getItem('payload'))
 
 const route = useRoute()
 
-const statusInBoard = ref({})
+const statusInBoard = ref([])
 const fetch = async () => {
-    const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`)
-    if(response) {
-        statusInBoard.value = response
-        if(statusInBoard.value) {
-            if(statusInBoard.value[0].name === 'NO STATUS') {
-                statusInBoard.value[0].name = 'No Status'
-            }
-            if(statusInBoard.value[1].name === 'TODO') {
-                statusInBoard.value[1].name = 'To Do'
-            }
-            if(statusInBoard.value[2].name === 'DOING') {
-                statusInBoard.value[2].name = 'Doing'
-            }
-            if(statusInBoard.value[3].name === 'DONE') {
-                statusInBoard.value[3].name = 'Done'
-            }
+    const token = JSON.parse(localStorage.getItem('token'));
+
+    if (!token) {
+        router.push({ name: 'Login' });
+        return;
+    }
+
+    const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}`, true);
+
+    if (response != null) {
+        statusInBoard.value = response;
+
+        if (Array.isArray(statusInBoard.value)) {
+            statusInBoard.value.forEach(status => {
+                if (status.name === 'NO STATUS') {
+                    status.name = 'No Status';
+                } else if (status.name === 'TODO') {
+                    status.name = 'To Do';
+                } else if (status.name === 'DOING') {
+                    status.name = 'Doing';
+                } else if (status.name === 'DONE') {
+                    status.name = 'Done';
+                }
+            });
+        } else {
+            console.log('error: statusInBoard is not an array');
+            router.push({ name: 'Login' });
         }
     } else {
-        console.log('error')
+        console.log('error: response is null');
+        router.push({ name: 'Login' });
     }
-}
+};
 
 // Delete
 const statuses = ref(statusInBoard.value);
@@ -93,21 +105,21 @@ const isOwner = ref(route.meta.isOwner)
     />
     <div class="w-full min-h-screen">
         <!-- Nav -->
-        <div class="flex justify-between items-center bg-slate-800 p-5">
-            <h1 class="font-bold text-2xl text-white">ITBKK SSA3 Taskboard</h1>
+        <div class="flex items-center justify-between p-5 bg-slate-800">
+            <h1 class="text-2xl font-bold text-white">ITBKK SSA3 Taskboard</h1>
             <!-- User Info -->
-            <div class="text-right text-white">
+            <div v-if = "token != null" class="text-right text-white">
                 <h1 class="font-semibold">{{ userAuthItem.name }}</h1>
                 <h1 class="text-xs">{{ userAuthItem.email }}</h1>
             </div>
         </div>
 
-        <div class="flex flex-col space-y-4 p-5">
+        <div class="flex flex-col p-5 space-y-4">
             <div class="flex justify-end">
-                <div class="cursor-pointer px-5 py-3 bg-slate-300 rounded" @click="router.push({name: 'Home'})">Main Page</div>
+                <div class="px-5 py-3 rounded cursor-pointer bg-slate-300" @click="router.push({name: 'Home'})">Main Page</div>
             </div>
             <!-- Head of table -->
-            <div class="flex w-full items-center justify-between font-bold text-white p-3 bg-slate-600">
+            <div class="flex items-center justify-between w-full p-3 font-bold text-white bg-slate-600">
                 <p>Title</p>
                 <div class="flex items-center space-x-1">
                     <p>Status</p>
@@ -115,19 +127,24 @@ const isOwner = ref(route.meta.isOwner)
             </div>
             <!-- Add Status -->
             <button @click="router.push({ name: 'AddStatus' })"
-                    class="itbkk-button-add disabled:cursor-not-allowed rounded-md p-5 bg-slate-200 text-slate-500 cursor-pointer duration-300 hover:bg-slate-300 hover:text-slate-700"
+                    class="p-5 duration-300 rounded-md cursor-pointer itbkk-button-add disabled:cursor-not-allowed bg-slate-200 text-slate-500 hover:bg-slate-300 hover:text-slate-700"
                     :disabled="!isOwner">
                     + Add New Status
             </button>
             <!-- Card below head of table -->
-            <div v-for="status in statusInBoard" class="itbkk-item w-full flex items-center justify-between p-3 bg-white rounded-lg shadow-md border">
-                <div class="flex flex-col">
-                    <button :disabled="!isOwner" class="itbkk-button-edit disabled:cursor-not-allowed" @click="router.push({ name: 'EditStatusPopup', params: { editStatusId: status.id }})">Edit</button>
-                    <button :disabled="!isOwner" class="itbkk-button-delete disabled:cursor-not-allowed" @click="sendDeleteStatus(status)">Delete</button>
+                <div v-if="statusInBoard.length">
+                    <div v-for="status in statusInBoard" class="flex items-center justify-between w-full p-3 bg-white border rounded-lg shadow-md itbkk-item">
+                        <div class="flex flex-col">
+                            <button :disabled="!isOwner" class="itbkk-button-edit disabled:cursor-not-allowed" @click="router.push({ name: 'EditStatusPopup', params: { editStatusId: status.id }})">Edit</button>
+                            <button :disabled="!isOwner" class="itbkk-button-delete disabled:cursor-not-allowed" @click="sendDeleteStatus(status)">Delete</button>
+                        </div>
+                    <p class="px-5 text-lg font-bold rounded itbkk-status-name" :style="{ backgroundColor: status.color }">{{ status.name }}</p>
+                    <p>{{ status.description }}</p>
+                    </div>
                 </div>
-                <p class="itbkk-status-name font-bold text-lg px-5 rounded" :style="{ backgroundColor: status.color }">{{ status.name }}</p>
-                <p>{{ status.description }}</p>
-            </div>
+                <div v-else>
+                    <p>No statuses available.</p>
+                </div>
         </div>
     </div>
 

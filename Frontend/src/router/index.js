@@ -19,8 +19,6 @@ const router = createRouter({
     { path: '/', name: 'RootPath', redirect: { name: 'Login' } },
     { path: '/board', name: 'Board', component: BoardView },
     { path: '/404', name: 'Notfound', component: Notfound },
-
-    // Dynamic routes
     {
       path: '/board/:boardId',
       name: 'Home',
@@ -67,32 +65,50 @@ const router = createRouter({
   ],
 });
 
-// Utility function to check board access
+// Utility function to check board access 
 async function checkBoardAccess(to, from, next) {
   try {
-    const responseBoardDetail = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${to.params.boardId}`);
-    
-    // ตรวจสอบว่า Board เป็น Public หรือไม่
-    if (responseBoardDetail.visibility === 'PUBLIC') {
-      to.meta.isOwner = false;
-      next(); // ให้เข้าถึงได้ถ้า Board เป็น Public
-    } else {
-      // ถ้าไม่ใช่ Public ให้ตรวจสอบ token และ owner
-      const payload = JSON.parse(localStorage.getItem('payload'));
+      // Always try to get board details without requiring auth
+      const responseBoardDetail = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${to.params.boardId}`, false);
 
-      if (payload && responseBoardDetail.owner.userId === payload.oid) {
-        to.meta.isOwner = true;
-        next(); // User เป็นเจ้าของบอร์ด ให้เข้าถึงได้
+      // Ensure responseBoardDetail is valid and has the visibility property
+      if (responseBoardDetail && responseBoardDetail.visibility) {
+          // Check if the board is PUBLIC
+          if (responseBoardDetail.visibility === 'PUBLIC') {
+              to.meta.isOwner = false;
+              next(); // Allow access if the board is public
+          } else {
+              // If not public, check if the user is authenticated
+              const token = JSON.parse(localStorage.getItem('token'));
+              console.log('Token:', token); // Debugging output
+              
+              if (!token) {
+                  console.log('No token found, redirecting to login.'); // Debugging output
+                  next({ name: 'Login' }); // If no token, redirect to login
+              } else {
+                  // Check ownership if the user is authenticated
+                  const payload = JSON.parse(localStorage.getItem('payload'));
+                  console.log('Payload:', payload); // Debugging output
+                  
+                  if (payload && responseBoardDetail.owner && responseBoardDetail.owner.userId === payload.oid) {
+                      to.meta.isOwner = true;
+                      console.log('Owner access granted.'); // Debugging output
+                      next(); // User is the owner, allow access
+                  } else {
+                      console.log('Not authorized, redirecting to login.'); // Debugging output
+                      next({ name: 'Login' }); // Not authorized, redirect to login
+                  }
+              }
+          }
       } else {
-        next({ name: 'Login' }); // ไม่สามารถเข้าถึงได้ ให้ไปหน้า Login
+          console.log('Board not found or visibility is missing, redirecting to 404.'); // Debugging output
+          next({ name: 'Notfound' }); // Board not found or visibility is missing, redirect to 404
       }
-    }
   } catch (error) {
-    console.error('Error fetching board details:', error);
-    next({ name: 'Notfound' }); // ถ้ามีข้อผิดพลาด ให้ redirect ไปหน้า 404
+      console.error('Error fetching board details:', error);
+      next({ name: 'Notfound' }); // Handle fetch error, redirect to 404
   }
 }
-
 
 // Check token expired
 function isTokenExpired(payload) {
@@ -105,22 +121,23 @@ router.beforeEach((to, from, next) => {
   const token = JSON.parse(localStorage.getItem('token'));
   const payload = JSON.parse(localStorage.getItem('payload'));
 
-  // ถ้ามี token และ payload
+  // Check if user is logged in
   if (token && payload) {
-    // ตรวจสอบว่า token หมดอายุหรือไม่
+    // Check if token has expired
     if (isTokenExpired(payload)) {
       localStorage.removeItem('token');
       localStorage.removeItem('payload');
-      next({ name: 'Login' }); // ถ้า token หมดอายุ ให้ไปหน้า login
+      next({ name: 'Login' }); // If token expired, go to login
       return;
     }
   }
 
-  // ตรวจสอบว่าเส้นทางเป็น public หรือไม่ (เช่น '/login' หรือ 'public board')
-  if (to.name === 'Login' || to.name === 'Notfound' || to.meta.isPublic) {
-    next(); // ให้ผ่านได้ถ้าเป็นเส้นทางที่ไม่ต้องการ auth
+  // Allow public routes and existing logic for authentication checks
+  if (to.name === 'Login' || to.name === 'Notfound') {
+    next(); // Allow access
   } else {
-    next(); // ให้ผ่านสำหรับเส้นทางที่ต้องการ auth แต่ token ไม่หมดอายุ
+    // If it's a board-related route, additional checks are already handled in beforeEnter
+    next();
   }
 });
 

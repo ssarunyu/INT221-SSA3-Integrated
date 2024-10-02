@@ -1,68 +1,68 @@
 <script setup>
 import { ref, watch, onMounted, computed } from 'vue';
-import { getData, getDataById, deleteData, postData, updateData, patchVisi } from '@/lib/fetchMethod.js';
+import { getData, deleteData, patchVisi } from '@/lib/fetchMethod.js';
 import router from '@/router';
 import { useRoute } from 'vue-router';
-import Toast from '@/components/Toast.vue'
-import { styleStatus } from '@/lib/styleStatus';
-
-// Components
-import DeletePopup from '@/components/DeletePopup.vue';
+import Toast from '@/components/Toast.vue';
 import VisibilityBoardPopup from '@/components/VisibilityBoardPopup.vue';
+import DeletePopup from '@/components/DeletePopup.vue'; 
 
+const route = useRoute();
+const userAuthItem = JSON.parse(localStorage.getItem('payload'));
 
-const route = useRoute()
+const allTasks = ref([]);
+const allStatuses = ref([]);
+const boardDetail = ref(); // Set initial value to null
+const fetch = async () => {
+    // Fetch board details
+    const responseBoardDetail = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}`, false);
 
-const userAuthItem = JSON.parse(localStorage.getItem('payload'))
+    if (responseBoardDetail) {
+        boardDetail.value = responseBoardDetail;
 
-const allTasks = ref([])
-const allStatuses = ref([])
-const boardDetail = ref()
-const fetch = async() => {
-    // Fetch task
-    const allTask = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks`)
-    if(allTask !== undefined) {
-        allTasks.value.push(...allTask)
-    }
+        // Check if the board is public
+        if (boardDetail.value.visibility === 'PUBLIC') {
+            // Fetch tasks and statuses for public boards
+            const allTask = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks`, false, true);
+            if (allTask !== undefined) {
+                allTasks.value.push(...allTask);
+            }
 
-    // Fetch status
-    const allStatus = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`)
-    if(allStatus !== undefined) {
-        allStatuses.value.push(...allStatus)
-    }
+            const allStatus = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`, false, true);
+            if (allStatus !== undefined) {
+                allStatuses.value.push(...allStatus);
+            }
 
-    // Fetch that board detail
-    const responseBoardDetail = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}`)
-    boardDetail.value = responseBoardDetail
-}
-
-watch(allTasks.value, (newItems) => {
-    newItems.forEach(item => {
-        switch(item.status.name) {
-            case 'TODO':
-                item.status.name = 'To Do';
-                break;
-            case 'NO STATUS':
-                item.status.name = 'No Status';
-                break;
-            case 'DOING':
-                item.status.name = 'Doing';
-                break;
-            case 'DONE':
-                item.status.name = 'Done';
-                break;
-            default:
-                break;
+            return; // No need for redirect, simply return
+        } else if (boardDetail.value.visibility === 'PRIVATE' && !userAuthItem) {
+            // Redirect only for private boards when not authenticated
+            router.push({ name: 'Login' });
+            return;
         }
-    })
-});
 
-// Set the initial value for isPrivate base on boardDetail bisibility after fetch
-const isPrivate = ref()
+        // If the board is private and the user is authenticated, fetch tasks and statuses
+        if (userAuthItem) {
+            const allTask = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks`);
+            if (allTask !== undefined) {
+                allTasks.value.push(...allTask);
+            }
+
+            const allStatus = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`);
+            if (allStatus !== undefined) {
+                allStatuses.value.push(...allStatus);
+            }
+        }
+    } else {
+        // Handle the case where the board detail could not be fetched
+        console.error("Failed to fetch board details.");
+    }
+};
+
+const isPrivate = ref(false);
 onMounted(async () => {
-    await fetch()
-    isPrivate.value = boardDetail.value.visibility === 'PRIVATE' ? true : false
-})
+    await fetch();
+    isPrivate.value = boardDetail.value && boardDetail.value.visibility === 'PRIVATE';
+});
 
 // Toast
 const toastHandle = ref()
@@ -141,7 +141,7 @@ const deletePopupStatus = ref(false)
 const deleteTarget = ref()
 const openDeletePopup = async (id) => {
     deletePopupStatus.value = true
-    const result = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks/${id}`)
+    const result = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks/${id}` )
     deleteTarget.value = result
 }
 const deleteConfirm = async () => {
@@ -206,30 +206,30 @@ const isOwner = ref(route.meta.isOwner)
     <DeletePopup v-show="deletePopupStatus" v-if="deleteTarget" :deleteItem="deleteTarget" @close="deletePopupStatus = false" @confirm="deleteConfirm()"/>
     <div class="w-full min-h-screen">
         <!-- Nav -->
-        <div class="flex justify-between items-center bg-slate-800 p-5">
-            <h1 class="font-bold text-2xl text-white">ITBKK SSA3 Taskboard</h1>
+        <div class="flex items-center justify-between p-5 bg-slate-800">
+            <h1 class="text-2xl font-bold text-white">ITBKK SSA3 Taskboard</h1>
             <!-- NOTE: Need fix -->
             <div v-if="userAuthItem" class="text-right text-white">
                 <h1 class="font-semibold">{{ userAuthItem.name }}</h1>
                 <h1 class="text-xs">{{ userAuthItem.email }}</h1>
             </div>
         </div>
-        <div class="flex flex-col space-y-4 p-5">
+        <div class="flex flex-col p-5 space-y-4">
             <!-- Filter -->
             <!-- <div class="flex">
                 <div class="itbkk-status-filter dropdown dropdown-bottom">
-                    <div tabindex="0" role="button" class="btn m-1">Filter Tasks</div>
+                    <div tabindex="0" role="button" class="m-1 btn">Filter Tasks</div>
                     <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-white rounded-box w-52">
-                        <div class="text-blue-500 underline flex justify-end w-full my-2">
+                        <div class="flex justify-end w-full my-2 text-blue-500 underline">
                             <p class="cursor-pointer" @click="clearFilter">Clear all</p>
                         </div>
-                        <div v-for="status in allStatusArr" class="flex justify-between p-2 rounded duration-300 hover:bg-gray-100 ">
+                        <div v-for="status in allStatusArr" class="flex justify-between p-2 duration-300 rounded hover:bg-gray-100 ">
                             <button class="itbkk-status-choice" @click="submitFilter(status.name)">{{ status.name }}</button> 
                         </div>
                     </ul>
                 </div>
-                <div class="flex items-center space-x-3 ml-4">
-                    <div v-for="status in filterSelect" class="px-5 py-2 rounded bg-blue-200">
+                <div class="flex items-center ml-4 space-x-3">
+                    <div v-for="status in filterSelect" class="px-5 py-2 bg-blue-200 rounded">
                         {{ status }}
                         <font-awesome-icon class="cursor-pointer" @click="removeFilter(status)" icon="fa-solid fa-xmark" />
                     </div>
@@ -237,50 +237,50 @@ const isOwner = ref(route.meta.isOwner)
             </div> -->
             <!-- Status Page button -->
             <div class="flex justify-end">
-                <div class="itbkk-manage-status cursor-pointer px-5 py-3 bg-slate-300 rounded" @click="router.push({name: 'StatusView'})">Status Page</div>
+                <div class="px-5 py-3 rounded cursor-pointer itbkk-manage-status bg-slate-300" @click="router.push({name: 'StatusView'})">Status Page</div>
             </div>
             <div v-if="boardDetail">
                 <!-- Toggle visibility button -->
                 <div class="relative flex">
                     <input type="checkbox" class="absolute opacity-0" />
                     <div
-                        class="itbkk-board-visibility w-12 h-6 bg-gray-300 rounded-full cursor-pointer transition duration-200"
+                        class="w-12 h-6 transition duration-200 bg-gray-300 rounded-full cursor-pointer itbkk-board-visibility"
                         :class="{'bg-green-500': !isPrivate}"
                         @click="changeVisi"
                     >
-                        <div class="w-6 h-6 bg-white rounded-full shadow-md transform transition duration-200" :style="isPrivate ? 'transform: translateX(0)' : 'transform: translateX(100%);'"></div>
+                        <div class="w-6 h-6 transition duration-200 transform bg-white rounded-full shadow-md" :style="isPrivate ? 'transform: translateX(0)' : 'transform: translateX(100%);'"></div>
                     </div>
                     <p class="ml-3">{{ isPrivate ? 'Private' : 'Public' }} Board</p>
                 </div>
-                <p class="text-center text-2xl font-bold">{{ boardDetail.boardName }}</p>
+                <p class="text-2xl font-bold text-center">{{ boardDetail.boardName }}</p>
             </div>
             <!-- Head of table -->
-            <div class="flex w-full items-center justify-between font-xl font-bold text-white p-3 bg-slate-600">
+            <div class="flex items-center justify-between w-full p-3 font-bold text-white font-xl bg-slate-600">
                 <p>Title</p>
                 <p>Assignees</p>
                 <div class="flex items-center space-x-1">
                     <p>Status</p>
-                    <!-- <div @click="changeSortStage()" class="p-2 cursor-pointer transition duration-300"> -->
+                    <!-- <div @click="changeSortStage()" class="p-2 transition duration-300 cursor-pointer"> -->
                         <!-- <font-awesome-icon class="itbkk-status-sort" v-if="sortIcon" :icon="sortIcon" /> -->
                     <!-- </div> -->
                 </div>
             </div>
             <!-- Add task button -->
-            <div class="w-full flex flex-col justify-center items-center space-y-5">
+            <div class="flex flex-col items-center justify-center w-full space-y-5">
                 <button @click="router.push({ name: 'AddTask' })"
-                class="itbkk-button-add disabled:cursor-not-allowed w-full rounded-md p-5 bg-slate-200 text-slate-500 cursor-pointer duration-300 hover:bg-slate-300 hover:text-slate-700"
+                class="w-full p-5 duration-300 rounded-md cursor-pointer itbkk-button-add disabled:cursor-not-allowed bg-slate-200 text-slate-500 hover:bg-slate-300 hover:text-slate-700"
                 :disabled="!isOwner"
                 >
                     + Add New Task
                 </button>
             <Toast :toastObject="toastHandle" @close="toastHandle.status = false"/>
             <!-- Each element -->
-            <div v-for="item in allTasks" :key="item.id" class="itbkk-item relative flex items-center justify-between w-full p-3 rounded border">
+            <div v-for="item in allTasks" :key="item.id" class="relative flex items-center justify-between w-full p-3 border rounded itbkk-item">
                 <div class="absolute left-0 w-1 h-10" :class="`bg-[${item.status.statusColor}]`"></div>
                 <div class="flex items-center space-x-3">
                     <div>
                         <div class="dropdown itbkk-button-action">
-                            <p tabindex="0" role="button" class=" btn m-1 border-none font-bold text-2xl">
+                            <p tabindex="0" role="button" class="m-1 text-2xl font-bold border-none btn">
                                 :
                             </p>
                             <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-white rounded-box w-40">
@@ -306,7 +306,7 @@ const isOwner = ref(route.meta.isOwner)
                             {{ item.id }}
                         </p>
                         <div class="w-full">
-                            <p @click="router.push({ name: 'TaskDetail', params: { detailId: item.id }})" class="itbkk-title break-all font-bold text-xl duration-200 cursor-pointer hover:text-gray-700">
+                            <p @click="router.push({ name: 'TaskDetail', params: { detailId: item.id }})" class="text-xl font-bold break-all duration-200 cursor-pointer itbkk-title hover:text-gray-700">
                                 {{ item.title }}
                             </p>
                             <p class="itbkk-assignees" :class="item.assignees === null ? 'italic text-gray-500' : ''">
@@ -315,7 +315,7 @@ const isOwner = ref(route.meta.isOwner)
                         </div>
                     </div>
                     <div>
-                        <p class="itbkk-status px-4 py-2 rounded shadow-md" :style="{ backgroundColor: item.status.statusColor }">
+                        <p class="px-4 py-2 rounded shadow-md itbkk-status" :style="{ backgroundColor: item.status.statusColor }">
                             {{ item.status.name }}
                         </p>
                     </div>
