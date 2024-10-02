@@ -300,8 +300,8 @@ const isOwner = ref(route.meta.isOwner)
                                     </button>
                                 </li>
                             </ul>
-                            </div>
                         </div>
+                    </div>
                         <p class="text-xl font-bold">
                             {{ item.id }}
                         </p>

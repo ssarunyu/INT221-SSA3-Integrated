@@ -11,7 +11,7 @@ describe(`TC-PBI20-BOARD-VISIBILITY-1-FE\n
         cy.get('.itbkk-button-signin').click()
 
         cy.wait(100)
-        cy.visit('/board/kh-eqr8Suk')  // <------ add your board id here
+        cy.visit('/board/LdBFYa2Dx1')  // <------ add your board id here
     }) ;
 
     it('[Step 1] Should open the /board/:id page', () => {
@@ -117,7 +117,7 @@ describe(`TC-PBI20-BOARD-VISIBILITY-1-FE\n
                 show message "Access denied, you do not have permission to view this page.
                 and redirect to "/login".`,()=>{
 
-        cy.visit('/board/kh-eqr8Suk/task/add') // <------ add your board id here
+        cy.visit('/board/LdBFYa2Dx1/task/add') // <------ add your board id here
 
         cy.on('window:alert',(str)=>{
             expect(str).to.include('Access denied, you do not have permission to view this page.')
@@ -130,7 +130,7 @@ describe(`TC-PBI20-BOARD-VISIBILITY-1-FE\n
                 show message "Access denied, you do not have permission to view this page.
                 and redirect to "/login".`,()=>{
 
-        cy.visit('/board/kh-eqr8Suk/task/2/edit') // <------ add your board id and task id here
+        cy.visit('/board/LdBFYa2Dx1/task/2/edit') // <------ add your board id and task id here
 
         cy.on('window:alert',(str)=>{
             expect(str).to.include('Access denied, you do not have permission to view this page.')
@@ -143,7 +143,7 @@ describe(`TC-PBI20-BOARD-VISIBILITY-1-FE\n
                 show message "Access denied, you do not have permission to view this page.
                 and redirect to "/login".`,()=>{
 
-        cy.visit('/board/kh-eqr8Suk/status/add') // <------ add your board id here
+        cy.visit('/board/LdBFYa2Dx1/status/add') // <------ add your board id here
 
         cy.on('window:alert',(str)=>{
             expect(str).to.include('Access denied, you do not have permission to view this page.')
@@ -156,7 +156,7 @@ describe(`TC-PBI20-BOARD-VISIBILITY-1-FE\n
                 show message "Access denied, you do not have permission to view this page.
                 and redirect to "/login".`,()=>{
 
-        cy.visit('/board/kh-eqr8Suk/status/1/edit') // <------ add your board id and status id here
+        cy.visit('/board/LdBFYa2Dx1/status/1/edit') // <------ add your board id and status id here
 
         cy.on('window:alert',(str)=>{
             expect(str).to.include('Access denied, you do not have permission to view this page.')

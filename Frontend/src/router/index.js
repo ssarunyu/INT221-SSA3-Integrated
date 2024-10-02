@@ -74,13 +74,6 @@ async function checkBoardAccess(to, from, next) {
 
   try {
     const responseBoardDetail = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${to.params.boardId}`);
-    console.log(responseBoardDetail);
-
-    // Ensure responseBoardDetail is defined and has the expected structure
-    if (!responseBoardDetail) {
-      window.alert('Error of fetch board detail for un-auth user i dont know how to fix');
-      return next({ name: 'Login' }); // Redirect to login if board is not found
-    }
 
     // Check if the user is the owner
     if (payload && responseBoardDetail.owner.userId === payload.oid) {
@@ -89,14 +82,12 @@ async function checkBoardAccess(to, from, next) {
     } else if (responseBoardDetail.visibility === 'PUBLIC') {
       to.meta.isOwner = false;
       next(); // Public board access granted
-    } else {
-      window.alert('Access denied, you do not have permission to view this page.');
-      next({ name: 'Login' }); // Redirect to login for private boards
     }
   } catch (error) {
+    next()
     console.error('Error fetching board details:', error);
-    window.alert('Error fetching board details. Redirecting to login.');
-    next({ name: 'Login' });
+    // window.alert('Error fetching board details. Redirecting to login.');
+    // next({ name: 'Login' });
   }
 }
 

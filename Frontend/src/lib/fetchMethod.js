@@ -16,6 +16,10 @@ async function getData(url) {
                 localStorage.removeItem('payload')
                 router.push({ name: 'Login' })
             }
+            if(response.status === 403) {
+                window.alert('Access denied, you do not have permission to view this page.')
+                router.push({ name: 'Login' })
+            }
             const result = await response.json()
             return result
         } catch (error) {
