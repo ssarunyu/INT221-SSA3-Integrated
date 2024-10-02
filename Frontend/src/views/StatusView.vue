@@ -13,39 +13,31 @@ const userAuthItem = JSON.parse(localStorage.getItem('payload'))
 
 const route = useRoute()
 
-const statusInBoard = ref([])
+const statusInBoard = ref({})
 const fetch = async () => {
-    const token = JSON.parse(localStorage.getItem('token'));
 
-    if (!token) {
-        router.push({ name: 'Login' });
-        return;
-    }
+    const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`, false);
 
-    const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}`, true);
-
-    if (response != null) {
-        statusInBoard.value = response;
-
-        if (Array.isArray(statusInBoard.value)) {
-            statusInBoard.value.forEach(status => {
-                if (status.name === 'NO STATUS') {
-                    status.name = 'No Status';
-                } else if (status.name === 'TODO') {
-                    status.name = 'To Do';
-                } else if (status.name === 'DOING') {
-                    status.name = 'Doing';
-                } else if (status.name === 'DONE') {
-                    status.name = 'Done';
-                }
-            });
-        } else {
-            console.log('error: statusInBoard is not an array');
-            router.push({ name: 'Login' });
+    if(response != null) {
+        statusInBoard.value = response
+        if(statusInBoard.value) {
+            if(statusInBoard.value[0].name === 'NO STATUS') {
+                statusInBoard.value[0].name = 'No Status'
+            }
+            if(statusInBoard.value[1].name === 'TODO') {
+                statusInBoard.value[1].name = 'To Do'
+            }
+            if(statusInBoard.value[2].name === 'DOING') {
+                statusInBoard.value[2].name = 'Doing'
+            }
+            if(statusInBoard.value[3].name === 'DONE') {
+                statusInBoard.value[3].name = 'Done'
+            }
         }
     } else {
-        console.log('error: response is null');
+        console.log('error')
         router.push({ name: 'Login' });
+        return;
     }
 };
 
@@ -86,7 +78,6 @@ onMounted(() => {
 // User permission
 const isOwner = ref(route.meta.isOwner)
 </script>
-
 <template>
     <router-view></router-view>
     <DeleteStatusPopup
@@ -108,7 +99,7 @@ const isOwner = ref(route.meta.isOwner)
         <div class="flex items-center justify-between p-5 bg-slate-800">
             <h1 class="text-2xl font-bold text-white">ITBKK SSA3 Taskboard</h1>
             <!-- User Info -->
-            <div v-if = "token != null" class="text-right text-white">
+            <div v-if="userAuthItem" class="text-right text-white">
                 <h1 class="font-semibold">{{ userAuthItem.name }}</h1>
                 <h1 class="text-xs">{{ userAuthItem.email }}</h1>
             </div>
@@ -132,19 +123,14 @@ const isOwner = ref(route.meta.isOwner)
                     + Add New Status
             </button>
             <!-- Card below head of table -->
-                <div v-if="statusInBoard.length">
-                    <div v-for="status in statusInBoard" class="flex items-center justify-between w-full p-3 bg-white border rounded-lg shadow-md itbkk-item">
-                        <div class="flex flex-col">
-                            <button :disabled="!isOwner" class="itbkk-button-edit disabled:cursor-not-allowed" @click="router.push({ name: 'EditStatusPopup', params: { editStatusId: status.id }})">Edit</button>
-                            <button :disabled="!isOwner" class="itbkk-button-delete disabled:cursor-not-allowed" @click="sendDeleteStatus(status)">Delete</button>
-                        </div>
-                    <p class="px-5 text-lg font-bold rounded itbkk-status-name" :style="{ backgroundColor: status.color }">{{ status.name }}</p>
-                    <p>{{ status.description }}</p>
-                    </div>
+            <div v-for="status in statusInBoard" class="flex items-center justify-between w-full p-3 bg-white border rounded-lg shadow-md itbkk-item">
+                <div class="flex flex-col">
+                    <button :disabled="!isOwner" class="itbkk-button-edit disabled:cursor-not-allowed" @click="router.push({ name: 'EditStatusPopup', params: { editStatusId: status.id }})">Edit</button>
+                    <button :disabled="!isOwner" class="itbkk-button-delete disabled:cursor-not-allowed" @click="sendDeleteStatus(status)">Delete</button>
                 </div>
-                <div v-else>
-                    <p>No statuses available.</p>
-                </div>
+                <p class="px-5 text-lg font-bold rounded itbkk-status-name" :style="{ backgroundColor: status.color }">{{ status.name }}</p>
+                <p>{{ status.description }}</p>
+            </div>
         </div>
     </div>
 

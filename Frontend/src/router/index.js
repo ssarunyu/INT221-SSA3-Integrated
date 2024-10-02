@@ -66,47 +66,82 @@ const router = createRouter({
 });
 
 // Utility function to check board access 
+// async function checkBoardAccess(to, from, next) {
+//   try {
+//       // Always try to get board details without requiring auth
+//       const responseBoardDetail = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${to.params.boardId}`, false);
+
+//       // Ensure responseBoardDetail is valid and has the visibility property
+//       if (responseBoardDetail && responseBoardDetail.visibility) {
+//           // Check if the board is PUBLIC
+//           if (responseBoardDetail.visibility === 'PUBLIC') {
+//               to.meta.isOwner = false;
+//               next(); // Allow access if the board is public
+//           } else {
+//               // If not public, check if the user is authenticated
+//               const token = JSON.parse(localStorage.getItem('token'));
+              
+//               if (!token) {
+//                   next({ name: 'Login' }); // If no token, redirect to login
+//               } else {
+//                   // Check ownership if the user is authenticated
+//                   const payload = JSON.parse(localStorage.getItem('payload'));
+                  
+//                   if (payload && responseBoardDetail.owner.userId === payload.oid) {
+//                       to.meta.isOwner = true;
+//                       next(); // User is the owner, allow access
+//                   } else {
+//                       next({ name: 'Login' }); // Not authorized, redirect to login
+//                   }
+//               }
+//           }
+//       } else {
+//           console.log('Board not found or visibility is missing, redirecting to 404.');
+//           next({ name: 'Notfound' }); // Board not found or visibility is missing, redirect to 404
+//       }
+//   } catch (error) {
+//       console.error('Error fetching board details:', error);
+//       next({ name: 'Notfound' }); // Handle fetch error, redirect to 404
+//   }
+// }
+
+// Utility function to check board access
 async function checkBoardAccess(to, from, next) {
   try {
-      // Always try to get board details without requiring auth
-      const responseBoardDetail = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${to.params.boardId}`, false);
+    const responseBoardDetail = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${to.params.boardId}`, false);
 
-      // Ensure responseBoardDetail is valid and has the visibility property
-      if (responseBoardDetail && responseBoardDetail.visibility) {
-          // Check if the board is PUBLIC
-          if (responseBoardDetail.visibility === 'PUBLIC') {
-              to.meta.isOwner = false;
-              next(); // Allow access if the board is public
-          } else {
-              // If not public, check if the user is authenticated
-              const token = JSON.parse(localStorage.getItem('token'));
-              console.log('Token:', token); // Debugging output
-              
-              if (!token) {
-                  console.log('No token found, redirecting to login.'); // Debugging output
-                  next({ name: 'Login' }); // If no token, redirect to login
-              } else {
-                  // Check ownership if the user is authenticated
-                  const payload = JSON.parse(localStorage.getItem('payload'));
-                  console.log('Payload:', payload); // Debugging output
-                  
-                  if (payload && responseBoardDetail.owner && responseBoardDetail.owner.userId === payload.oid) {
-                      to.meta.isOwner = true;
-                      console.log('Owner access granted.'); // Debugging output
-                      next(); // User is the owner, allow access
-                  } else {
-                      console.log('Not authorized, redirecting to login.'); // Debugging output
-                      next({ name: 'Login' }); // Not authorized, redirect to login
-                  }
-              }
-          }
-      } else {
-          console.log('Board not found or visibility is missing, redirecting to 404.'); // Debugging output
-          next({ name: 'Notfound' }); // Board not found or visibility is missing, redirect to 404
-      }
+    // Validate board details and ensure visibility property exists
+    if (!responseBoardDetail || !responseBoardDetail.visibility) {
+      console.log('Board not found or visibility missing, redirecting to 404.');
+      return next({ name: 'Notfound' });
+    }
+
+    // Verify if the authenticated user is the owner of the board
+    const userPayload = JSON.parse(localStorage.getItem('payload'));
+    const isOwner = userPayload && responseBoardDetail.owner.userId === userPayload.oid;
+    
+    // If the board is PUBLIC, allow access without authentication
+    if (responseBoardDetail.visibility === 'PUBLIC' && userPayload === null) {
+      to.meta.isOwner != isOwner
+      return next(); // Access granted for public boards
+    }
+
+    // If the board is not PUBLIC, check if the user is authenticated
+    const token = JSON.parse(localStorage.getItem('token'));
+    if (!token) {
+      return next({ name: 'Login' }); // Redirect to login if no token
+    }
+
+    if (userPayload != null && (responseBoardDetail.visibility === 'PUBLIC' || responseBoardDetail.visibility === 'PRIVATE')) {
+      to.meta.isOwner = isOwner;
+      return next(); // Allow access for the owner
+    } else {
+      return next({ name: 'Login' }); // Redirect to login if not the owner
+    }
+
   } catch (error) {
-      console.error('Error fetching board details:', error);
-      next({ name: 'Notfound' }); // Handle fetch error, redirect to 404
+    console.error('Error fetching board details:', error);
+    return next({ name: 'Notfound' }); // Redirect to 404 on error
   }
 }
 

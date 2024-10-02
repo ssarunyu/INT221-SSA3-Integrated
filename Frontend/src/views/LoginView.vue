@@ -37,26 +37,26 @@ function togglePasswordVisibility() {
 
 <template>
   <div
-    class="flex h-screen items-center justify-center bg-gradient-to-br from-blue-200 to-teal-100"
+    class="flex items-center justify-center h-screen bg-gradient-to-br from-blue-200 to-teal-100"
   >
     <!-- Main Container -->
     <div
-      class="flex max-w-5xl w-full bg-white rounded-3xl shadow-lg overflow-hidden"
+      class="flex w-full max-w-5xl overflow-hidden bg-white shadow-lg rounded-3xl"
     >
       <!-- Left Section: Login Form -->
       <div
-        class="flex flex-1 flex-col justify-center items-center p-10 bg-white"
+        class="flex flex-col items-center justify-center flex-1 p-10 bg-white"
       >
-        <h2 class="text-3xl font-bold text-gray-800 mb-2">LOGIN</h2>
-        <p class="text-gray-500 mb-8">
-          Welcome to Kradan Kanban of SSA3 group !
+        <h2 class="mb-2 text-3xl font-bold text-gray-800">LOGIN</h2>
+        <p class="mb-8 text-gray-500">
+          Welcome to Kradan Kanban of SSA3 group.
         </p>
 
         <!-- Username Input -->
         <div class="w-full mb-4">
           <label
             for="username"
-            class="flex items-center bg-gray-100 rounded-md p-2 mb-2"
+            class="flex items-center p-2 mb-2 bg-gray-100 rounded-md"
           >
             <img
               src="@/assets/user.svg"
@@ -67,7 +67,7 @@ function togglePasswordVisibility() {
               v-model="username"
               id="username"
               type="text"
-              class="itbkk-username flex-1 bg-transparent outline-none"
+              class="flex-1 bg-transparent outline-none itbkk-username"
               placeholder="Username"
               required
               maxlength="50"
@@ -76,10 +76,10 @@ function togglePasswordVisibility() {
         </div>
 
         <!-- Password Input -->
-        <div class="w-full mb-4 relative">
+        <div class="relative w-full mb-4">
           <label
             for="password"
-            class="itbkk-password flex items-center bg-gray-100 rounded-md p-2 mb-2"
+            class="flex items-center p-2 mb-2 bg-gray-100 rounded-md itbkk-password"
           >
             <!-- Key Icon -->
             <img
@@ -125,19 +125,19 @@ function togglePasswordVisibility() {
         <button
           @click="userLogin"
           :disabled="!username || !password"
-          class="itbkk-button-signin w-full py-2 bg-sky-600 text-white font-bold rounded-md hover:bg-sky-700 disabled:bg-sky-200"
+          class="w-full py-2 font-bold text-white rounded-md itbkk-button-signin bg-sky-600 hover:bg-sky-700 disabled:bg-sky-200"
         >
           Login
         </button>
       </div>
 
       <!-- Right Section: Image -->
-      <div class="flex flex-1 items-center justify-center">
-        <div class="bg-white rounded-2xl p-2">
+      <div class="flex items-center justify-center flex-1">
+        <div class="p-2 bg-white rounded-2xl">
           <img
             src="../assets/abyan-athif-K0U0eSAjFGU-unsplash.jpg"
             alt="login image"
-            class="rounded-r-xl object-cover h-full"
+            class="object-cover h-full rounded-r-xl"
           />
         </div>
       </div>
