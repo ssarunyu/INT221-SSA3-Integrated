@@ -48,7 +48,7 @@ const confirmHandle = async () => {
   };
 
   try {
-    const addNewTask = await postData(`http://localhost:8080/v3/boards/${route.params.boardId}/tasks`, newTask)
+    const addNewTask = await postData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks`, newTask)
     // Send task that just add to parent to resolve ref update
     emit('taskAdded', newTask)
     // Redirect when complete

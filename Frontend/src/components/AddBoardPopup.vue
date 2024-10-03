@@ -21,7 +21,7 @@ const createNewBoard = async () => {
   }
 
   try {
-    const result = await postBoard("http://localhost:8080/v3/boards", newBoard);
+    const result = await postBoard(`${import.meta.env.VITE_BASE_URL}/v3/boards`, newBoard);
     
     if(result.status === 401) {
       router.push({ name: 'Login' })
