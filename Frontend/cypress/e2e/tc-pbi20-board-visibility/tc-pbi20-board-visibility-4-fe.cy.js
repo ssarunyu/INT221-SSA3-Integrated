@@ -51,7 +51,7 @@ describe(`TC-PBI20-BOARD-VISIBILITY-1-FE\n
 
     it(`[Step 4 and 5] Should click "Confirm" button. The mocAPI return 403 
                         and the web shows "You do not have permission...".`,()=>{
-        cy.intercept('PATCH','http://localhost:8080/v3/**',{
+        cy.intercept('PATCH','http://intproj23.sit.kmutt.ac.th/ssa3/api/v3/**',{
             statusCode: 403
         }).as('mockAPI')
 
@@ -76,7 +76,7 @@ describe(`TC-PBI20-BOARD-VISIBILITY-1-FE\n
 
     it(`[Step 6] Should click "Confirm" button. The mocAPI return 500 
                         and the web shows "There is a problem. Please try again later.".`,()=>{
-        cy.intercept('PATCH','http://localhost:8080/v3/**',{
+        cy.intercept('PATCH','http://intproj23.sit.kmutt.ac.th/ssa3/api/v3/**',{
             statusCode: 500
         }).as('mockAPI')
 
@@ -100,7 +100,7 @@ describe(`TC-PBI20-BOARD-VISIBILITY-1-FE\n
     })
 
     it('[Step 7] Should click "Confirm" button. mocAPI should return 401 and redirect to "/login".',()=>{
-        cy.intercept('PATCH','http://localhost:8080/v3/**',{
+        cy.intercept('PATCH','http://intproj23.sit.kmutt.ac.th/ssa3/api/v3/**',{
             statusCode: 401
         }).as('mockAPI')
 

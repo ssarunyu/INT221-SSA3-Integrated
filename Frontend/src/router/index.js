@@ -79,19 +79,28 @@ async function checkBoardAccess(to, from, next) {
     console.log('payload', userPayload)
     console.log('from fetch', responseBoardDetail)
 
+    const allowRoute = ['Home', 'StatusView', 'TaskDetail']
+
     // Auth user owner that board permission
     // If mean auth and owner
     // Else mean auth but not the owner
     if(token && userPayload) {
       if(responseBoardDetail.owner.userId === userPayload.oid) {
         to.meta.isOwner = true
+        return next()
       } else {
-        to.meta.isOwner = false
+        if(allowRoute.includes(to.name)) {
+          to.meta.isOwner = false
+          return next()
+        } else {
+            window.alert('Access denied, you do not have permission to view this page.')
+            router.push({ name: 'Login' })
+            return;
+        }
       }
-      return next()
+      
     }
 
-    const allowRoute = ['Home', 'StatusView', 'TaskDetail']
     // Un-auth user control
     if(!userPayload || !token) {
       if(responseBoardDetail.visibility === 'PUBLIC') {
@@ -101,9 +110,9 @@ async function checkBoardAccess(to, from, next) {
           return next()
         } 
         else {
-            window.alert('Access denied, you do not have permission to view this page.')
-            router.push({ name: 'Login' })
-            return;
+          window.alert('Access denied, you do not have permission to view this page.')
+          router.push({ name: 'Login' })
+          return;
         }
       }
     }
