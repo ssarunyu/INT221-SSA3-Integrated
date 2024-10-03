@@ -31,7 +31,12 @@ const router = createRouter({
       component: AddBoardPopup,
       beforeEnter: checkBoardAccess,
     },
-    { path: '/board/:boardId/:detailId', name: 'TaskDetail', component: TaskDetail },
+    {
+      path: '/board/:boardId/task/:detailId',
+      name: 'TaskDetail',
+      component: TaskDetail,
+      beforeEnter: checkBoardAccess 
+    },
     {
       path: '/board/:boardId/task/add',
       name: 'AddTask',
@@ -39,7 +44,7 @@ const router = createRouter({
       beforeEnter: checkBoardAccess,
     },
     {
-      path: '/board/:boardId/:taskId/edit',
+      path: '/board/:boardId/task/:taskId/edit',
       name: 'EditTask',
       component: EditPopup,
       beforeEnter: checkBoardAccess,
@@ -68,40 +73,48 @@ const router = createRouter({
 // Utility function to check board access
 async function checkBoardAccess(to, from, next) {
   try {
-    const responseBoardDetail = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${to.params.boardId}`, false);
-
-    // Validate board details and ensure visibility property exists
-    if (!responseBoardDetail || !responseBoardDetail.visibility) {
-      console.log('Board not found or visibility missing, redirecting to 404.');
-      return next({ name: 'Notfound' });
-    }
-
-    // Verify if the authenticated user is the owner of the board
-    const userPayload = JSON.parse(localStorage.getItem('payload'));
-    const isOwner = userPayload && responseBoardDetail.owner.userId === userPayload.oid;
-    
-    // If the board is PUBLIC, allow access without authentication
-    if (responseBoardDetail.visibility === 'PUBLIC' && userPayload === null) {
-      to.meta.isOwner != isOwner
-      return next(); // Access granted for public boards
-    }
-
-    // If the board is not PUBLIC, check if the user is authenticated
     const token = JSON.parse(localStorage.getItem('token'));
-    if (!token) {
-      return next({ name: 'Login' }); // Redirect to login if no token
+    const responseBoardDetail = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${to.params.boardId}`)
+    const userPayload = JSON.parse(localStorage.getItem('payload'));
+    console.log('payload', userPayload)
+    console.log('from fetch', responseBoardDetail)
+
+    // Auth user owner that board permission
+    // If mean auth and owner
+    // Else mean auth but not the owner
+    if(token && userPayload) {
+      if(responseBoardDetail.owner.userId === userPayload.oid) {
+        to.meta.isOwner = true
+      } else {
+        to.meta.isOwner = false
+      }
+      return next()
     }
 
-    if (userPayload != null && (responseBoardDetail.visibility === 'PUBLIC' || responseBoardDetail.visibility === 'PRIVATE')) {
-      to.meta.isOwner = isOwner;
-      return next(); // Allow access for the owner
-    } else {
-      return next({ name: 'Login' }); // Redirect to login if not the owner
+    const allowRoute = ['Home', 'StatusView', 'TaskDetail']
+    // Un-auth user control
+    if(!userPayload || !token) {
+      if(responseBoardDetail.visibility === 'PUBLIC') {
+        to.meta.isOwner = false
+        // Check path first
+        if(allowRoute.includes(to.name)) {
+          return next()
+        } 
+        else {
+            window.alert('Access denied, you do not have permission to view this page.')
+            router.push({ name: 'Login' })
+            return;
+        }
+      }
     }
+
+    return next()
+    
 
   } catch (error) {
     console.error('Error fetching board details:', error);
-    return next({ name: 'Notfound' }); // Redirect to 404 on error
+    // Control yellow error
+    return next()
   }
 }
 
@@ -112,28 +125,28 @@ function isTokenExpired(payload) {
 }
 
 // Navigation Guard
-router.beforeEach((to, from, next) => {
-  const token = JSON.parse(localStorage.getItem('token'));
-  const payload = JSON.parse(localStorage.getItem('payload'));
+// router.beforeEach((to, from, next) => {
+//   const token = JSON.parse(localStorage.getItem('token'));
+//   const payload = JSON.parse(localStorage.getItem('payload'));
 
-  // Check if user is logged in
-  if (token && payload) {
-    // Check if token has expired
-    if (isTokenExpired(payload)) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('payload');
-      next({ name: 'Login' }); // If token expired, go to login
-      return;
-    }
-  }
+//   // Check if user is logged in
+//   if (token && payload) {
+//     // Check if token has expired
+//     if (isTokenExpired(payload)) {
+//       localStorage.removeItem('token');
+//       localStorage.removeItem('payload');
+//       next({ name: 'Login' }); // If token expired, go to login
+//       return;
+//     }
+//   }
 
-  // Allow public routes and existing logic for authentication checks
-  if (to.name === 'Login' || to.name === 'Notfound') {
-    next(); // Allow access
-  } else {
-    // If it's a board-related route, additional checks are already handled in beforeEnter
-    next();
-  }
-});
+//   // Allow public routes and existing logic for authentication checks
+//   if (to.name === 'Login' || to.name === 'Notfound') {
+//     next(); // Allow access
+//   } else {
+//     // If it's a board-related route, additional checks are already handled in beforeEnter
+//     next();
+//   }
+// });
 
 export default router;

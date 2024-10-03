@@ -1,35 +1,6 @@
 import router from '@/router';
 import { jwtDecode } from "jwt-decode";
 
-async function getData(url) {
-    const token = JSON.parse(localStorage.getItem('token'))
-    if(token) {
-        try {
-            const response = await fetch(url, {
-                method: "GET",
-                headers: {
-                    'Authorization': `Bearer ${token.access_token}`
-                }
-            })
-            if(response.status === 401) {
-                localStorage.removeItem('token')
-                localStorage.removeItem('payload')
-                router.push({ name: 'Login' })
-            }
-            if(response.status === 403) {
-                window.alert('Access denied, you do not have permission to view this page.')
-                router.push({ name: 'Login' })
-            }
-            const result = await response.json()
-            return result
-        } catch (error) {
-            console.log(error)
-        }
-    } else {
-        router.push({ name: 'Login' })
-    }
-}
-
 async function postBoard(url, newBoard) {
     const token = JSON.parse(localStorage.getItem('token'))
     if(token) {
@@ -100,6 +71,35 @@ async function getBoardId(url, id) {
     } catch (error) {
         console.log(error)
     }  
+}
+
+async function getData(url) {
+    const token = JSON.parse(localStorage.getItem('token'))
+    const tokenHeader = new Headers()
+
+    // Auth user use for owner go into own private board
+    if (token) {
+        tokenHeader.append('Authorization', `Bearer ${token.access_token}`)
+    }
+    
+    try {
+        const response = await fetch(url, {
+            method: "GET",
+            headers: tokenHeader
+        })
+        if(response.status === 401) {
+            router.push({ name: 'Login' })
+        }
+        // Auth but not owner of that board
+        if(response.status === 403) {
+            window.alert('Access denied, you do not have permission to view this page.')
+            router.push({ name: 'Login' })
+        }
+        const result = await response.json()
+        return result
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 async function deleteBoardId(url, id) {

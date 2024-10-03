@@ -1,6 +1,6 @@
 <script setup>
 import { styleStatus } from '@/lib/styleStatus';
-import { getDataById } from '@/lib/fetchMethod';
+import { getData } from '@/lib/fetchMethod';
 import { ref, onMounted, watch } from 'vue';
 import router from '@/router';
 import { useRoute } from 'vue-router';
@@ -13,7 +13,8 @@ const options = {
 }
 const item = ref()
 onMounted(async () => {
-  const fetch = await getDataById(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks`, route.params.detailId)
+  const fetch = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/tasks/${route.params.detailId}`)
+  console.log(fetch)
   fetch.createdOn = new Date(fetch.createdOn).toLocaleString('en-AU', options)
   fetch.updatedOn = new Date(fetch.updatedOn).toLocaleString('en-AU', options)
   item.value = await fetch
@@ -39,7 +40,7 @@ onMounted(async () => {
   <div v-if="item" class="fixed z-10 inset-0 overflow-y-auto">
     <div class="flex items-center justify-center h-screen">
       <div class="fixed inset-0 bg-gray-500 bg-opacity-75 backdrop-blur"></div>
-      <div class="relative bg-white p-10 rounded-lg shadow-xl w-[70%]">
+      <div class="itbkk-modal-task relative bg-white p-10 rounded-lg shadow-xl w-[70%]">
         <h1 class="itbkk-title text-2xl font-bold break-all">
           {{ item.title }}
         </h1>

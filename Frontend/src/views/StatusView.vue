@@ -16,7 +16,7 @@ const route = useRoute()
 const statusInBoard = ref({})
 const fetch = async () => {
 
-    const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`, false);
+    const response = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${route.params.boardId}/statuses`);
 
     if(response != null) {
         statusInBoard.value = response
@@ -34,10 +34,6 @@ const fetch = async () => {
                 statusInBoard.value[3].name = 'Done'
             }
         }
-    } else {
-        console.log('error')
-        router.push({ name: 'Login' });
-        return;
     }
 };
 
@@ -118,15 +114,15 @@ const isOwner = ref(route.meta.isOwner)
             </div>
             <!-- Add Status -->
             <button @click="router.push({ name: 'AddStatus' })"
-                    class="p-5 duration-300 rounded-md cursor-pointer itbkk-button-add disabled:cursor-not-allowed bg-slate-200 text-slate-500 hover:bg-slate-300 hover:text-slate-700"
+                    class="itbkk-button-add p-5 duration-300 rounded-md cursor-pointer disabled disabled:cursor-not-allowed bg-slate-200 text-slate-500 hover:bg-slate-300 hover:text-slate-700"
                     :disabled="!isOwner">
                     + Add New Status
             </button>
             <!-- Card below head of table -->
             <div v-for="status in statusInBoard" class="flex items-center justify-between w-full p-3 bg-white border rounded-lg shadow-md itbkk-item">
                 <div class="flex flex-col">
-                    <button :disabled="!isOwner" class="itbkk-button-edit disabled:cursor-not-allowed" @click="router.push({ name: 'EditStatusPopup', params: { editStatusId: status.id }})">Edit</button>
-                    <button :disabled="!isOwner" class="itbkk-button-delete disabled:cursor-not-allowed" @click="sendDeleteStatus(status)">Delete</button>
+                    <button :disabled="!isOwner" class="itbkk-button-edit disabled disabled:cursor-not-allowed" @click="router.push({ name: 'EditStatusPopup', params: { editStatusId: status.id }})">Edit</button>
+                    <button :disabled="!isOwner" class="itbkk-button-delete disabled disabled:cursor-not-allowed" @click="sendDeleteStatus(status)">Delete</button>
                 </div>
                 <p class="px-5 text-lg font-bold rounded itbkk-status-name" :style="{ backgroundColor: status.color }">{{ status.name }}</p>
                 <p>{{ status.description }}</p>
