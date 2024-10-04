@@ -26,6 +26,12 @@ const createNewBoard = async () => {
     if(result.status === 401) {
       router.push({ name: 'Login' })
     }
+    if(result.status === 403) {
+      window.alert('you do not have permission')
+    }
+    if(result.status === 500) {
+      window.alert('There is a problem. Please try again later.')
+    }
     if (result && result.status === 201) {
       closeHandle();
       router.push({ name: "Home", params: { boardId: result.data.id } });
