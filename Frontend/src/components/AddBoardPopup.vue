@@ -61,6 +61,7 @@ const createNewBoard = async () => {
               <div class="flex flex-col">
                 <p class="font-semibold">Name</p>
                 <input v-model="addName"
+                  :disabled="!addName"
                   class="itbkk-board-name border border-black rounded p-2 peer invalid:border-red-500 focus:outline-none"
                   type="text" required maxlength="120" />
                 <p class="hidden peer-invalid:block text-red-600 text-sm">

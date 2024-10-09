@@ -12,6 +12,9 @@ import LoginView from '@/views/LoginView.vue';
 import BoardView from '@/views/BoardView.vue';
 import AddBoardPopup from '@/components/AddBoardPopup.vue';
 
+// Lib
+import { selectToken } from '@/lib/selectToken';
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -76,6 +79,10 @@ async function checkBoardAccess(to, from, next) {
     const token = JSON.parse(localStorage.getItem('token'));
     const responseBoardDetail = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards/${to.params.boardId}`)
     const userPayload = JSON.parse(localStorage.getItem('payload'));
+
+    // Function select to use access token or refresh token 
+    selectToken()
+
     console.log('payload', userPayload)
     console.log('from fetch', responseBoardDetail)
 
