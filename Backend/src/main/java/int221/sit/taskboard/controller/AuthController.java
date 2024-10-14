@@ -10,6 +10,8 @@ import int221.sit.taskboard.services.JwtUserDetailsService;
 import int221.sit.taskboard.repositories.auth.UserRepository;
 import int221.sit.taskboard.services.UserService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -62,7 +65,7 @@ public class AuthController {
             }
 
             String token = jwtTokenUtil.generateToken(user);
-            String refreshToken = jwtTokenUtil.generateRefreshTokenFromToken(token);
+            String refreshToken = jwtTokenUtil.gerarRefreshToken(user);
             ResponseToken responseToken = new ResponseToken(token, refreshToken);
 
             return ResponseEntity.ok(responseToken);
@@ -73,15 +76,37 @@ public class AuthController {
     }
 
     @PostMapping("/token")
-    public ResponseEntity<Object> refreshToken(@RequestHeader("x-refresh-token") String refreshToken) {
+    public ResponseEntity<Object> refreshToken(@RequestHeader(value = "Authorization", required = false) String refreshToken) {
         try {
-            Claims claims = jwtTokenUtil.getAllClaimsFromToken(refreshToken);
-            String accessToken = jwtTokenUtil.generateTokenWithClaims(claims);
+            if (refreshToken == null || !refreshToken.startsWith("Bearer ")) {
+                throw new NotCreatedException("Refresh token is missing or invalid.");
+            }
+
+            String token = refreshToken.substring(7);
+
+            Claims claims = jwtTokenUtil.getAllClaimsFromToken(token);
+
+            if (claims.getExpiration().before(new Date())) {
+                throw new NotCreatedException("Refresh token has expired.");
+            }
+
+            String oid = claims.get("oid", String.class);
+            Users user = jwtUserDetailsService.getUserByOid(oid);
+
+            if (user == null) {
+                throw new ItemNotFoundException("User not found.");
+            }
+
+            String accessToken = jwtTokenUtil.generateTokenWithClaims(user);
 
             Map<String, Object> responseBody = new HashMap<>();
             responseBody.put("access_token", accessToken);
 
             return ResponseEntity.ok(responseBody);
+        } catch (ExpiredJwtException e) {
+            throw new NotCreatedException("Refresh token has expired.");
+        } catch (JwtException e) {
+            throw new NotCreatedException("Invalid refresh token.");
         } catch (Exception e) {
             throw new NotCreatedException("Refresh token failed!");
         }

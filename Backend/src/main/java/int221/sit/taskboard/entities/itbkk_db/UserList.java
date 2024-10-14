@@ -1,15 +1,11 @@
 package int221.sit.taskboard.entities.itbkk_db;
 
-import int221.sit.taskboard.entities.itbkk_shared.Users;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.time.ZonedDateTime;
-import java.util.Collection;
 import java.util.List;
 
 @Getter

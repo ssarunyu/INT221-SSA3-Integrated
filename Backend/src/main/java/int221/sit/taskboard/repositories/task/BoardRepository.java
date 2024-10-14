@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface BoardRepository extends JpaRepository<Boards, String> {
-    @Query("SELECT sb.board FROM SharedBoard sb WHERE sb.owner.userListId = :userId")
+    @Query("SELECT c.board FROM SharedBoard c WHERE c.owner.userListId = :userId")
     List<Boards> findAllByOwnerId(@Param("userId") String userId);
 
     Boards findByBoardId(String boardId);

@@ -6,10 +6,7 @@ import int221.sit.taskboard.DTO.boards.BoardUpdateResponse;
 import int221.sit.taskboard.Jwt.JwtTokenUtil;
 import int221.sit.taskboard.entities.itbkk_db.Boards;
 import int221.sit.taskboard.entities.itbkk_db.UserList;
-import int221.sit.taskboard.exceptions.AccessDeniedException;
-import int221.sit.taskboard.exceptions.BadRequestException;
-import int221.sit.taskboard.exceptions.ItemNotFoundException;
-import int221.sit.taskboard.exceptions.NotCreatedException;
+import int221.sit.taskboard.exceptions.*;
 import int221.sit.taskboard.repositories.task.BoardRepository;
 import int221.sit.taskboard.repositories.task.UserListRepository;
 import int221.sit.taskboard.services.BoardService;
@@ -25,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/v3")
+@RequestMapping("/v3/boards")
 @CrossOrigin(origins = "http://localhost:5173")
 public class BoardController {
 
@@ -44,7 +41,7 @@ public class BoardController {
     @Autowired
     private BoardRepository boardRepository;
 
-    @GetMapping("/boards")
+    @GetMapping("")
     public ResponseEntity<List<BoardDTO>> getAllBoards(@RequestHeader(value = "Authorization", required = false) String token) {
 
         if (token != null && token.startsWith("Bearer ")) {
@@ -59,7 +56,7 @@ public class BoardController {
     }
 
 
-    @GetMapping("/boards/{board_id}")
+    @GetMapping("/{board_id}")
     public ResponseEntity<Object> getBoardById(@PathVariable("board_id") String boardId, @RequestHeader(value = "Authorization", required = false) String token) {
 
         BoardDTO boardDTO = boardService.getBoardById(boardId);
@@ -95,7 +92,7 @@ public class BoardController {
 
     }
 
-    @PostMapping("/boards")
+    @PostMapping("")
     public ResponseEntity<BoardForCreated> createBoard(@Valid @RequestBody(required = false) BoardForCreated bfc, HttpServletRequest request) {
         if (bfc == null) {
             throw new BadRequestException("Please fill in the board information completely!");
@@ -115,7 +112,7 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdBoard);
     }
 
-    @PatchMapping("/boards/{board_id}")
+    @PatchMapping("/{board_id}")
     public ResponseEntity<Object> updateBoardVisibility(
             @PathVariable("board_id") String boardId,
             @RequestBody(required = false) Map<String, String> requestBody,

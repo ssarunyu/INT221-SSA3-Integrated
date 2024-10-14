@@ -21,10 +21,12 @@ public class JwtTokenUtil implements Serializable {
     private String SECRET_KEY;
     SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
+    // กำหนดอายุ access token เป็น 30 นาที
     @Value("#{${jwt.max-token-interval-hour}*60*60*1000}")
     private int JWT_TOKEN_VALIDITY;
 
-    @Value("#{${jwt.refresh-token-interval-hour}*60*60*1000}") // กำหนดอายุ refresh token เป็น 24 ชั่วโมง
+    // กำหนดอายุ refresh token เป็น 24 ชั่วโมง
+    @Value("#{${jwt.refresh-token-interval-hour}*60*60*1000}")
     private int JWT_REFRESH_TOKEN_VALIDITY;
 
     public String getUsernameFromToken(String token) {
@@ -81,19 +83,15 @@ public class JwtTokenUtil implements Serializable {
     }
 
     // Method เพื่อสร้าง refresh token โดยใช้ข้อมูลจาก token หลัก
-    public String generateRefreshTokenFromToken(String token) {
-        // ดึงข้อมูลจาก token หลัก
-        Claims claims = getAllClaimsFromToken(token);
-        // ตรวจสอบว่าหมดอายุหรือไม่ (ในที่นี้จะยังใช้ได้แม้หมดอายุ)
-        // ไม่จำเป็นต้องเช็คว่า token หลักหมดอายุแล้วหรือไม่ เนื่องจากเราต้องการใช้ข้อมูลภายใน
-        // ใช้ข้อมูลที่ดึงมาเพื่อสร้าง refresh token
-        Map<String, Object> refreshClaims = new HashMap<>(claims);
+    public String gerarRefreshToken(Users userInfo) {
+        Map<String, Object> refreshClaims = new HashMap<>();
+        refreshClaims.put("oid", userInfo.getUserId());
 
         // ตั้งค่า expired ของ refresh token เป็น 24 ชั่วโมง
-        return doGenerateRefreshToken(refreshClaims, claims.getSubject());
+        return doGenerateRefreshToken(refreshClaims);
     }
 
-    private String doGenerateRefreshToken(Map<String, Object> claims, String name) {
+    private String doGenerateRefreshToken(Map<String, Object> claims) {
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT")
                 .setClaims(claims)
@@ -104,13 +102,22 @@ public class JwtTokenUtil implements Serializable {
                 .compact();
     }
 
-    public String generateTokenWithClaims(Claims claims) {
-        Map<String, Object> tokenClaims = new HashMap<>();
-        tokenClaims.put("sub", claims.getSubject());
-        tokenClaims.put("oid", claims.get("oid"));
-        tokenClaims.put("iss", claims.getIssuer());
-        tokenClaims.put("email", claims.get("email"));
-        return doGenerateToken(tokenClaims);
+    public String generateTokenWithClaims(Users userInfo) {
+        Map<String, Object> newClaims = new HashMap<>();
+        newClaims.put("oid", userInfo.getUserId());
+        newClaims.put("name", userInfo.getName());
+        newClaims.put("email", userInfo.getEmail());
+        newClaims.put("role", userInfo.getRole());
+
+
+        return Jwts.builder()
+                .setHeaderParam("typ", "JWT")
+                .setClaims(newClaims)
+                .setIssuer("https://intproj23.sit.kmutt.ac.th/ssa3/")
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
+                .signWith(signatureAlgorithm, SECRET_KEY)
+                .compact();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {

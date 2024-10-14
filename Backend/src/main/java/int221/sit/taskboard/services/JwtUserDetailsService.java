@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
@@ -41,6 +42,13 @@ public class JwtUserDetailsService implements UserDetailsService {
 
         return new AuthUser(user.getUsername(), user.getPassword());
     }
+    public Users getUserByOid(String oid) {
+        Optional<Users> userOptional = userRepository.findByUserId(oid);
 
-
+        if (userOptional.isPresent()) {
+            return userOptional.get();
+        } else {
+            throw new UsernameNotFoundException("User not found with oid: " + oid);
+        }
+    }
 }

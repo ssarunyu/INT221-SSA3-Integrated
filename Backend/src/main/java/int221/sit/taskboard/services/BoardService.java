@@ -144,24 +144,21 @@ public class BoardService {
     }
 
     public BoardDTO getBoardByIdAndUser(String boardId, String userId) {
-        // ค้นหา board ตาม boardId
+
         Boards board = boardRepository.findByBoardId(boardId);
         if (board == null) {
-            return null; // ถ้าไม่มี board ให้คืนค่า null
+            return null;
         }
-        // ค้นหา sharedBoard ตาม board
+
         SharedBoard sharedBoard = sharedBoardRepository.findByBoard(board);
-        // ตรวจสอบว่า sharedBoard มีอยู่และ owner ตรงกับ userId หรือไม่
         if (sharedBoard == null || !sharedBoard.getOwner().getUserListId().equals(userId)) {
-            return null; // ถ้าไม่มี sharedBoard หรือ owner ไม่ตรงกับ userId ให้คืนค่า null
+            return null;
         }
-        // แปลง Boards เป็น BoardDTO
+
         BoardDTO boardDTO = modelMapper.map(board, BoardDTO.class);
-        // แปลง owner (UserList) เป็น UserListResponse และตั้งค่าให้กับ boardDTO
         UserList owner = sharedBoard.getOwner();
         UserListResponse ownerResponse = modelMapper.map(owner, UserListResponse.class);
         boardDTO.setOwner(ownerResponse);
-        // คืนค่า BoardDTO
         return boardDTO;
     }
 
@@ -169,7 +166,6 @@ public class BoardService {
         // ดึงข้อมูลบอร์ดจาก boardId โดยไม่ต้องกรอง userId
         Optional<Boards> optionalBoard = boardRepository.findById(boardId);
 
-        // ถ้าไม่มีบอร์ดให้ throw ข้อผิดพลาด
         if (!optionalBoard.isPresent()) {
             throw new ItemNotFoundException("Board not found !!!");
         }
@@ -214,5 +210,4 @@ public class BoardService {
         // บันทึก entity หลังจากทำการอัปเดต
         return boardRepository.save(boardEntity);
     }
-
 }

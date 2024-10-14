@@ -20,4 +20,19 @@ public class SharedBoard {
     @ManyToOne
     @JoinColumn(name = "boardId", nullable = false)
     private Boards board;
+
+//    @Column(name = "added_on")
+//    private ZonedDateTime addedOn;
+//
+//    @NotNull
+//    @Enumerated(EnumType.STRING)
+//    @Column(name = "access_right", nullable = false)
+//    private AccessRight accessRight = AccessRight.READ;
+//
+//    public enum AccessRight {
+//        READ,
+//        WRITE
+//    }
+
+
 }
