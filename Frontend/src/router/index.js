@@ -149,10 +149,17 @@ function isTokenExpired(payload) {
 //   if (token && payload) {
 //     // Check if token has expired
 //     if (isTokenExpired(payload)) {
-//       localStorage.removeItem('token');
-//       localStorage.removeItem('payload');
-//       next({ name: 'Login' }); // If token expired, go to login
-//       return;
+//       console.log('use refresh')
+//       // Set refresh to access when token expired
+//       localStorage.setItem('token', JSON.stringify(
+//         {
+//           access_token: token.refresh_token
+//         }
+//       ))
+//       // localStorage.removeItem('token');
+//       // localStorage.removeItem('payload');
+//       // next({ name: 'Login' }); // If token expired, go to login
+//       // return;
 //     }
 //   }
 

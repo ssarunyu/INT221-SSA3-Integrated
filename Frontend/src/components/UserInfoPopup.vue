@@ -7,7 +7,7 @@ const userLogin = JSON.parse(localStorage.getItem("payload"));
 const logout = () => {
   localStorage.removeItem("payload");
   localStorage.removeItem("token");
-  router.push('/login');
+  router.push({ name: 'Login' });
 };
 
 </script>

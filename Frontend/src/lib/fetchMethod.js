@@ -88,7 +88,11 @@ async function getData(url) {
             headers: tokenHeader
         })
         if(response.status === 401) {
-            router.push({ name: 'Login' })
+            if(token.refresh_token) {
+                localStorage.setItem('token', JSON.stringify({ access_token: token.refresh_token }))
+            } else {
+                router.push({ name: 'Login' })
+            }
         }
         // Auth but not owner of that board
         if(response.status === 403) {
