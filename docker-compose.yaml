@@ -29,6 +29,9 @@ services:
     image: nginx:alpine
     volumes:
       - ./Proxy/default.conf:/etc/nginx/conf.d/default.conf
+      - ./Proxy/fullchain.pem:/etc/nginx/ssl/fullchain.pem
+      - ./Proxy/privkey.pem:/etc/nginx/ssl/privkey.pem
+      - ./Proxy/dhparam-2048.pem:/etc/nginx/ssl/dhparam-2048.pem
     ports:
       - "80:80"
     depends_on:
