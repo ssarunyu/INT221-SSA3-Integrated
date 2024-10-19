@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v3/boards")
-@CrossOrigin(origins = { "http://localhost:5173", "https://localhost:5173" } )
+@CrossOrigin(origins = { "http://localhost:5173", "https://intproj23.sit.kmutt.ac.th/"} )
 public class CollaboratorController {
     @Autowired
     private CollaboratorService collaboratorService;
