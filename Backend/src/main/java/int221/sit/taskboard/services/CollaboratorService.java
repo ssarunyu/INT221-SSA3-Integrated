@@ -35,9 +35,9 @@ public class CollaboratorService {
 
         List<CollaboratorResponseDTO> collaboratorList = collaborators.stream()
                 .map(collaborator -> new CollaboratorResponseDTO(
-                        collaborator.getOwner().getUserListId(),
-                        collaborator.getOwner().getName(),
-                        collaborator.getOwner().getEmail(),
+                        collaborator.getUser().getUserListId(),
+                        collaborator.getUser().getName(),
+                        collaborator.getUser().getEmail(),
                         collaborator.getAccessRight(),
                         collaborator.getAddedOn()))
                 .collect(Collectors.toList());
@@ -59,9 +59,9 @@ public class CollaboratorService {
         }
 
         CollaboratorResponseDTO response = new CollaboratorResponseDTO(
-                collaborator.getOwner().getUserListId(),
-                collaborator.getOwner().getName(),
-                collaborator.getOwner().getEmail(),
+                collaborator.getUser().getUserListId(),
+                collaborator.getUser().getName(),
+                collaborator.getUser().getEmail(),
                 collaborator.getAccessRight(),
                 collaborator.getAddedOn());
 

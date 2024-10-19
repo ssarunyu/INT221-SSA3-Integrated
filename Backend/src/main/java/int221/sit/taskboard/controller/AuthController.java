@@ -31,7 +31,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = { "http://localhost:5173", "https://localhost:5173" } )
 public class AuthController {
 
     @Autowired

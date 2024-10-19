@@ -18,7 +18,7 @@ public class Collaborator {
 
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
-    private UserList owner;
+    private UserList user;
 
     @ManyToOne
     @JoinColumn(name = "boardId", nullable = false)

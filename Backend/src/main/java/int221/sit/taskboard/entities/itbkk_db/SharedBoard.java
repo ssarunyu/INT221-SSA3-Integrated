@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "shared_boards")
+@Table(name = "personal_boards")
 public class SharedBoard {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

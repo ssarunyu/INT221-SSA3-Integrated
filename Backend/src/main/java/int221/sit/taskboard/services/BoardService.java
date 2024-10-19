@@ -4,24 +4,20 @@ import int221.sit.taskboard.DTO.boards.BoardDTO;
 import int221.sit.taskboard.DTO.boards.BoardForCreated;
 import int221.sit.taskboard.DTO.UserListResponse;
 import int221.sit.taskboard.Jwt.JwtTokenUtil;
-import int221.sit.taskboard.entities.itbkk_db.Boards;
-import int221.sit.taskboard.entities.itbkk_db.SharedBoard;
-import int221.sit.taskboard.entities.itbkk_db.StatusList;
-import int221.sit.taskboard.entities.itbkk_db.UserList;
+import int221.sit.taskboard.entities.itbkk_db.*;
 import int221.sit.taskboard.exceptions.BadRequestException;
 import int221.sit.taskboard.exceptions.ItemNotFoundException;
 import int221.sit.taskboard.repositories.auth.UserRepository;
-import int221.sit.taskboard.repositories.task.BoardRepository;
-import int221.sit.taskboard.repositories.task.SharedBoardRepository;
-import int221.sit.taskboard.repositories.task.StatusListRepository;
-import int221.sit.taskboard.repositories.task.UserListRepository;
+import int221.sit.taskboard.repositories.task.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -48,6 +44,9 @@ public class BoardService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private CollaboratorRepository collaboratorRepository;
 
     @Autowired
     ModelMapper modelMapper;
@@ -111,11 +110,22 @@ public class BoardService {
         return resultDTO;
     }
 
-    public List<BoardDTO> getAllBoards(String userId) {
+    public Map<String, List<BoardDTO>> getPersonalAndCollabBoards(String userId) {
         List<Boards> ownedBoards = boardRepository.findAllBoardByUserId(userId);
-        return ownedBoards.stream()
+        List<BoardDTO> personalBoards = ownedBoards.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+
+        List<Collaborator> collaboratorBoards = collaboratorRepository.findAllByUser_UserListId(userId);
+        List<BoardDTO> collabBoards = collaboratorBoards.stream()
+                .map(collaborator -> convertToDTO(collaborator.getBoard()))
+                .collect(Collectors.toList());
+
+        Map<String, List<BoardDTO>> boardMap = new HashMap<>();
+        boardMap.put("personalBoards", personalBoards);
+        boardMap.put("collabBoards", collabBoards);
+
+        return boardMap;
     }
 
     private BoardDTO convertToDTO(Boards board) {

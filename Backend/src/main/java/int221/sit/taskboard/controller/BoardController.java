@@ -23,7 +23,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/v3/boards")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = { "http://localhost:5173", "https://localhost:5173" } )
 public class BoardController {
 
     @Autowired
@@ -42,12 +42,13 @@ public class BoardController {
     private BoardRepository boardRepository;
 
     @GetMapping("")
-    public ResponseEntity<List<BoardDTO>> getAllBoards(@RequestHeader(value = "Authorization", required = false) String token) {
+    public ResponseEntity<Map<String, List<BoardDTO>>> getAllBoards(@RequestHeader(value = "Authorization", required = false) String token) {
 
         if (token != null && token.startsWith("Bearer ")) {
             String jwtToken = token.substring(7);
             String userId = jwtTokenUtil.getUserIdFromToken(jwtToken);
-            List<BoardDTO> boards = boardService.getAllBoards(userId);
+
+            Map<String, List<BoardDTO>> boards = boardService.getPersonalAndCollabBoards(userId);
 
             return ResponseEntity.ok(boards);
         } else {
