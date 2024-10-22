@@ -23,6 +23,9 @@
   try {
     boards.value = await getData(`${import.meta.env.VITE_BASE_URL}/v3/boards`);
 
+    // Debug data type
+    console.log('board.value', typeof boards.value, boards.value)
+
     // Redirect only if just logged in and if we're not coming back from 'Home'
     if (boards.value.length > 0 && justLoggedIn.value === true) {
       const latestBoard = boards.value.sort(
