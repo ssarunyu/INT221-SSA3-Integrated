@@ -27,13 +27,8 @@
     console.log('board.value', typeof boards.value, boards.value)
 
     // Redirect only if just logged in and if we're not coming back from 'Home'
-    if (boards.value.length > 0 && justLoggedIn.value === true) {
-      const latestBoard = boards.value.sort(
-        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
-      )[0];
-
-      router.replace({ name: "Home", params: { boardId: latestBoard.id } });
-      justLoggedIn.value = false;
+    if (boards.value.length > 0) {
+      router.push({ name: 'Home', params: { boardId: boards.value.personalBoards[0] } })
     }
   } catch (error) {
     console.error("Error fetching boards:", error);

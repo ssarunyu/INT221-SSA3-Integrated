@@ -168,6 +168,7 @@ async function getDataById(url, id) {
 
 async function postData(url, task) {
     const token = JSON.parse(localStorage.getItem('token'))
+    console.log('token in post med', token)
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -177,6 +178,13 @@ async function postData(url, task) {
             },
             body: JSON.stringify(task)
         })
+        if(response.status === 401) {
+            if(token.refresh_token) {
+                localStorage.setItem('token', JSON.stringify({ access_token: token.refresh_token }))
+            } else {
+                router.push({ name: 'Login' })
+            }
+        }
         if(response.status === 401) {
             localStorage.removeItem('token')
             localStorage.removeItem('payload')
