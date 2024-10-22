@@ -3,9 +3,6 @@
 -- Model: New Model    Version: 1.0
 -- MySQL Workbench Forward Engineering
 
--- Grant Privileges to 'dev1'
-GRANT ALL PRIVILEGES ON *.* TO 'dev1'@'%';
-
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
@@ -99,12 +96,14 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `itbkk_db`.`shared_boards`
+-- Table `itbkk_db`.`personal_boards`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `itbkk_db`.`shared_boards` (
+CREATE TABLE IF NOT EXISTS `itbkk_db`.`personal_boards` (
   `sharedId` INT NOT NULL auto_increment,
   `boardId` VARCHAR(10) NOT NULL,
   `ownerOid` CHAR(36) NOT NULL,
+  `access_right` ENUM('READ', 'WRITE') NOT NULL DEFAULT 'READ',
+  `added_on` DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`sharedId`, `boardId`, `ownerOid`),
   INDEX `fk_boards_has_users_store_users_store1_idx` (`ownerOid` ASC) VISIBLE,
   INDEX `fk_boards_has_users_store_boards1_idx` (`boardId` ASC) VISIBLE,
@@ -117,6 +116,27 @@ CREATE TABLE IF NOT EXISTS `itbkk_db`.`shared_boards` (
     FOREIGN KEY (`ownerOid`)
     REFERENCES `itbkk_db`.`users` (`oid`)
     ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `itbkk_db`.`collaborators` (
+  `collabId` INT NOT NULL auto_increment,
+  `boardId` VARCHAR(10) NOT NULL,
+  `userId` CHAR(36) NOT NULL,
+  `access_right` ENUM('READ', 'WRITE') NOT NULL DEFAULT 'READ',
+  `added_on` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`collabId`),
+  INDEX `fk_collaborators_boards_idx` (`boardId` ASC),
+  INDEX `fk_collaborators_users_idx` (`userId` ASC),
+  CONSTRAINT `fk_collaborators_boards`
+    FOREIGN KEY (`boardId`)
+    REFERENCES `itbkk_db`.`boards` (`boardId`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_collaborators_users`
+    FOREIGN KEY (`userId`)
+    REFERENCES `itbkk_db`.`users` (`oid`)
+    ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
