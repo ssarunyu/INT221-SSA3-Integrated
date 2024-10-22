@@ -116,7 +116,7 @@ onMounted(async () => {
 
     <!-- CARDS SECTION -->
     <div class="flex flex-wrap items-center justify-center gap-5 mt-5">
-      <template v-for="board in boards" :key="board.id">
+      <template v-for="board in boards.personalBoards" :key="board.id">
         <div
           class="w-1/4 duration-300 bg-white rounded-lg shadow-lg cursor-pointer hover:bg-slate-50"
         >
