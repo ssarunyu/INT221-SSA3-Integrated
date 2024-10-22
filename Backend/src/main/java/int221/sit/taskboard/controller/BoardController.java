@@ -23,7 +23,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/v3/boards")
-@CrossOrigin(origins = { "http://localhost:5173", "https://intproj23.sit.kmutt.ac.th/" } )
+@CrossOrigin(origins = { "http://localhost:5173", "https://intproj23.sit.kmutt.ac.th" } )
 public class BoardController {
 
     @Autowired
